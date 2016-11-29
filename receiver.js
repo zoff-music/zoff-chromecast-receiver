@@ -119,7 +119,6 @@ window.addEventListener('load', function() {
 
 function durationSetter(){
   duration = player.getDuration();
-  console.log(duration);
   dMinutes = Math.floor(duration / 60);
   dSeconds = duration - dMinutes * 60;
   currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
@@ -127,6 +126,7 @@ function durationSetter(){
       currDurr = duration;
   minutes = Math.floor(currDurr / 60);
   seconds = currDurr - (minutes * 60);
+  document.getElementById("title").innerHTML = player.getVideoData().title;
   document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
   setTimeout(durationSetter, 1000);
 }
@@ -164,7 +164,6 @@ function onPlayerReady() {
 
 function onPlayerStateChange(event) {
 	//channel.send({'event':'stateChange','message':event.data});
-  console.log(event);
 	if (event.data==YT.PlayerState.ENDED) {
 		customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
     //customMessageBus.send("urn:x-cast:zoff.no", {type: -1, videoId: videoId})
