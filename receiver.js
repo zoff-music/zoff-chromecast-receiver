@@ -129,7 +129,7 @@ function durationSetter(){
     seconds = currDurr - (minutes * 60);
     document.getElementById("title").innerHTML = player.getVideoData().title;
     document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
-  }catch(){}
+  }catch(err){}
   setTimeout(durationSetter, 1000);
 }
 
