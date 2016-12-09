@@ -169,7 +169,12 @@ function onPlayerStateChange(event) {
 	if (event.data==YT.PlayerState.ENDED) {
 		customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
     //customMessageBus.send("urn:x-cast:zoff.no", {type: -1, videoId: videoId})
-	} else if(event.data == 1){
+
+  } else if(event.data == 5 || event.data == 100 ||
+              event.data == 101 || event.data == 150)
+          {
+            customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+  } else if(event.data == 1){
     loading = false;
     if(seekTo){
       player.seekTo(seekTo);
