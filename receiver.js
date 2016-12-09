@@ -127,7 +127,6 @@ function durationSetter(){
         currDurr = duration;
     minutes = Math.floor(currDurr / 60);
     seconds = currDurr - (minutes * 60);
-    document.getElementById("title").innerHTML = player.getVideoData().title;
     document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
   }catch(err){}
   setTimeout(durationSetter, 1000);
@@ -141,7 +140,7 @@ function onYouTubeIframeAPIReady() {
   player = new YT.Player('player', {
 	    height: 562,
 	    width: 1000,
-			playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3" },
+			playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "1"},
       events: {
 				'onReady': onPlayerReady,
 				'onStateChange': onPlayerStateChange
