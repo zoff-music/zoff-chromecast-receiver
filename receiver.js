@@ -118,16 +118,18 @@ window.addEventListener('load', function() {
 });
 
 function durationSetter(){
-  duration = player.getDuration();
-  dMinutes = Math.floor(duration / 60);
-  dSeconds = duration - dMinutes * 60;
-  currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
-  if(currDurr > duration)
-      currDurr = duration;
-  minutes = Math.floor(currDurr / 60);
-  seconds = currDurr - (minutes * 60);
-  document.getElementById("title").innerHTML = player.getVideoData().title;
-  document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
+  try{
+    duration = player.getDuration();
+    dMinutes = Math.floor(duration / 60);
+    dSeconds = duration - dMinutes * 60;
+    currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
+    if(currDurr > duration)
+        currDurr = duration;
+    minutes = Math.floor(currDurr / 60);
+    seconds = currDurr - (minutes * 60);
+    document.getElementById("title").innerHTML = player.getVideoData().title;
+    document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
+  }catch(){}
   setTimeout(durationSetter, 1000);
 }
 
