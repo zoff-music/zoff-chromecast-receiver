@@ -144,7 +144,8 @@ function onYouTubeIframeAPIReady() {
 			playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
       events: {
 				'onReady': onPlayerReady,
-				'onStateChange': onPlayerStateChange
+				'onStateChange': onPlayerStateChange,
+        'onError': errorHandler
       }
   });
 }
@@ -164,16 +165,19 @@ function onPlayerReady() {
   //channel.send({'event':'iframeApiReady','message':'ready'});
 }
 
+function errorHandler(event){
+  if(event.data == 5 || event.data == 100 ||
+    event.data == 101 || event.data == 150){
+      customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+  }
+}
+
 function onPlayerStateChange(event) {
 	//channel.send({'event':'stateChange','message':event.data});
 	if (event.data==YT.PlayerState.ENDED) {
 		customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
     //customMessageBus.send("urn:x-cast:zoff.no", {type: -1, videoId: videoId})
 
-  } else if(event.data == 5 || event.data == 100 ||
-              event.data == 101 || event.data == 150)
-          {
-            customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
   } else if(event.data == 1){
     loading = false;
     if(seekTo){
