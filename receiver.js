@@ -15,8 +15,11 @@ customMessageBus.onMessage = function(event) {
     case "loadVideo":
       if(ytReady){
         loading = true;
+        prev_video = videoId;
         videoId = json_parsed.videoId;
-        player.loadVideoById(json_parsed.videoId);
+        if(prev_video != videoId){
+          player.loadVideoById(json_parsed.videoId);
+        }
         if(json_parsed.seekTo){
           player.seekTo(json_parsed.seekTo);
         }
