@@ -4,6 +4,7 @@
 		<script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js">		</script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="receiver.js"></script>
+		<title>Zöff Chromecast Receiver</title>
 		<style>
 			body{
 				background: black;
@@ -78,6 +79,165 @@
 				padding-left:10px;
 			}
 
+			/*width: 100%;*/
+			@-webkit-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@-webkit-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@-moz-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@-ms-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@-moz-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@-webkit-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@-o-keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			@keyframes uil-ring-anim {
+			 0% {
+				 -ms-transform: rotate(0deg);
+				 -moz-transform: rotate(0deg);
+				 -webkit-transform: rotate(0deg);
+				 -o-transform: rotate(0deg);
+				 transform: rotate(0deg);
+			 }
+			 100% {
+				 -ms-transform: rotate(360deg);
+				 -moz-transform: rotate(360deg);
+				 -webkit-transform: rotate(360deg);
+				 -o-transform: rotate(360deg);
+				 transform: rotate(360deg);
+			 }
+			}
+			.uil-ring-css {
+			 background: none;
+			 position: relative;
+			 width: 200px;
+			 height: 200px;
+			 transform: scale(0.7);
+			 position: absolute;
+			 left: 0;
+			 right: 0;
+			 margin: auto;
+			 top: 70%;
+			}
+			.uil-ring-css > div {
+			 position: absolute;
+			 display: block;
+			 width: 160px;
+			 height: 160px;
+			 top: 20px;
+			 left: 20px;
+			 border-radius: 80px;
+			 box-shadow: 0 6px 0 0 #ffffff;
+			 -ms-animation: uil-ring-anim 1s linear infinite;
+			 -moz-animation: uil-ring-anim 1s linear infinite;
+			 -webkit-animation: uil-ring-anim 1s linear infinite;
+			 -o-animation: uil-ring-anim 1s linear infinite;
+			 animation: uil-ring-anim 1s linear infinite;
+			}
+
+
+
 		</style>
 	</head>
 	<body>
@@ -88,6 +248,7 @@
 		    <div id="next_title"><div id="duration">00:00/00:00</div><div id="next_title_content">Coolest song</div></div>
 		  </div>
 			<img id="zoff-logo" class="center" src="squareicon_small.png" alt="logo">
+			<div class="uil-ring-css" style="transform:scale(0.7);"><div></div></div>
 			<div id="player" class="hide"></div>
 		</div>
 	</body>
