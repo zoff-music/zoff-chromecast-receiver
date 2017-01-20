@@ -25,6 +25,7 @@ customMessageBus.onMessage = function(event) {
         }
         if(initial){
           $("#player").toggleClass("hide");
+          $(".uil-ring-css").toggleCass("hide");
           $("#zoff-logo").toggleClass("center");
           $("#zoff-logo").toggleClass("lower_left");
           initial = false;
