@@ -1,11 +1,11 @@
-var ytReady = false;
-var videoId = null;
-var seekTo = null;
-var nextVideo = null;
-var loading = false;
-var initial = true;
+var ytReady     = false;
+var videoId     = null;
+var seekTo      = null;
+var nextVideo   = null;
+var loading     = false;
+var initial     = true;
 
-cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
+//cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.no');
@@ -87,12 +87,7 @@ appConfig.statusText = 'Ready to play';
  * @type {number|undefined}
  **/
 // 100 minutes for testing, use default 10sec in prod by not setting this value
-appConfig.maxInactivity = 6000;
-/**
- * Initializes the system manager. The application should call this method when
- * it is ready to start receiving messages, typically after registering
- * to listen for the events it is interested on.
- */
+//appConfig.maxInactivity = 6000;
 
 window.castReceiverManager.onSenderDisconnected = function(event) {
   if(window.castReceiverManager.getSenders().length == 0 &&
@@ -101,19 +96,6 @@ window.castReceiverManager.onSenderDisconnected = function(event) {
   }
 }
 
-
-/*
-var receiver = new cast.receiver.Receiver("E6856E24", ["no.zoff.customcast"],"",5);
-var ytChannelHandler = new cast.receiver.ChannelHandler("no.zoff.customcast");
-var nextVideo;
-ytChannelHandler.addChannelFactory(receiver.createChannelFactory("no.zoff.customcast"));
-ytChannelHandler.addEventListener(
-  cast.receiver.Channel.EventType.MESSAGE,
-	onMessage.bind(this)
-);
-
-receiver.start();
-*/
 window.addEventListener('load', function() {
   var tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
@@ -166,7 +148,6 @@ function onPlayerReady() {
       seekTo = null;
     }
   }
-  //channel.send({'event':'iframeApiReady','message':'ready'});
 }
 
 function errorHandler(event){
@@ -177,10 +158,8 @@ function errorHandler(event){
 }
 
 function onPlayerStateChange(event) {
-	//channel.send({'event':'stateChange','message':event.data});
 	if (event.data==YT.PlayerState.ENDED) {
 		customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
-    //customMessageBus.send("urn:x-cast:zoff.no", {type: -1, videoId: videoId})
 
   } else if(event.data == 1){
     loading = false;
