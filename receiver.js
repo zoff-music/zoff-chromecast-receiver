@@ -8,7 +8,7 @@ var initial     = true;
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.no');
+var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
 customMessageBus.onMessage = function(event) {
   var json_parsed = JSON.parse(event.data);
   switch(json_parsed.type){

@@ -1,3 +1,3 @@
 # zoff-chromecast-receiver
 
-Custom chromecast receiver for Zöff
+Custom chromecast receiver for Zoff
