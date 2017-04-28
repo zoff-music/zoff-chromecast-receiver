@@ -115,7 +115,7 @@ function durationSetter(){
     minutes = Math.floor(currDurr / 60);
     seconds = currDurr - (minutes * 60);
 
-    if(currDurr > 15 && !hidden_info) {
+    if(currDurr > 15 && !hidden_info && duration - currDurr > 15) {
       hidden_info = true;
       $("#title").fadeOut();
       $("#next_song").fadeOut();
