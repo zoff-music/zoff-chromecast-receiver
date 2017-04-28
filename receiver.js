@@ -4,6 +4,7 @@ var seekTo      = null;
 var nextVideo   = null;
 var loading     = false;
 var initial     = true;
+var hidden_info = false;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
@@ -113,6 +114,16 @@ function durationSetter(){
         currDurr = duration;
     minutes = Math.floor(currDurr / 60);
     seconds = currDurr - (minutes * 60);
+
+    if(currDurr > 15 && !hidden_info) {
+      hidden_info = true;
+      $("#title").fadeOut();
+      $("#next_song").fadeOut();
+    } else if(duration - currDurr <= 15 && hidden_info) {
+      hidden_info = false;
+      $("#title").fadeIn();
+      $("#next_song").fadeIn();
+    }
     document.getElementById("title_cont").innerHTML = player.getVideoData().title;
     document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
   }catch(err){}
