@@ -5,6 +5,7 @@ var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
+var started = false;
 var hide_timer;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
@@ -33,12 +34,14 @@ customMessageBus.onMessage = function(event) {
           initial = false;
           durationSetter();
         }
-        clearTimeout(hide_timer);
-        hide_timer = setTimeout(function() {
-          hidden_info = true;
-          $("#title").fadeOut();
-          $("#next_song").fadeOut();
-        }, 15000);
+        if(started) {
+          clearTimeout(hide_timer);
+          hide_timer = setTimeout(function() {
+            hidden_info = true;
+            $("#title").fadeOut();
+            $("#next_song").fadeOut();
+          }, 15000);
+        }
       } else {
         videoId = json_parsed.videoId;
         if(json_parsed.seekTo){
@@ -188,6 +191,16 @@ function onPlayerStateChange(event) {
     if(seekTo){
       player.seekTo(seekTo);
       seekTo = null;
+    }
+
+    if(started == false) {
+      started = true;
+      clearTimeout(hide_timer);
+      hide_timer = setTimeout(function() {
+        hidden_info = true;
+        $("#title").fadeOut();
+        $("#next_song").fadeOut();
+      }, 15000);
     }
   }
 }
