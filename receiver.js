@@ -70,6 +70,13 @@ customMessageBus.onMessage = function(event) {
       $("#next_title_content").html("Next Song:<br>" + nextTitle);
       $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
       $("#next_song").css("display", "flex");
+
+      clearTimeout(hide_timer);
+      hide_timer = setTimeout(function() {
+        hidden_info = true;
+        $("#title").fadeOut();
+        $("#next_song").fadeOut();
+      }, 15000);
       break;
   }
 }
