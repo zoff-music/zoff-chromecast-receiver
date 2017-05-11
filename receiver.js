@@ -14,6 +14,7 @@ window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
 customMessageBus.onMessage = function(event) {
   var json_parsed = JSON.parse(event.data);
+  console.log(event);
   switch(json_parsed.type){
     case "loadVideo":
       if(ytReady){
