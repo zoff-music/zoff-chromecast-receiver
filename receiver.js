@@ -6,6 +6,13 @@ var loading     = false;
 var initial     = true;
 var hidden_info = false;
 var started = false;
+var mobile_hack = false;
+var channel;
+var guid;
+var adminpass;
+var userpass;
+var socket_id;
+var socket;
 var hide_timer;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
@@ -17,36 +24,38 @@ customMessageBus.onMessage = function(event) {
   console.log(event);
   switch(json_parsed.type){
     case "loadVideo":
-      if(ytReady){
-        loading = true;
-        prev_video = videoId;
-        videoId = json_parsed.videoId;
-        if(prev_video != videoId){
-          player.loadVideoById(json_parsed.videoId);
-        }
-        if(json_parsed.seekTo){
-          player.seekTo(json_parsed.seekTo);
-        }
-        if(initial){
-          $("#player").toggleClass("hide");
-          $(".uil-ring-css").toggleClass("hide");
-          $("#zoff-logo").toggleClass("center");
-          $("#zoff-logo").toggleClass("lower_left");
-          initial = false;
-          durationSetter();
-        }
-        if(started) {
-          clearTimeout(hide_timer);
-          hide_timer = setTimeout(function() {
-            hidden_info = true;
-            $("#title").fadeOut();
-            $("#next_song").fadeOut();
-          }, 15000);
-        }
-      } else {
-        videoId = json_parsed.videoId;
-        if(json_parsed.seekTo){
-          seekTo = json_parsed.seekTo;
+      if(!mobile_hack) {
+        if(ytReady){
+          loading = true;
+          prev_video = videoId;
+          videoId = json_parsed.videoId;
+          if(prev_video != videoId){
+            player.loadVideoById(json_parsed.videoId);
+          }
+          if(json_parsed.seekTo){
+            player.seekTo(json_parsed.seekTo);
+          }
+          if(initial){
+            $("#player").toggleClass("hide");
+            $(".uil-ring-css").toggleClass("hide");
+            $("#zoff-logo").toggleClass("center");
+            $("#zoff-logo").toggleClass("lower_left");
+            initial = false;
+            durationSetter();
+          }
+          if(started) {
+            clearTimeout(hide_timer);
+            hide_timer = setTimeout(function() {
+              hidden_info = true;
+              $("#title").fadeOut();
+              $("#next_song").fadeOut();
+            }, 15000);
+          }
+        } else {
+          videoId = json_parsed.videoId;
+          if(json_parsed.seekTo){
+            seekTo = json_parsed.seekTo;
+          }
         }
       }
       break;
@@ -69,18 +78,75 @@ customMessageBus.onMessage = function(event) {
       player.seekTo(json_parsed.seekTo);
       break;
     case "nextVideo":
-      nextVideo = json_parsed.videoId;
-      nextTitle = json_parsed.title;
-      $("#next_title_content").html("Next Song:<br>" + nextTitle);
-      $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-      $("#next_song").css("display", "flex");
+      if(!mobile_hack) {
+        nextVideo = json_parsed.videoId;
+        nextTitle = json_parsed.title;
+        $("#next_title_content").html("Next Song:<br>" + nextTitle);
+        $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+        $("#next_song").css("display", "flex");
 
-      clearTimeout(hide_timer);
-      hide_timer = setTimeout(function() {
-        hidden_info = true;
-        $("#title").fadeOut();
-        $("#next_song").fadeOut();
-      }, 15000);
+        clearTimeout(hide_timer);
+        hide_timer = setTimeout(function() {
+          hidden_info = true;
+          $("#title").fadeOut();
+          $("#next_song").fadeOut();
+        }, 15000);
+      }
+      break;
+    case "mobilespecs":
+      socket_id = json_parsed.socketid;
+      guid = json_parsed.guid;
+      adminpass = json_parsed.adminpass;
+      userpass = json_parsed.userpass;
+      channel = json_parsed.channel;
+      mobile_hack = true;
+
+      var oScript = document.createElement("script");
+      oScript.type = "text\/javascript";
+      oScript.onload = function() {
+        socket = io.connect('https://zoff.me:8080', {
+        	'sync disconnect on unload':true,
+        	'secure': true,
+        	'force new connection': true
+        });
+
+        socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+        socket.on("np", function(msg) {
+          if(msg.np) {
+            var conf       = msg.conf[0];
+            var time       = msg.time;
+    				var seekTo     = time - conf.startTime;
+            prev_video = videoId;
+            videoId = msg.np[0].id;
+            if(prev_video != videoId){
+              player.loadVideoById(videoId);
+            }
+            if(seekTo){
+              player.seekTo(seekTo);
+            }
+          }
+        });
+
+        socket.on("next_song", function(msg) {
+          nextVideo = msg.videoId;
+          nextTitle = msg.title;
+          $("#next_title_content").html("Next Song:<br>" + nextTitle);
+          $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+          $("#next_song").css("display", "flex");
+
+          clearTimeout(hide_timer);
+          hide_timer = setTimeout(function() {
+            hidden_info = true;
+            $("#title").fadeOut();
+            $("#next_song").fadeOut();
+          }, 15000);
+        });
+
+      }
+
+      oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+			firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
       break;
   }
 }
