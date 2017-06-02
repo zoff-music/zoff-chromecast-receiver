@@ -260,7 +260,11 @@ function errorHandler(event){
 
 function onPlayerStateChange(event) {
 	if (event.data==YT.PlayerState.ENDED) {
-		customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+    if(mobile_hack && socket) {
+      socket.emit("end", {id: videoId, channel: channel, pass: userpass});
+    } else {
+		    customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+    }
 
   } else if(event.data == 1){
     loading = false;
