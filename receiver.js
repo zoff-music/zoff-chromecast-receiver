@@ -104,14 +104,19 @@ customMessageBus.onMessage = function(event) {
       var oScript = document.createElement("script");
       oScript.type = "text\/javascript";
       oScript.onload = function() {
+        console.log("Loaded socket.io script");
         socket = io.connect('https://zoff.me:8080', {
         	'sync disconnect on unload':true,
         	'secure': true,
         	'force new connection': true
         });
 
+        console.log("Tried to connect to socket.io zoff");
+
         socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
         socket.on("np", function(msg) {
+          console.log("Gotten np");
+          console.log(msg);
           if(msg.np) {
             var conf       = msg.conf[0];
             var time       = msg.time;
@@ -128,6 +133,8 @@ customMessageBus.onMessage = function(event) {
         });
 
         socket.on("next_song", function(msg) {
+          console.log("Gotten next_song");
+          console.log(msg);
           nextVideo = msg.videoId;
           nextTitle = msg.title;
           $("#next_title_content").html("Next Song:<br>" + nextTitle);
@@ -147,6 +154,7 @@ customMessageBus.onMessage = function(event) {
       oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
       var firstScriptTag = document.getElementsByTagName('script')[0];
 			firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
+      console.log("Inserted script");
       break;
   }
 }
