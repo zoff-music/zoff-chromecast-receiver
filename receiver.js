@@ -75,7 +75,9 @@ customMessageBus.onMessage = function(event) {
       player.unMute();
       break;
     case "seekTo":
-      player.seekTo(json_parsed.seekTo);
+      if(!mobile_hack) {
+        player.seekTo(json_parsed.seekTo);
+      }
       break;
     case "nextVideo":
       if(!mobile_hack) {
@@ -104,7 +106,6 @@ customMessageBus.onMessage = function(event) {
       var oScript = document.createElement("script");
       oScript.type = "text\/javascript";
       oScript.onload = function() {
-        console.log("Loaded socket.io script");
         socket = io.connect('https://zoff.me:8080', {
         	'sync disconnect on unload':true,
         	'secure': true,
@@ -114,6 +115,7 @@ customMessageBus.onMessage = function(event) {
         console.log("Tried to connect to socket.io zoff");
 
         socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+        socket.emit('pos', {channel: channel, pass: userpass});
         socket.on("np", function(msg) {
           console.log("Gotten np");
           console.log(msg);
