@@ -16,7 +16,35 @@
 				margin-left: -8px;
 				margin-top: -8px;
 			}
+
+			.zoff-info {
+				position: absolute;
+		    bottom: 0px;
+		    /* width: 100%; */
+		    left: 0;
+		    right: 0;
+		    text-align: left;
+		    display: flex;
+		    flex-direction: row;
+		    align-items: center;
+			}
+
+			.zoff-channel-info {
+				color: white;
+				padding: 20px;
+				display: flex;
+				align-items: center;
+				font-size: 1.5rem;
+				font-family: sans-serif;
+				text-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
+			}
+
+			#zoff-logo {
+				width: 100%;
+			}
+
 			.center{
+				display: block;
 				position: absolute;
 				top: 40%;
 				transform: translateY(-50%);
@@ -25,6 +53,7 @@
 				margin: auto;
 				text-align: center;
 				width: 50%;
+				bottom: auto;
 			}
 
 			.lower_left{
@@ -237,9 +266,6 @@
 			 -o-animation: uil-ring-anim 1s linear infinite;
 			 animation: uil-ring-anim 1s linear infinite;
 			}
-
-
-
 		</style>
 	</head>
 	<body>
@@ -249,7 +275,10 @@
 		    <img id="next_pic" src="https://zoff.me/assets/images/loading.png" alt="next_picture">
 		    <div id="next_title"><div id="duration">00:00/00:00</div><div id="next_title_content">Coolest song</div></div>
 		  </div>
-			<img id="zoff-logo" class="center" src="z.svg" alt="logo">
+			<div class="zoff-info center">
+				<img id="zoff-logo" src="z.svg" class="" alt="logo">
+	    	<div class="zoff-channel-info hide"></div>
+    	</div>
 			<div class="uil-ring-css" style="transform:scale(0.7);"><div></div></div>
 			<div id="player" class="hide"></div>
 		</div>

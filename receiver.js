@@ -38,8 +38,9 @@ customMessageBus.onMessage = function(event) {
           if(initial){
             $("#player").toggleClass("hide");
             $(".uil-ring-css").toggleClass("hide");
-            $("#zoff-logo").toggleClass("center");
-            $("#zoff-logo").toggleClass("lower_left");
+            $(".zoff-info").toggleClass("center");
+            $(".zoff-info").toggleClass("lower_left");
+            $(".zoff-channel-info").toggleClass("hide");
             initial = false;
             durationSetter();
           }
@@ -58,6 +59,8 @@ customMessageBus.onMessage = function(event) {
           }
         }
       }
+      channel = json_parsed.videoId;
+      $(".zoff-channel-info").text("/" + channel);
       break;
     case "stopVideo":
       player.stopVideo();
