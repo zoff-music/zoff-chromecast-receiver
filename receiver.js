@@ -59,7 +59,7 @@ customMessageBus.onMessage = function(event) {
           }
         }
       }
-      channel = json_parsed.videoId;
+      channel = json_parsed.channel;
       $(".zoff-channel-info").text("/" + channel);
       break;
     case "stopVideo":
