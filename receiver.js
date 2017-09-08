@@ -134,6 +134,12 @@ customMessageBus.onMessage = function(event) {
           }
         });
 
+        socket.on("self_ping", function() {
+      		if(channel != undefined && channel.toLowerCase() != "") {
+      			socket.emit("self_ping", {channel: channel.toLowerCase()});
+      		}
+      	});
+
         socket.on("next_song", function(msg) {
           console.log("Gotten next_song");
           console.log(msg);
