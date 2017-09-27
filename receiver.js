@@ -7,6 +7,7 @@ var initial     = true;
 var hidden_info = false;
 var started = false;
 var mobile_hack = false;
+var connect_error = false;
 var channel;
 var guid;
 var adminpass;
@@ -135,6 +136,26 @@ customMessageBus.onMessage = function(event) {
               player.seekTo(seekTo);
             }
           }
+        });
+
+        socket.on('connect_failed', function(){
+            if(!connect_error){
+                connect_error = true;
+            }
+        });
+
+        socket.on("connect_error", function(){
+            if(!connect_error){
+                connect_error = true;
+            }
+        });
+
+        socket.on("connect", function(){
+            if(connect_error){
+                connect_error = false;
+                socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                socket.emit('pos', {channel: channel, pass: userpass});
+            }
         });
 
         socket.on("self_ping", function() {
