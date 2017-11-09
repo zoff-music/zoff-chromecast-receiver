@@ -8,6 +8,8 @@ var hidden_info = false;
 var started = false;
 var mobile_hack = false;
 var connect_error = false;
+var startSeconds = 0;
+endSeconds = 99999;
 var channel;
 var guid;
 var adminpass;
@@ -30,8 +32,10 @@ customMessageBus.onMessage = function(event) {
           loading = true;
           prev_video = videoId;
           videoId = json_parsed.videoId;
+          startSeconds = json_parsed.start;
+          endSeconds = json_parsed.end;
           if(prev_video != videoId){
-            player.loadVideoById(json_parsed.videoId);
+            player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
           }
           if(json_parsed.seekTo){
             player.seekTo(json_parsed.seekTo);
@@ -129,8 +133,10 @@ customMessageBus.onMessage = function(event) {
     				var seekTo     = time - conf.startTime;
             prev_video = videoId;
             videoId = msg.np[0].id;
+            startSeconds = msg.np[0].start;
+            endSeconds = msg.np[0].end;
             if(prev_video != videoId){
-              player.loadVideoById(videoId);
+              player.loadVideoById({'videoId': videoId, 'startSeconds': s, 'endSeconds': e});
             }
             if(seekTo){
               player.seekTo(seekTo);
@@ -274,7 +280,7 @@ function onPlayerReady() {
   ytReady = true;
   if(videoId){
     loading = true;
-    player.loadVideoById(videoId);
+    player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
     player.playVideo();
     if(seekTo){
       player.seekTo(seekTo);
