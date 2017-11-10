@@ -38,7 +38,7 @@ customMessageBus.onMessage = function(event) {
             player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
           }
           if(json_parsed.seekTo){
-            player.seekTo(json_parsed.seekTo);
+            player.seekTo(json_parsed.seekTo + startSeconds);
           }
           if(initial){
             $("#player").toggleClass("hide");
@@ -60,7 +60,7 @@ customMessageBus.onMessage = function(event) {
         } else {
           videoId = json_parsed.videoId;
           if(json_parsed.seekTo){
-            seekTo = json_parsed.seekTo;
+            seekTo = json_parsed.seekTo + startSeconds;
           }
         }
       }
@@ -84,7 +84,7 @@ customMessageBus.onMessage = function(event) {
       break;
     case "seekTo":
       if(!mobile_hack) {
-        player.seekTo(json_parsed.seekTo);
+        player.seekTo(json_parsed.seekTo + startSeconds);
       }
       break;
     case "nextVideo":
@@ -237,12 +237,14 @@ window.addEventListener('load', function() {
 
 function durationSetter(){
   try{
-    duration = player.getDuration();
+    duration = endSeconds;//player.getDuration();
     dMinutes = Math.floor(duration / 60);
     dSeconds = duration - dMinutes * 60;
     currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
-    if(currDurr > duration)
-        currDurr = duration;
+    if(currDurr - startSeconds > duration) {
+        currDurr = duration - startSeconds;
+    }
+    currDurr = currDurr - startSeconds;
     minutes = Math.floor(currDurr / 60);
     seconds = currDurr - (minutes * 60);
 
