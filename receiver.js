@@ -136,7 +136,7 @@ customMessageBus.onMessage = function(event) {
                     startSeconds = msg.np[0].start;
                     endSeconds = msg.np[0].end;
                     if(prev_video != videoId){
-                        player.loadVideoById({'videoId': videoId, 'startSeconds': s, 'endSeconds': e});
+                        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
                     }
                     if(seekTo){
                         player.seekTo(seekTo);
@@ -157,6 +157,7 @@ customMessageBus.onMessage = function(event) {
             });
 
             socket.on("connect", function(){
+                console.log("connected");
                 if(connect_error){
                     connect_error = false;
                     socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
