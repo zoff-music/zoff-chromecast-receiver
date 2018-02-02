@@ -46,8 +46,10 @@ customMessageBus.onMessage = function(event) {
                     $(".zoff-info").toggleClass("center");
                     $(".zoff-info").toggleClass("lower_left");
                     $(".zoff-channel-info").toggleClass("hide");
+                    //$(".zoff-channel-info-qr").toggleClass("hide");
                     initial = false;
                     durationSetter();
+                    change_info(true);
                 }
                 if(started) {
                     clearTimeout(hide_timer);
@@ -66,6 +68,7 @@ customMessageBus.onMessage = function(event) {
         }
         channel = json_parsed.channel;
         $(".zoff-channel-info").text("/" + channel);
+        $(".zoff-channel-info-qr-image").attr("src", "https://chart.googleapis.com/chart?chs=221x221&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
         break;
         case "stopVideo":
         player.stopVideo();
@@ -114,6 +117,8 @@ customMessageBus.onMessage = function(event) {
         var oScript = document.createElement("script");
         oScript.type = "text\/javascript";
         oScript.onload = function() {
+
+            change_info(true);
             socket = io.connect('https://zoff.me:8080', {
                 'sync disconnect on unload':true,
                 'secure': true,
@@ -303,32 +308,46 @@ function errorHandler(event){
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
             customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+    }
+}
+
+function onPlayerStateChange(event) {
+    if (event.data==YT.PlayerState.ENDED) {
+        if(mobile_hack && socket) {
+            socket.emit("end", {id: videoId, channel: channel, pass: userpass});
+        } else {
+            customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+        }
+
+    } else if(event.data == 1){
+        loading = false;
+        if(seekTo){
+            player.seekTo(seekTo);
+            seekTo = null;
+        }
+
+        if(started == false) {
+            started = true;
+            clearTimeout(hide_timer);
+            hide_timer = setTimeout(function() {
+                hidden_info = true;
+                $("#title").fadeOut();
+                $("#next_song").fadeOut();
+            }, 15000);
         }
     }
+}
 
-    function onPlayerStateChange(event) {
-        if (event.data==YT.PlayerState.ENDED) {
-            if(mobile_hack && socket) {
-                socket.emit("end", {id: videoId, channel: channel, pass: userpass});
-            } else {
-                customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
-            }
-
-        } else if(event.data == 1){
-            loading = false;
-            if(seekTo){
-                player.seekTo(seekTo);
-                seekTo = null;
-            }
-
-            if(started == false) {
-                started = true;
-                clearTimeout(hide_timer);
-                hide_timer = setTimeout(function() {
-                    hidden_info = true;
-                    $("#title").fadeOut();
-                    $("#next_song").fadeOut();
-                }, 15000);
-            }
-        }
-    }
+function change_info(info) {
+    var qr = info ? "" : "-qr";
+    var info_text = info ? "-qr" : "";
+    $(".zoff-channel-info" + qr).css("opacity", 0);
+    setTimeout(function() {
+        $(".zoff-channel-info" + qr).css("display", "none");
+        $(".zoff-channel-info" + info_text).css("display", "block");
+        $(".zoff-channel-info" + info_text).css("opacity", 1);
+        setTimeout(function() {
+            change_info(!info);
+        }, 10000);
+    }, 500);
+}

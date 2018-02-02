@@ -266,6 +266,14 @@
 			 -o-animation: uil-ring-anim 1s linear infinite;
 			 animation: uil-ring-anim 1s linear infinite;
 			}
+
+			.zoff-channel-info-qr, .zoff-channel-info {
+				-webkit-trasition: opacity .5s;
+				-moz-transition: opacity .5s;
+				-o-transition: opacity .5s;
+				-ms-transition: opacity .5s;
+				transition: opacity .5s;
+			}
 		</style>
 	</head>
 	<body>
@@ -278,6 +286,9 @@
 			<div class="zoff-info center">
 				<img id="zoff-logo" src="z.svg" class="" alt="logo">
 	    	<div class="zoff-channel-info hide"></div>
+            <div class="zoff-channel-info-qr" style="display:none;"><img class="zoff-channel-info-qr-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr" style="
+                width: 100px;
+            "></div>
     	</div>
 			<div class="uil-ring-css" style="transform:scale(0.7);"><div></div></div>
 			<div id="player" class="hide"></div>
