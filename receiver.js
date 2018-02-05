@@ -27,160 +27,73 @@ customMessageBus.onMessage = function(event) {
     console.log(event);
     switch(json_parsed.type){
         case "loadVideo":
-        if(!mobile_hack) {
-            if(ytReady){
-                loading = true;
-                prev_video = videoId;
-                videoId = json_parsed.videoId;
-                startSeconds = json_parsed.start;
-                endSeconds = json_parsed.end;
-                if(prev_video != videoId){
-                    player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-                }
-                if(json_parsed.seekTo){
-                    player.seekTo(json_parsed.seekTo + startSeconds);
-                }
-                if(initial){
-                    $("#player").toggleClass("hide");
-                    $(".uil-ring-css").toggleClass("hide");
-                    $(".zoff-info").toggleClass("center");
-                    $(".zoff-info").toggleClass("lower_left");
-                    $(".zoff-channel-info").toggleClass("hide");
-                    //$(".zoff-channel-info-qr").toggleClass("hide");
-                    initial = false;
-                    durationSetter();
-                    change_info(true);
-                }
-                if(started) {
-                    clearTimeout(hide_timer);
-                    hide_timer = setTimeout(function() {
-                        hidden_info = true;
-                        $("#title").fadeOut();
-                        $("#next_song").fadeOut();
-                    }, 15000);
-                }
-            } else {
-                videoId = json_parsed.videoId;
-                if(json_parsed.seekTo){
-                    seekTo = json_parsed.seekTo + startSeconds;
+            if(!mobile_hack) {
+                if(ytReady){
+                    loading = true;
+                    prev_video = videoId;
+                    videoId = json_parsed.videoId;
+                    startSeconds = json_parsed.start;
+                    endSeconds = json_parsed.end;
+                    if(prev_video != videoId){
+                        player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+                    }
+                    if(json_parsed.seekTo){
+                        player.seekTo(json_parsed.seekTo + startSeconds);
+                    }
+                    if(initial){
+                        $("#player").toggleClass("hide");
+                        $(".uil-ring-css").toggleClass("hide");
+                        $(".zoff-info").toggleClass("center");
+                        $(".zoff-info").toggleClass("lower_left");
+                        $(".zoff-channel-info").toggleClass("hide");
+                        //$(".zoff-channel-info-qr").toggleClass("hide");
+                        initial = false;
+                        durationSetter();
+                        change_info(true);
+                    }
+                    if(started) {
+                        clearTimeout(hide_timer);
+                        hide_timer = setTimeout(function() {
+                            hidden_info = true;
+                            $("#title").fadeOut();
+                            $("#next_song").fadeOut();
+                        }, 15000);
+                    }
+                } else {
+                    videoId = json_parsed.videoId;
+                    if(json_parsed.seekTo){
+                        seekTo = json_parsed.seekTo + startSeconds;
+                    }
                 }
             }
-        }
-        channel = json_parsed.channel;
-        $(".zoff-channel-info").text("/" + channel);
-        $(".zoff-channel-info-qr-image").attr("src", "https://chart.googleapis.com/chart?chs=221x221&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
-        break;
+            channel = json_parsed.channel;
+            $(".zoff-channel-info").text("/" + channel);
+            $(".zoff-channel-info-qr-image").attr("src", "https://chart.googleapis.com/chart?chs=221x221&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
+            break;
         case "stopVideo":
-        player.stopVideo();
-        break;
+            player.stopVideo();
+            break;
         case "pauseVideo":
-        player.pauseVideo();
-        break;
+            player.pauseVideo();
+            break;
         case "playVideo":
-        player.playVideo();
-        break;
+            player.playVideo();
+            break;
         case "mute":
-        player.mute();
-        break;
+            player.mute();
+            break;
         case "unMute":
-        player.unMute();
-        break;
+            player.unMute();
+            break;
         case "seekTo":
-        if(!mobile_hack) {
-            player.seekTo(json_parsed.seekTo + startSeconds);
-        }
-        break;
+            if(!mobile_hack) {
+                player.seekTo(json_parsed.seekTo + startSeconds);
+            }
+            break;
         case "nextVideo":
-        if(!mobile_hack) {
-            nextVideo = json_parsed.videoId;
-            nextTitle = json_parsed.title;
-            $("#next_title_content").html("Next Song:<br>" + nextTitle);
-            $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-            $("#next_song").css("display", "flex");
-
-            clearTimeout(hide_timer);
-            hide_timer = setTimeout(function() {
-                hidden_info = true;
-                $("#title").fadeOut();
-                $("#next_song").fadeOut();
-            }, 15000);
-        }
-        break;
-        case "mobilespecs":
-        socket_id = json_parsed.socketid;
-        guid = json_parsed.guid;
-        adminpass = json_parsed.adminpass;
-        userpass = json_parsed.userpass;
-        channel = json_parsed.channel;
-        mobile_hack = true;
-
-        var oScript = document.createElement("script");
-        oScript.type = "text\/javascript";
-        oScript.onload = function() {
-
-            change_info(true);
-            socket = io.connect('https://zoff.me:8080', {
-                'sync disconnect on unload':true,
-                'secure': true,
-                'force new connection': true
-            });
-
-            console.log("Tried to connect to socket.io zoff");
-
-            socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-            socket.emit('pos', {channel: channel, pass: userpass});
-            socket.on("np", function(msg) {
-                console.log("Gotten np");
-                console.log(msg);
-                if(msg.np) {
-                    var conf       = msg.conf[0];
-                    var time       = msg.time;
-                    var seekTo     = time - conf.startTime;
-                    prev_video = videoId;
-                    videoId = msg.np[0].id;
-                    startSeconds = msg.np[0].start;
-                    endSeconds = msg.np[0].end;
-                    if(prev_video != videoId){
-                        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-                    }
-                    if(seekTo){
-                        player.seekTo(seekTo);
-                    }
-                }
-            });
-
-            socket.on('connect_failed', function(){
-                if(!connect_error){
-                    connect_error = true;
-                }
-            });
-
-            socket.on("connect_error", function(){
-                if(!connect_error){
-                    connect_error = true;
-                }
-            });
-
-            socket.on("connect", function(){
-                console.log("connected");
-                if(connect_error){
-                    connect_error = false;
-                    socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                    socket.emit('pos', {channel: channel, pass: userpass});
-                }
-            });
-
-            socket.on("self_ping", function() {
-                if(channel != undefined && channel.toLowerCase() != "") {
-                    socket.emit("self_ping", {channel: channel.toLowerCase()});
-                }
-            });
-
-            socket.on("next_song", function(msg) {
-                console.log("Gotten next_song");
-                console.log(msg);
-                nextVideo = msg.videoId;
-                nextTitle = msg.title;
+            if(!mobile_hack) {
+                nextVideo = json_parsed.videoId;
+                nextTitle = json_parsed.title;
                 $("#next_title_content").html("Next Song:<br>" + nextTitle);
                 $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
                 $("#next_song").css("display", "flex");
@@ -191,15 +104,104 @@ customMessageBus.onMessage = function(event) {
                     $("#title").fadeOut();
                     $("#next_song").fadeOut();
                 }, 15000);
-            });
+            }
+            break;
+        case "mobilespecs":
+            socket_id = json_parsed.socketid;
+            guid = json_parsed.guid;
+            adminpass = json_parsed.adminpass;
+            userpass = json_parsed.userpass;
+            channel = json_parsed.channel;
+            mobile_hack = true;
 
-        }
+            var oScript = document.createElement("script");
+            oScript.type = "text\/javascript";
+            oScript.onload = function() {
 
-        oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
-        console.log("Inserted script");
-        break;
+                change_info(true);
+                socket = io.connect('https://zoff.me:8080', {
+                    'sync disconnect on unload':true,
+                    'secure': true,
+                    'force new connection': true
+                });
+
+                console.log("Tried to connect to socket.io zoff");
+
+                socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                socket.emit('pos', {channel: channel, pass: userpass});
+                socket.on("np", function(msg) {
+                    console.log("Gotten np");
+                    console.log(msg);
+                    if(msg.np) {
+                        var conf       = msg.conf[0];
+                        var time       = msg.time;
+                        var seekTo     = time - conf.startTime;
+                        prev_video = videoId;
+                        videoId = msg.np[0].id;
+                        startSeconds = msg.np[0].start;
+                        endSeconds = msg.np[0].end;
+                        //if(prev_video != videoId){
+                        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+                        //}
+                        if(seekTo){
+                            player.seekTo(seekTo);
+                        }
+                    }
+                });
+
+                socket.on('connect_failed', function(){
+                    console.log("connect failed");
+                    if(!connect_error){
+                        connect_error = true;
+                    }
+                });
+
+                socket.on("connect_error", function(){
+                    console.log("connect error");
+                    if(!connect_error){
+                        connect_error = true;
+                    }
+                });
+
+                socket.on("connect", function(){
+                    console.log("connected");
+                    if(connect_error){
+                        connect_error = false;
+                        socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                        socket.emit('pos', {channel: channel, pass: userpass});
+                    }
+                });
+
+                socket.on("self_ping", function() {
+                    if(channel != undefined && channel.toLowerCase() != "") {
+                        socket.emit("self_ping", {channel: channel.toLowerCase()});
+                    }
+                });
+
+                socket.on("next_song", function(msg) {
+                    console.log("Gotten next_song");
+                    console.log(msg);
+                    nextVideo = msg.videoId;
+                    nextTitle = msg.title;
+                    $("#next_title_content").html("Next Song:<br>" + nextTitle);
+                    $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+                    $("#next_song").css("display", "flex");
+
+                    clearTimeout(hide_timer);
+                    hide_timer = setTimeout(function() {
+                        hidden_info = true;
+                        $("#title").fadeOut();
+                        $("#next_song").fadeOut();
+                    }, 15000);
+                });
+
+            }
+
+            oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
+            console.log("Inserted script");
+            break;
     }
 }
 /**
