@@ -17,6 +17,7 @@ var userpass;
 var socket_id;
 var socket;
 var hide_timer;
+var showInfoTimer;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
@@ -68,7 +69,9 @@ customMessageBus.onMessage = function(event) {
             }
             channel = json_parsed.channel;
             $(".zoff-channel-info").text("/" + channel);
+            $(".channel-name-link").text(channel);
             $(".zoff-channel-info-qr-image").attr("src", "https://chart.googleapis.com/chart?chs=221x221&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
+            $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
             break;
         case "stopVideo":
             player.stopVideo();
@@ -84,6 +87,15 @@ customMessageBus.onMessage = function(event) {
             break;
         case "unMute":
             player.unMute();
+            break;
+        case "showJoinInfo":
+            clearTimeout(showInfoTimer);
+            $(".join-info-full").removeClass("no-opacity");
+            showInfoTimer = setTimeout(function () {
+                if(!$(".join-info-full").hasClass("no-opacity")) {
+                    $(".join-info-full").addClass("no-opacity");
+                }
+            }, 15000);
             break;
         case "seekTo":
             if(!mobile_hack) {
