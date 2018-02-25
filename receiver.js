@@ -59,6 +59,8 @@ customMessageBus.onMessage = function(event) {
                         //change_info(true);
                     }
                     if(started) {
+                        $("#title").fadeIn();
+                        $("#next_song").fadeIn();
                         clearTimeout(hide_timer);
                         hide_timer = setTimeout(function() {
                             hidden_info = true;
@@ -166,6 +168,14 @@ customMessageBus.onMessage = function(event) {
                         }
                         //if(prev_video != videoId){
                         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+                        $("#title").fadeIn();
+                        $("#next_song").fadeIn();
+                        clearTimeout(hide_timer);
+                        hide_timer = setTimeout(function() {
+                            hidden_info = true;
+                            $("#title").fadeOut();
+                            $("#next_song").fadeOut();
+                        }, 15000);
                         //}
                         if(seekTo){
                             player.seekTo(seekTo);
