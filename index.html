@@ -70,7 +70,7 @@
 			}
 
 			#next_song{
-				display:none;
+				display: flex;
 				position: absolute;
 		    background: rgba(0,0,0,0.4);
 		    right: 10px;
@@ -78,6 +78,9 @@
 		    border: 1px solid white;
 		    width: 26rem;
 		    height: 7rem;
+			-webkit-transition: all .5s;
+			transition: all .5s;
+			-webkit-transform: translateX(120%);
 			}
 
 			#next_pic{
@@ -86,10 +89,11 @@
 
 			#next_title{
 				align-self: center;
-		    overflow: hidden;
-		    color: white;
+		              overflow: hidden;
+		                    color: white;
 				display:flex;
-		    flex-direction: column;
+              flex-direction: column;
+
 			}
 
 			#duration{
@@ -304,6 +308,10 @@
 			.join-info-image {
 				width: 300px;
 			}
+
+            .slid-in {
+                -webkit-transform: translateX(0px) !important;
+            }
 		</style>
 	</head>
 	<body>

@@ -60,12 +60,15 @@ customMessageBus.onMessage = function(event) {
                     }
                     if(started) {
                         $("#title").fadeIn();
-                        $("#next_song").fadeIn();
+                        if(!$("#next_song").hasClass("slid-in")) {
+                            $("#next_song").addClass("slid-in");
+                        }
                         clearTimeout(hide_timer);
                         hide_timer = setTimeout(function() {
                             hidden_info = true;
                             $("#title").fadeOut();
-                            $("#next_song").fadeOut();
+                            $("#next_song").removeClass("slid-in");
+
                         }, 15000);
                     }
                 } else {
@@ -116,13 +119,15 @@ customMessageBus.onMessage = function(event) {
                 nextTitle = json_parsed.title;
                 $("#next_title_content").html("Next Song:<br>" + nextTitle);
                 $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-                $("#next_song").css("display", "flex");
+                if(!$("#next_song").hasClass("slid-in")) {
+                    $("#next_song").addClass("slid-in");
+                }
 
                 clearTimeout(hide_timer);
                 hide_timer = setTimeout(function() {
                     hidden_info = true;
                     $("#title").fadeOut();
-                    $("#next_song").fadeOut();
+                    $("#next_song").removeClass("slid-in");
                 }, 15000);
             }
             break;
@@ -169,12 +174,14 @@ customMessageBus.onMessage = function(event) {
                         //if(prev_video != videoId){
                         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
                         $("#title").fadeIn();
-                        $("#next_song").fadeIn();
+                        if(!$("#next_song").hasClass("slid-in")) {
+                            $("#next_song").addClass("slid-in");
+                        }
                         clearTimeout(hide_timer);
                         hide_timer = setTimeout(function() {
                             hidden_info = true;
                             $("#title").fadeOut();
-                            $("#next_song").fadeOut();
+                            $("#next_song").removeClass("slid-in");
                         }, 15000);
                         //}
                         if(seekTo){
@@ -219,13 +226,15 @@ customMessageBus.onMessage = function(event) {
                     nextTitle = msg.title;
                     $("#next_title_content").html("Next Song:<br>" + nextTitle);
                     $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-                    $("#next_song").css("display", "flex");
+                    if(!$("#next_song").hasClass("slid-in")) {
+                        $("#next_song").addClass("slid-in");
+                    }
 
                     clearTimeout(hide_timer);
                     hide_timer = setTimeout(function() {
                         hidden_info = true;
                         $("#title").fadeOut();
-                        $("#next_song").fadeOut();
+                        $("#next_song").removeClass("slid-in");
                     }, 15000);
                 });
 
@@ -294,7 +303,9 @@ function durationSetter(){
             clearTimeout(hide_timer);
             hidden_info = false;
             $("#title").fadeIn();
-            $("#next_song").fadeIn();
+            if(!$("#next_song").hasClass("slid-in")) {
+                $("#next_song").addClass("slid-in");
+            }
         }
         if($("#title_cont").text() != player.getVideoData().title) {
             $("#title_cont").text(player.getVideoData().title);
@@ -370,7 +381,7 @@ function onPlayerStateChange(event) {
             hide_timer = setTimeout(function() {
                 hidden_info = true;
                 $("#title").fadeOut();
-                $("#next_song").fadeOut();
+                $("#next_song").removeClass("slid-in");
             }, 15000);
         }
     }
