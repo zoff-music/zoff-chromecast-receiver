@@ -57,14 +57,18 @@ customMessageBus.onMessage = function(event) {
                         durationSetter();
                     }
                     if(started) {
-                        $("#title").fadeIn();
+                        //$("#title").fadeIn();
+                        if(!$("#title").hasClass("slid-in-title")) {
+                            $("#title").addClass("slid-in-title");
+                        }
                         if(!$("#next_song").hasClass("slid-in")) {
                             $("#next_song").addClass("slid-in");
                         }
                         clearTimeout(hide_timer);
                         hide_timer = setTimeout(function() {
                             hidden_info = true;
-                            $("#title").fadeOut();
+                            //$("#title").fadeOut();
+                            $("#title").removeClass("slid-in-title");
                             $("#next_song").removeClass("slid-in");
 
                         }, 15000);
@@ -123,7 +127,8 @@ customMessageBus.onMessage = function(event) {
                 clearTimeout(hide_timer);
                 hide_timer = setTimeout(function() {
                     hidden_info = true;
-                    $("#title").fadeOut();
+                    //$("#title").fadeOut();
+                    $("#title").removeClass("slid-in-title");
                     $("#next_song").removeClass("slid-in");
                 }, 15000);
             }
@@ -168,14 +173,18 @@ customMessageBus.onMessage = function(event) {
                         }
                         //if(prev_video != videoId){
                         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-                        $("#title").fadeIn();
+                        //$("#title").fadeIn();
+                        if(!$("#title").hasClass("slid-in-title")) {
+                            $("#title").addClass("slid-in-title");
+                        }
                         if(!$("#next_song").hasClass("slid-in")) {
                             $("#next_song").addClass("slid-in");
                         }
                         clearTimeout(hide_timer);
                         hide_timer = setTimeout(function() {
                             hidden_info = true;
-                            $("#title").fadeOut();
+                            //$("#title").fadeOut();
+                            $("#title").removeClass("slid-in-title");
                             $("#next_song").removeClass("slid-in");
                         }, 15000);
                         //}
@@ -228,7 +237,8 @@ customMessageBus.onMessage = function(event) {
                     clearTimeout(hide_timer);
                     hide_timer = setTimeout(function() {
                         hidden_info = true;
-                        $("#title").fadeOut();
+                        //$("#title").fadeOut();
+                        $("#title").removeClass("slid-in-title");
                         $("#next_song").removeClass("slid-in");
                     }, 15000);
                 });
@@ -297,7 +307,10 @@ function durationSetter(){
         if(endSeconds - player.getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
             hidden_info = false;
-            $("#title").fadeIn();
+            //$("#title").fadeIn();
+            if(!$("#title").hasClass("slid-in-title")) {
+                $("#title").addClass("slid-in-title");
+            }
             if(!$("#next_song").hasClass("slid-in")) {
                 $("#next_song").addClass("slid-in");
             }
@@ -375,7 +388,8 @@ function onPlayerStateChange(event) {
             clearTimeout(hide_timer);
             hide_timer = setTimeout(function() {
                 hidden_info = true;
-                $("#title").fadeOut();
+                //$("#title").fadeOut();
+                $("#title").removeClass("slid-in-title");
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
