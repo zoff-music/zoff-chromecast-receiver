@@ -1,340 +1,339 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js">		</script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="receiver.js"></script>
-		<title>Zoff Chromecast Receiver</title>
-		<style>
-			body{
-				background: black;
-			}
-			#player{
-				width: 100vw;
-				height: 100vh;
-				margin-left: -8px;
-				margin-top: -8px;
-			}
+<head>
+	<meta charset="utf-8" />
+	<script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js">		</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="receiver.js"></script>
+	<title>Zoff Chromecast Receiver</title>
+	<style>
+		body{
+			background: black;
+		}
+		#player{
+			width: 100vw;
+			height: 100vh;
+			margin-left: -8px;
+			margin-top: -8px;
+		}
 
-			.zoff-info {
-				position: absolute;
-		    bottom: 0px;
-		    /* width: 100%; */
-		    left: 0;
-		    right: 0;
-		    text-align: left;
-		    display: flex;
-		    flex-direction: row;
-		    align-items: center;
-			}
+		.zoff-info {
+			position: absolute;
+			bottom: 0px;
+			/* width: 100%; */
+			left: 0;
+			right: 0;
+			text-align: left;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
 
-			.zoff-channel-info {
-				color: white;
-				padding: 20px;
-				display: flex;
-				align-items: center;
-				font-size: 1.5rem;
-				font-family: sans-serif;
-				text-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
-			}
+		.zoff-channel-info {
+			color: white;
+			padding: 20px;
+			display: flex;
+			align-items: center;
+			font-size: 1.5rem;
+			font-family: sans-serif;
+			text-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
+		}
 
-			#zoff-logo {
-				width: 100%;
-			}
+		#zoff-logo {
+			width: 100%;
+		}
 
-			.center{
-				display: block;
-				position: absolute;
-				top: 40%;
-				transform: translateY(-50%);
-				left: 17%;
-				right: 0;
-				margin: auto;
-				text-align: center;
-				width: 50%;
-				bottom: auto;
-			}
+		.center{
+			display: block;
+			position: absolute;
+			top: 40%;
+			transform: translateY(-50%);
+			left: 17%;
+			right: 0;
+			margin: auto;
+			text-align: center;
+			width: 50%;
+			bottom: auto;
+		}
 
-			.lower_left{
-				position: absolute;
-		    bottom: 0px;
-		    width: 15%;
-		    left: 0;
-		    right: 0;
-		    text-align: left;
-			}
+		.lower_left{
+			position: absolute;
+			bottom: 0px;
+			width: 15%;
+			left: 0;
+			right: 0;
+			text-align: left;
+		}
 
-			.hide{
-				display: none;
-			}
+		.hide{
+			display: none;
+		}
 
-			#next_song{
-				display: flex;
-				position: absolute;
-		    background: rgba(0,0,0,0.4);
-		    right: 10px;
-		    bottom: 10px;
-		    border: 1px solid white;
-		    width: 26rem;
-		    height: 7rem;
-			-webkit-transition: all .5s;
-			transition: all .5s;
+		#next_song{
+			display: flex;
+			position: absolute;
+			background: rgba(0,0,0,0.4);
+			right: 10px;
+			bottom: 10px;
+			border: 1px solid white;
+			width: 26rem;
+			height: 7rem;
+			-webkit-transition: all 1s;
+			transition: all 1s;
 			-webkit-transform: translateX(120%);
-			}
+		}
 
-			#next_pic{
-		    height: 7rem;
-			}
+		#next_pic{
+			height: 7rem;
+		}
 
-			#next_title{
-				align-self: center;
-		              overflow: hidden;
-		                    color: white;
-				display:flex;
-              flex-direction: column;
+		#next_title{
+			align-self: center;
+			overflow: hidden;
+			color: white;
+			display:flex;
+			flex-direction: column;
 
-			}
+		}
 
-			#duration{
-				text-align: center;
-			}
+		#duration{
+			text-align: center;
+		}
 
-			#title{
-				width: 100vw;
-		    position: absolute;
-		    left: 0px;
-		    top: 0px;
-		    height: 65px;
-		    color: white;
-		    background: -webkit-linear-gradient(black, transparent);
-			}
+		#title{
+			width: 100vw;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			height: 65px;
+			color: white;
+			background: -webkit-linear-gradient(black, transparent);
+		}
 
-			#title_cont{
-				padding-left:10px;
-			}
+		#title_cont{
+			padding-left:10px;
+		}
 
-			/*width: 100%;*/
-			@-webkit-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+		/*width: 100%;*/
+		@-webkit-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
 			}
-			@-webkit-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
 			}
-			@-moz-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+		}
+		@-webkit-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
 			}
-			@-ms-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
 			}
-			@-moz-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+		}
+		@-moz-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
 			}
-			@-webkit-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
 			}
-			@-o-keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+		}
+		@-ms-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
 			}
-			@keyframes uil-ring-anim {
-			 0% {
-				 -ms-transform: rotate(0deg);
-				 -moz-transform: rotate(0deg);
-				 -webkit-transform: rotate(0deg);
-				 -o-transform: rotate(0deg);
-				 transform: rotate(0deg);
-			 }
-			 100% {
-				 -ms-transform: rotate(360deg);
-				 -moz-transform: rotate(360deg);
-				 -webkit-transform: rotate(360deg);
-				 -o-transform: rotate(360deg);
-				 transform: rotate(360deg);
-			 }
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
 			}
-			.uil-ring-css {
-			 background: none;
-			 position: relative;
-			 width: 200px;
-			 height: 200px;
-			 transform: scale(0.7);
-			 position: absolute;
-			 left: 0;
-			 right: 0;
-			 margin: auto;
-			 top: 70%;
+		}
+		@-moz-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
 			}
-			.uil-ring-css > div {
-			 position: absolute;
-			 display: block;
-			 width: 160px;
-			 height: 160px;
-			 top: 20px;
-			 left: 20px;
-			 border-radius: 80px;
-			 box-shadow: 0 6px 0 0 #ffffff;
-			 -ms-animation: uil-ring-anim 1s linear infinite;
-			 -moz-animation: uil-ring-anim 1s linear infinite;
-			 -webkit-animation: uil-ring-anim 1s linear infinite;
-			 -o-animation: uil-ring-anim 1s linear infinite;
-			 animation: uil-ring-anim 1s linear infinite;
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
 			}
+		}
+		@-webkit-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
+			}
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
+			}
+		}
+		@-o-keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
+			}
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
+			}
+		}
+		@keyframes uil-ring-anim {
+			0% {
+				-ms-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-o-transform: rotate(0deg);
+				transform: rotate(0deg);
+			}
+			100% {
+				-ms-transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				-o-transform: rotate(360deg);
+				transform: rotate(360deg);
+			}
+		}
+		.uil-ring-css {
+			background: none;
+			position: relative;
+			width: 200px;
+			height: 200px;
+			transform: scale(0.7);
+			position: absolute;
+			left: 0;
+			right: 0;
+			margin: auto;
+			top: 70%;
+		}
+		.uil-ring-css > div {
+			position: absolute;
+			display: block;
+			width: 160px;
+			height: 160px;
+			top: 20px;
+			left: 20px;
+			border-radius: 80px;
+			box-shadow: 0 6px 0 0 #ffffff;
+			-ms-animation: uil-ring-anim 1s linear infinite;
+			-moz-animation: uil-ring-anim 1s linear infinite;
+			-webkit-animation: uil-ring-anim 1s linear infinite;
+			-o-animation: uil-ring-anim 1s linear infinite;
+			animation: uil-ring-anim 1s linear infinite;
+		}
 
-			.zoff-channel-info-qr, .zoff-channel-info {
-				-webkit-trasition: opacity .5s;
-				-moz-transition: opacity .5s;
-				-o-transition: opacity .5s;
-				-ms-transition: opacity .5s;
-				transition: opacity .5s;
-			}
+		.zoff-channel-info-qr, .zoff-channel-info {
+			-webkit-trasition: opacity .5s;
+			-moz-transition: opacity .5s;
+			-o-transition: opacity .5s;
+			-ms-transition: opacity .5s;
+			transition: opacity .5s;
+		}
 
-            .join-info-full {
-                -webkit-trasition: opacity .5s;
-				-moz-transition: opacity .5s;
-				-o-transition: opacity .5s;
-				-ms-transition: opacity .5s;
-				transition: opacity .5s;
-				height: 100vh;
-				width: 100vw;
-				position: absolute;
-				left: 0px;
-				top: 0px;
-				display: flex;
-				justify-content: center;
-				flex-direction: column;
-				align-items: center;
-				background: rgba(0,0,0,.8);
-				color: white;
-				font-family: sans-serif;
-				font-size: 2rem;
-				opacity: 1;
-            }
+		.join-info-full {
+			-webkit-trasition: opacity .5s;
+			-moz-transition: opacity .5s;
+			-o-transition: opacity .5s;
+			-ms-transition: opacity .5s;
+			transition: opacity .5s;
+			height: 100vh;
+			width: 100vw;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			display: flex;
+			justify-content: center;
+			flex-direction: column;
+			align-items: center;
+			background: rgba(0,0,0,.8);
+			color: white;
+			font-family: sans-serif;
+			font-size: 2rem;
+			opacity: 1;
+		}
 
-            .no-opacity {
-                opacity: 0;
-            }
+		.no-opacity {
+			opacity: 0;
+		}
 
-			.join-info-image {
-				width: 300px;
-			}
+		.join-info-image {
+			width: 300px;
+		}
 
-            .slid-in {
-                -webkit-transform: translateX(0px) !important;
-            }
-		</style>
-	</head>
-	<body>
-		<div id="wrapper">
-			<div id="title"><p id="title_cont"></p></div>
-			<div id="next_song">
-		    <img id="next_pic" src="https://zoff.me/assets/images/loading.png" alt="next_picture">
-		    <div id="next_title"><div id="duration">00:00/00:00</div><div id="next_title_content">Coolest song</div></div>
-		  </div>
-			<div class="zoff-info center">
-				<img id="zoff-logo" src="z.svg" class="" alt="logo">
-	    	<div class="zoff-channel-info hide"></div>
-            <div class="zoff-channel-info-qr" style="display:none;"><img class="zoff-channel-info-qr-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr" style="
-                width: 100px;
-            "></div>
-    	</div>
-			<div class="uil-ring-css" style="transform:scale(0.7);"><div></div></div>
-			<div id="player" class="hide"></div>
+		.slid-in {
+			-webkit-transform: translateX(0px) !important;
+		}
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="title"><p id="title_cont"></p></div>
+		<div id="next_song">
+			<img id="next_pic" src="https://zoff.me/assets/images/loading.png" alt="next_picture">
+			<div id="next_title"><div id="duration">00:00/00:00</div><div id="next_title_content">Coolest song</div></div>
 		</div>
-        <div class="join-info-full no-opacity">
-            <p>To join this channel, go to</p>
-            <p>zoff.me/<span class="channel-name-link"></span></p>
-            <img class="join-info-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr">
-        </div>
+		<div class="zoff-info center">
+			<img id="zoff-logo" src="z.svg" class="" alt="logo">
+			<div class="zoff-channel-info hide"></div>
+		</div>
+		<div class="uil-ring-css" style="transform:scale(0.7);">
+			<div></div>
+		</div>
+		<div id="player" class="hide"></div>
+		</div>
+		<div class="join-info-full no-opacity">
+			<p>To join this channel, go to</p>
+			<p>zoff.me/<span class="channel-name-link"></span></p>
+			<img class="join-info-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr">
+		</div>
 	</body>
-</html>
+	</html>

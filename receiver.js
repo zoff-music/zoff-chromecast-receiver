@@ -53,10 +53,8 @@ customMessageBus.onMessage = function(event) {
                         $(".zoff-info").toggleClass("center");
                         $(".zoff-info").toggleClass("lower_left");
                         $(".zoff-channel-info").toggleClass("hide");
-                        //$(".zoff-channel-info-qr").toggleClass("hide");
                         initial = false;
                         durationSetter();
-                        //change_info(true);
                     }
                     if(started) {
                         $("#title").fadeIn();
@@ -81,7 +79,6 @@ customMessageBus.onMessage = function(event) {
             channel = json_parsed.channel;
             $(".zoff-channel-info").text("/" + channel);
             $(".channel-name-link").text(channel);
-            $(".zoff-channel-info-qr-image").attr("src", "https://chart.googleapis.com/chart?chs=221x221&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
             $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
             break;
         case "stopVideo":
@@ -142,8 +139,6 @@ customMessageBus.onMessage = function(event) {
             var oScript = document.createElement("script");
             oScript.type = "text\/javascript";
             oScript.onload = function() {
-
-                //change_info(true);
                 socket = io.connect('https://zoff.me:8080', {
                     'sync disconnect on unload':true,
                     'secure': true,
