@@ -219,7 +219,7 @@ customMessageBus.onMessage = function(event) {
                     console.log(msg);
                     nextVideo = msg.videoId;
                     nextTitle = msg.title;
-                    $("#next_title_content").html("Next Song:<br>" + nextTitle);
+                    $("#next_title_content").html("Next:<br>" + nextTitle);
                     $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
                     if(!$("#next_song").hasClass("slid-in")) {
                         $("#next_song").addClass("slid-in");

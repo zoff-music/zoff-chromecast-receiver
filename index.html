@@ -10,12 +10,14 @@
 		body{
 			background: black;
             font-family: sans-serif;
+			overflow: hidden;
+			margin: 0px;
 		}
 		#player{
 			width: 100vw;
 			height: 100vh;
-			margin-left: -8px;
-			margin-top: -8px;
+			/*margin-left: -8px;
+			margin-top: -8px;*/
 		}
 
 		.zoff-info {
@@ -70,18 +72,21 @@
 			display: none;
 		}
 
-		#next_song{
-			display: flex;
-			position: absolute;
-			background: rgba(0,0,0,0.4);
-			right: 10px;
-			bottom: 10px;
-			border: 1px solid white;
-			width: 26rem;
-			height: 7rem;
-			-webkit-transition: all 1s;
-			transition: all 1s;
-			-webkit-transform: translateX(120%);
+		#next_song {
+		    display: flex;
+		    position: absolute;
+		    background: rgba(0,0,0,.5);
+		    right: 0px;
+		    bottom: 40px;
+		    /* border: 1px solid #fff; */
+		    width: 26rem;
+		    height: 7rem;
+		    -webkit-transition: all 1s;
+		    transition: all 1s;
+		    -webkit-transform: translateX(120%);
+		    -webkit-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75);
+		    -moz-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75);
+		    box-shadow: 0px 0px 150px 0px rgba(0,0,0,0.75);
 		}
 
 		#next_pic{
@@ -94,7 +99,7 @@
 			color: white;
 			display:flex;
 			flex-direction: column;
-
+			margin: auto;
 		}
 
 		#duration{
