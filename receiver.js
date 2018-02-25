@@ -35,6 +35,12 @@ customMessageBus.onMessage = function(event) {
                     videoId = json_parsed.videoId;
                     startSeconds = json_parsed.start;
                     endSeconds = json_parsed.end;
+                    if(startSeconds == undefined) {
+                        startSeconds = 0;
+                    }
+                    if(endSeconds == undefined) {
+                        endSeconds = json_parse.duration;
+                    }
                     if(prev_video != videoId){
                         player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
                     }
@@ -50,7 +56,7 @@ customMessageBus.onMessage = function(event) {
                         //$(".zoff-channel-info-qr").toggleClass("hide");
                         initial = false;
                         durationSetter();
-                        change_info(true);
+                        //change_info(true);
                     }
                     if(started) {
                         clearTimeout(hide_timer);
@@ -130,7 +136,7 @@ customMessageBus.onMessage = function(event) {
             oScript.type = "text\/javascript";
             oScript.onload = function() {
 
-                change_info(true);
+                //change_info(true);
                 socket = io.connect('https://zoff.me:8080', {
                     'sync disconnect on unload':true,
                     'secure': true,
@@ -152,6 +158,12 @@ customMessageBus.onMessage = function(event) {
                         videoId = msg.np[0].id;
                         startSeconds = msg.np[0].start;
                         endSeconds = msg.np[0].end;
+                        if(startSeconds == undefined) {
+                            startSeconds = 0;
+                        }
+                        if(endSeconds == undefined) {
+                            endSeconds = msg.np[0].duration;
+                        }
                         //if(prev_video != videoId){
                         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
                         //}
@@ -274,8 +286,10 @@ function durationSetter(){
             $("#title").fadeIn();
             $("#next_song").fadeIn();
         }
-        document.getElementById("title_cont").innerHTML = player.getVideoData().title;
-        document.getElementById("duration").innerHTML = pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds);
+        if($("#title_cont").text() != player.getVideoData().title) {
+            $("#title_cont").text(player.getVideoData().title);
+        }
+        $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(player.getCurrentTime() > endSeconds) {
             if(mobile_hack && socket) {
                 socket.emit("end", {id: videoId, channel: channel, pass: userpass});
