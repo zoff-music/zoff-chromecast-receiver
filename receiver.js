@@ -21,7 +21,7 @@ var showInfoTimer;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
-window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+window.castReceiverManager = cast.framework.CastReceiverContext.getInstance();
 var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
 castReceiverManager.addCustomMessageListener('urn:x-cast:zoff.me', function(event) {
     var json_parsed = JSON.parse(event.data);
