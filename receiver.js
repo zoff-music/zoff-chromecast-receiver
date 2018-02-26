@@ -23,7 +23,7 @@ var showInfoTimer;
 
 window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
-customMessageBus.onMessage = function(event) {
+castReceiverManager.addCustomMessageListener('urn:x-cast:zoff.me', function(event) {
     var json_parsed = JSON.parse(event.data);
     console.log(event);
     switch(json_parsed.type){
@@ -258,7 +258,7 @@ customMessageBus.onMessage = function(event) {
             console.log("Inserted script");
             break;
     }
-}
+});
 /**
 * Application config
 **/
