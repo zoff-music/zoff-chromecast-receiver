@@ -427,7 +427,7 @@ function onPlayerStateChange(event) {
         }
         castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
-        castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
+        castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
     }
 }
 
