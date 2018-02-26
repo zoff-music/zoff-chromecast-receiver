@@ -288,15 +288,22 @@ appConfig.statusText = 'Ready to play';
 * @type {number|undefined}
 **/
 // 100 minutes for testing, use default 10sec in prod by not setting this value
-//appConfig.maxInactivity = 6000;
+appConfig.maxInactivity = 86400;
 
-window.castReceiverManager.onSenderDisconnected = function(event) {
+window.castReceiverManager.addEventListener('SENDER_DISCONNECTED', function(event) {
     console.log(event);
     if(window.castReceiverManager.getSenders().length == 0 &&
     event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
         window.close();
     }
-}
+});
+/*window.castReceiverManager.onSenderDisconnected = function(event) {
+    console.log(event);
+    if(window.castReceiverManager.getSenders().length == 0 &&
+    event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+        window.close();
+    }
+}*/
 
 window.addEventListener('load', function() {
     var tag = document.createElement('script');
