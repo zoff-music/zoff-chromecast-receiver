@@ -85,6 +85,13 @@ customMessageBus.onMessage = function(event) {
             $(".channel-name-link").text(channel);
             $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
             break;
+        case "playPauseVideo":
+            if(player.getPlayerState() == 1) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+            break;
         case "stopVideo":
             player.stopVideo();
             break;
@@ -404,6 +411,9 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
+        customMessageBus.broadcast(JSON.stringify({type: 1}));
+    } else if(event.data == 2) {
+        customMessageBus.broadcast(JSON.stringify({type: 2}));
     }
 }
 
