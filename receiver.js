@@ -262,7 +262,7 @@ castReceiverManager.addCustomMessageListener('urn:x-cast:zoff.me', function(even
 /**
 * Application config
 **/
-var appConfig = new cast.receiver.CastReceiverManager.Config();
+var appConfig = new cast.framework.CastReceiverOptions();
 
 /**
 * Text that represents the application status. It should meet
