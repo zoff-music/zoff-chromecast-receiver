@@ -22,8 +22,9 @@ var showInfoTimer;
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.castReceiverManager = cast.framework.CastReceiverContext.getInstance();
+var NAMESPACE = 'urn:x-cast:zoff.me';
 //var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
-castReceiverManager.addCustomMessageListener('urn:x-cast:zoff.me', function(event) {
+castReceiverManager.addCustomMessageListener(NAMESPACE, function(event) {
     console.log(event);
     var json_parsed;
     try {
@@ -336,7 +337,7 @@ function durationSetter(){
             if(mobile_hack && socket) {
                 socket.emit("end", {id: videoId, channel: channel, pass: userpass});
             } else {
-                customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+                castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
             }
         }
     }catch(err){}
@@ -387,7 +388,7 @@ function errorHandler(event){
                     userpass: userpass
                 });
             } else {
-                customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+                castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
             }
     }
 }
@@ -397,7 +398,7 @@ function onPlayerStateChange(event) {
         if(mobile_hack && socket) {
             socket.emit("end", {id: videoId, channel: channel, pass: userpass});
         } else {
-            customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+            castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
         }
 
     } else if(event.data == 1){
@@ -417,9 +418,9 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
-        customMessageBus.broadcast(JSON.stringify({type: 1}));
+        castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
-        customMessageBus.broadcast(JSON.stringify({type: 2}));
+        castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     }
 }
 
