@@ -24,6 +24,7 @@ var showInfoTimer;
 window.castReceiverManager = cast.framework.CastReceiverContext.getInstance();
 //var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
 castReceiverManager.addCustomMessageListener('urn:x-cast:zoff.me', function(event) {
+    console.log(event);
     var json_parsed = JSON.parse(event.data);
     console.log(event);
     switch(json_parsed.type){
