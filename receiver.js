@@ -364,7 +364,18 @@ function onPlayerReady() {
 function errorHandler(event){
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
-            customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+            if(mobile_hack && socket) {
+                curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
+                socket.emit("skip", {
+                    error: event.data,
+                    id: videoId,
+                    pass: adminpass,
+                    channel: channel.toLowerCase(),
+                    userpass: userpass
+                });
+            } else {
+                customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+            }
     }
 }
 
