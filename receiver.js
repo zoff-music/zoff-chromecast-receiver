@@ -40,7 +40,7 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     //loadRequestData.media.metadata =
 
     //return loadRequestData;
-    return loadRequestData;
+    return true;
 });
 
 playerManager.addEventListener(cast.framework.events.category.CORE, event => {
@@ -431,7 +431,7 @@ function onPlayerReady() {
         }
     }
     //cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
-    //playerManager.setMediaElement(document.getElementById("youtube-player"));
+    playerManager.setMediaElement(player);
 }
 
 function errorHandler(event){
