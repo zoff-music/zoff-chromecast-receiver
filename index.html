@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<<<<<<< HEAD
     <head>
     	<meta charset="utf-8" />
         <script type="text/javascript" src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js">
@@ -14,6 +15,27 @@
     			overflow: hidden;
     			margin: 0px;
     		}
+=======
+<head>
+	<meta charset="utf-8" />
+	<script src="cast_receiver.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="receiver.js"></script>
+	<title>Zoff Chromecast Receiver</title>
+	<style>
+		body{
+			background: black;
+            font-family: sans-serif;
+			overflow: hidden;
+			margin: 0px;
+		}
+		#player{
+			width: 100vw;
+			height: 100vh;
+			/*margin-left: -8px;
+			margin-top: -8px;*/
+		}
+>>>>>>> master
 
     		.zoff-info {
     			position: absolute;
@@ -127,162 +149,160 @@
     			padding-left:10px;
     		}
 
-    		/*width: 100%;*/
-    		@-webkit-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@-webkit-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@-moz-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@-ms-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@-moz-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@-webkit-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@-o-keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		@keyframes uil-ring-anim {
-    			0% {
-    				-ms-transform: rotate(0deg);
-    				-moz-transform: rotate(0deg);
-    				-webkit-transform: rotate(0deg);
-    				-o-transform: rotate(0deg);
-    				transform: rotate(0deg);
-    			}
-    			100% {
-    				-ms-transform: rotate(360deg);
-    				-moz-transform: rotate(360deg);
-    				-webkit-transform: rotate(360deg);
-    				-o-transform: rotate(360deg);
-    				transform: rotate(360deg);
-    			}
-    		}
-    		.uil-ring-css {
-    			background: none;
-    			position: relative;
-    			width: 200px;
-    			height: 200px;
-    			transform: scale(0.7);
-    			position: absolute;
-    			left: 0;
-    			right: 0;
-    			margin: auto;
-    			top: 70%;
-    		}
-    		.uil-ring-css > div {
-    			position: absolute;
-    			display: block;
-    			width: 160px;
-    			height: 160px;
-    			top: 20px;
-    			left: 20px;
-    			border-radius: 80px;
-    			box-shadow: 0 6px 0 0 #ffffff;
-    			-ms-animation: uil-ring-anim 1s linear infinite;
-    			-moz-animation: uil-ring-anim 1s linear infinite;
-    			-webkit-animation: uil-ring-anim 1s linear infinite;
-    			-o-animation: uil-ring-anim 1s linear infinite;
-    			animation: uil-ring-anim 1s linear infinite;
-    		}
+			@-webkit-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@-webkit-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@-moz-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@-ms-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@-moz-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@-webkit-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@-o-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			.uil-ring-css {
+				background: none;
+				width: 130px;
+				height: 130px;
+				transform: scale(.7);
+				position: absolute;
+				left: 0;
+				right: 0;
+				margin: auto;
+				top: 70%;
+			}
+			.uil-ring-css > div {
+	            position: absolute;
+	            width: 100px;
+	            height: 100px;
+	            border: 15px solid white;
+	            border-radius: 50%;
+	            border-bottom-color: transparent;
+	            border-left-color: transparent;
+	            transform: rotate(-45deg);'
+				-ms-animation: uil-ring-anim 1s linear infinite;
+				-moz-animation: uil-ring-anim 1s linear infinite;
+				-webkit-animation: uil-ring-anim 1s linear infinite;
+				-o-animation: uil-ring-anim 1s linear infinite;
+				animation: uil-ring-anim 1s linear infinite;
+			}
 
     		.zoff-channel-info-qr, .zoff-channel-info {
     			-webkit-trasition: opacity .5s;
