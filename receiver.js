@@ -429,8 +429,8 @@ function onPlayerReady() {
             seekTo = null;
         }
     }
-    cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
-    //playerManager.setMediaElement(document.getElementById("youtube-player"));
+    //cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
+    playerManager.setMediaElement(document.getElementById("youtube-player"));
 }
 
 function errorHandler(event){
@@ -476,18 +476,16 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
-        var mediaInfo = new cast.framework.messages.MediaInformation({
-            contentId: video_id,
-            contentType: "video/*",
-            duration: endSeconds - startSeconds,
-            metadata: new cast.framework.messages.GenericMediaMetadata({
-                images: "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg",
-                title: player.getVideoData().title
-            })
-        });
-
-        //playerManager.setMediaInformation(mediaInfo, true);
-        cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
+        var metadata = new cast.framework.messages.GenericMediaMetadata();
+        metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
+        metadata.title = player.getVideoData().title;
+        var mediaInfo = new cast.framework.messages.MediaInformation(mediaInfo);
+        mediaInfo.contentId = video_id;
+        mediaInfo.contentType = "video/*";
+        mediaInfo.duration= endSeconds - startSeconds;
+        mediaInfo.metadata = metadata;
+        playerManager.setMediaInformation(mediaInfo, true);
+        //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
