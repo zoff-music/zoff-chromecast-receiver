@@ -31,6 +31,7 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     var customData = loadRequestData.customData;
     video_id = loadRequestData.media.contentId;
     if(ytReady) {
+        playerManager.setMediaElement(player);
         player.loadVideoById(video_id);
     }
     for(var i = 0; i < customData.length; i++) {
@@ -416,9 +417,11 @@ function onYouTubeIframeAPIReady() {
             'onError': errorHandler
         }
     });
+    playerManager.setMediaElement(player);
 }
 
 function onPlayerReady() {
+    playerManager.setMediaElement(player);
     context.start(appConfig);
     context.setApplicationState("Ready to play");
     ytReady = true;
