@@ -111,7 +111,6 @@ function messageHandle(event) {
                         $(".zoff-info").toggleClass("lower_left");
                         $(".zoff-channel-info").toggleClass("hide");
                         initial = false;
-                        durationSetter();
                     }
                     if(started) {
                         //$("#title").fadeIn();
@@ -197,123 +196,6 @@ function messageHandle(event) {
                 }, 15000);
             }
             break;
-        case "mobilespecs":
-            socket_id = json_parsed.socketid;
-            guid = json_parsed.guid;
-            adminpass = json_parsed.adminpass;
-            userpass = json_parsed.userpass;
-            channel = json_parsed.channel;
-            mobile_hack = true;
-
-            var oScript = document.createElement("script");
-            oScript.type = "text\/javascript";
-            oScript.onload = function() {
-                socket = io.connect('https://zoff.me:8080', {
-                    'sync disconnect on unload':true,
-                    'secure': true,
-                    'force new connection': true
-                });
-
-                console.log("Tried to connect to socket.io zoff");
-
-                socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                socket.emit('pos', {channel: channel, pass: userpass});
-                socket.on("np", function(msg) {
-                    console.log("Gotten np");
-                    console.log(msg);
-                    if(msg.np) {
-                        var conf       = msg.conf[0];
-                        var time       = msg.time;
-                        var seekTo     = time - conf.startTime;
-                        prev_video = videoId;
-                        videoId = msg.np[0].id;
-                        startSeconds = msg.np[0].start;
-                        endSeconds = msg.np[0].end;
-                        if(startSeconds == undefined) {
-                            startSeconds = 0;
-                        }
-                        if(endSeconds == undefined) {
-                            endSeconds = msg.np[0].duration;
-                        }
-                        //if(prev_video != videoId){
-                        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-                        //$("#title").fadeIn();
-                        if(!$("#title").hasClass("slid-in-title")) {
-                            $("#title").addClass("slid-in-title");
-                        }
-                        if(!$("#next_song").hasClass("slid-in")) {
-                            $("#next_song").addClass("slid-in");
-                        }
-                        clearTimeout(hide_timer);
-                        hide_timer = setTimeout(function() {
-                            hidden_info = true;
-                            //$("#title").fadeOut();
-                            $("#title").removeClass("slid-in-title");
-                            $("#next_song").removeClass("slid-in");
-                        }, 15000);
-                        //}
-                        if(seekTo){
-                            player.seekTo(seekTo);
-                        }
-                    }
-                });
-
-                socket.on('connect_failed', function(){
-                    console.log("connect failed");
-                    if(!connect_error){
-                        connect_error = true;
-                    }
-                });
-
-                socket.on("connect_error", function(){
-                    console.log("connect error");
-                    if(!connect_error){
-                        connect_error = true;
-                    }
-                });
-
-                socket.on("connect", function(){
-                    console.log("connected");
-                    if(connect_error){
-                        connect_error = false;
-                        socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                        socket.emit('pos', {channel: channel, pass: userpass});
-                    }
-                });
-
-                socket.on("self_ping", function() {
-                    if(channel != undefined && channel.toLowerCase() != "") {
-                        socket.emit("self_ping", {channel: channel.toLowerCase()});
-                    }
-                });
-
-                socket.on("next_song", function(msg) {
-                    console.log("Gotten next_song");
-                    console.log(msg);
-                    nextVideo = msg.videoId;
-                    nextTitle = msg.title;
-                    $("#next_title_content").html("Next:<br>" + nextTitle);
-                    $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-                    if(!$("#next_song").hasClass("slid-in")) {
-                        $("#next_song").addClass("slid-in");
-                    }
-
-                    clearTimeout(hide_timer);
-                    hide_timer = setTimeout(function() {
-                        hidden_info = true;
-                        //$("#title").fadeOut();
-                        $("#title").removeClass("slid-in-title");
-                        $("#next_song").removeClass("slid-in");
-                    }, 15000);
-                });
-
-            }
-
-            oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
-            console.log("Inserted script");
-            break;
     }
 }
 
@@ -384,45 +266,6 @@ window.addEventListener('load', function() {
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 });
-
-function durationSetter(){
-    try{
-        duration = endSeconds;//player.getDuration();
-        dMinutes = Math.floor(duration / 60);
-        dSeconds = duration - dMinutes * 60;
-        currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
-        if(currDurr - startSeconds > duration) {
-            currDurr = duration - startSeconds;
-        }
-        currDurr = currDurr - startSeconds;
-        minutes = Math.floor(currDurr / 60);
-        seconds = currDurr - (minutes * 60);
-
-        if(endSeconds - player.getCurrentTime() <= 15 && hidden_info) {
-            clearTimeout(hide_timer);
-            hidden_info = false;
-            //$("#title").fadeIn();
-            if(!$("#title").hasClass("slid-in-title")) {
-                $("#title").addClass("slid-in-title");
-            }
-            if(!$("#next_song").hasClass("slid-in")) {
-                $("#next_song").addClass("slid-in");
-            }
-        }
-        if($("#title_cont").text() != player.getVideoData().title) {
-            $("#title_cont").text(player.getVideoData().title);
-        }
-        $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
-        if(player.getCurrentTime() > endSeconds) {
-            if(mobile_hack && socket) {
-                socket.emit("end", {id: videoId, channel: channel, pass: userpass});
-            } else {
-                context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
-            }
-        }
-    }catch(err){}
-    setTimeout(durationSetter, 1000);
-}
 
 function pad(n){
     return n < 10 ? "0"+Math.floor(n) : Math.floor(n);
@@ -527,18 +370,4 @@ function onPlayerStateChange(event) {
     } else if(event.data == 2) {
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
     }
-}
-
-function change_info(info) {
-    var qr = info ? "" : "-qr";
-    var info_text = info ? "-qr" : "";
-    $(".zoff-channel-info" + qr).css("opacity", 0);
-    setTimeout(function() {
-        $(".zoff-channel-info" + qr).css("display", "none");
-        $(".zoff-channel-info" + info_text).css("display", "block");
-        $(".zoff-channel-info" + info_text).css("opacity", 1);
-        setTimeout(function() {
-            change_info(!info);
-        }, 10000);
-    }, 500);
 }
