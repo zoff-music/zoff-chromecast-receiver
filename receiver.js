@@ -29,7 +29,7 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     video_id = loadRequestData.media.contentId;
-    loadRequestData.media.contentUrl = contentId;
+    loadRequestData.media.contentId = contentId;
     var customData = loadRequestData.customData;
     if(ytReady) {
         //playerManager.setMediaElement(player);
