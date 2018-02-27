@@ -24,13 +24,13 @@ var videoEl;
 
 window.context = cast.framework.CastReceiverContext.getInstance();
 var playerManager = context.getPlayerManager();
-
+player = new YoutubeVideo({
+    el: videoEl
+});
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
     document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + loadRequestData.media.contentId + '" />';
-    player = new YoutubeVideo({
-        el: videoEl
-    });
+
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     video_id = loadRequestData.media.contentId;
@@ -546,7 +546,7 @@ videoEl.load().then(function () {
     playerManager.setMediaElement(videoEl);
     context.start(appConfig);
     return videoEl.play();
-})
+});
 
 function onPlayerStateChange(event) {
     if (event.data==YT.PlayerState.ENDED) {
