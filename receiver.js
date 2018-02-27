@@ -432,7 +432,6 @@ function onPlayerReady() {
         }
     }
     //cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
-    playerManager.setMediaElement(player);
 }
 
 function errorHandler(event){
@@ -482,11 +481,15 @@ function onPlayerStateChange(event) {
         metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
         metadata.title = player.getVideoData().title;
         var mediaInfo = new cast.framework.messages.MediaInformation(mediaInfo);
-        mediaInfo.contentId = video_id;
+        mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
         mediaInfo.contentType = "video/*";
         mediaInfo.duration= endSeconds - startSeconds;
         mediaInfo.metadata = metadata;
+        console.log("hello");
         playerManager.setMediaInformation(mediaInfo, true);
+        console.log("hello2");
+        playerManager.setMediaElement(player);
+        console.log("hello3");
         //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
