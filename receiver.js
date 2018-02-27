@@ -23,15 +23,16 @@ var videoEl;
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.context = cast.framework.CastReceiverContext.getInstance();
-var playerManager = context.getPlayerManager();
-videoEl = document.getElementById("youtube-player");
-player = new YoutubeVideo({
-    el: videoEl
-});
+window.onload = function() {
+    var playerManager = context.getPlayerManager();
+    videoEl = document.getElementById("youtube-player");
+    player = new YoutubeVideo({
+        el: videoEl
+    });
+}
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
     document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + loadRequestData.media.contentId + '" />';
-
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     video_id = loadRequestData.media.contentId;
