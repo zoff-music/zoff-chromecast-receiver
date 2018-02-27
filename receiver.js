@@ -486,9 +486,9 @@ function onPlayerStateChange(event) {
         mediaInfo.duration= endSeconds - startSeconds;
         mediaInfo.metadata = metadata;
         console.log("hello");
+        playerManager.setMediaElement(player);
         playerManager.setMediaInformation(mediaInfo, true);
         console.log("hello2");
-        playerManager.setMediaElement(player);
         console.log("hello3");
         //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
