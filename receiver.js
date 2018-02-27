@@ -27,9 +27,9 @@ const playerManager = context.getPlayerManager();
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
     console.log(loadRequestData);
-    var contentId = loadRequestData.media.contentId;
+    var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     var customData = loadRequestData.customData;
-    video_id = contentId;
+    video_id = loadRequestData.media.contentId;
     if(ytReady) {
         player.loadVideoById(video_id);
     }
@@ -39,8 +39,8 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
 
     //loadRequestData.media.metadata =
 
-    //return loadRequestData;
-    return true;
+    return loadRequestData;
+    //return true;
 });
 
 playerManager.addEventListener(cast.framework.events.category.CORE, event => {
