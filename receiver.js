@@ -26,6 +26,7 @@ const playerManager = context.getPlayerManager();
 
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
+    console.log(loadRequestData);
     var contentId = loadRequestData.media.contentId;
     var customData = loadRequestData.customData;
     video_id = contentId;
