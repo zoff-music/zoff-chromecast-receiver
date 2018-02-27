@@ -24,6 +24,7 @@ var videoEl;
 
 window.context = cast.framework.CastReceiverContext.getInstance();
 var playerManager = context.getPlayerManager();
+videoEl = document.getElementById("youtube-player");
 player = new YoutubeVideo({
     el: videoEl
 });
@@ -452,8 +453,6 @@ function onYouTubeIframeAPIReady() {
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
 
 }
-
-videoEl = document.getElementById("youtube-player");
 
 
 function onPlayerReady() {
