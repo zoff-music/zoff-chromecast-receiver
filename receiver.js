@@ -29,7 +29,8 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     video_id = loadRequestData.media.contentId;
-    loadRequestData.media.contentId = contentId;
+    loadRequestData.media.contentUrl = contentId;
+    loadRequestData.media.streamType = "BUFFERED";
     var customData = loadRequestData.customData;
     if(ytReady) {
         playerManager.setMediaElement(player);
@@ -426,12 +427,14 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerReady() {
-    console.log("a");
-    console.log(player.a.setAttribute);
+    player.setAttribute = function() {
+        player.a.setAttribute(arguments[0], arguments[1]);
+    }
+    player.state = "playing";
     playerManager.setMediaElement(player);
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
     context.start(appConfig);
-    context.setApplicationState("Ready to play");
+    //context.setApplicationState("Ready to play");
     ytReady = true;
     if(videoId){
         loading = true;
@@ -472,6 +475,7 @@ function onPlayerStateChange(event) {
         }
 
     } else if(event.data == 1){
+        player.a.dispatchEvent(new Event("PLAYING"));
         loading = false;
         if(seekTo){
             player.seekTo(seekTo);
@@ -491,16 +495,14 @@ function onPlayerStateChange(event) {
         var metadata = new cast.framework.messages.GenericMediaMetadata();
         metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
         metadata.title = player.getVideoData().title;
-        var mediaInfo = new cast.framework.messages.MediaInformation(mediaInfo);
+        var mediaInfo = new cast.framework.messages.MediaInformation();
         mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
         mediaInfo.contentType = "video/*";
-        mediaInfo.duration= endSeconds - startSeconds;
+        mediaInfo.duration = endSeconds - startSeconds;
         mediaInfo.metadata = metadata;
-        console.log("hello");
         playerManager.setMediaElement(player);
         playerManager.setMediaInformation(mediaInfo, true);
-        console.log("hello2");
-        console.log("hello3");
+        context.setApplicationState(player.getVideoData().title);
         //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
