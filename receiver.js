@@ -430,7 +430,7 @@ function onPlayerReady() {
         }
     }
     //cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
-    playerManager.setMediaElement(document.getElementById("youtube-player"));
+    //playerManager.setMediaElement(document.getElementById("youtube-player"));
 }
 
 function errorHandler(event){
