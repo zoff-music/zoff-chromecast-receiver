@@ -23,13 +23,6 @@ var showInfoTimer;
 
 window.context = cast.framework.CastReceiverContext.getInstance();
 var playerManager = context.getPlayerManager();
-playerManager.a.setAttribute = function() {
-    console.log(arguments);
-}
-
-playerManager.a.a.setAttribute = function() {
-    console.log(arguments);
-}
 
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
@@ -38,7 +31,8 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     var customData = loadRequestData.customData;
     video_id = loadRequestData.media.contentId;
     if(ytReady) {
-        playerManager.setMediaElement(player);
+        //playerManager.setMediaElement(player);
+        playerManager.setMediaElement(document.getElementById("youtube-player"));
         player.loadVideoById(video_id);
     }
     for(var i = 0; i < customData.length; i++) {
@@ -427,11 +421,14 @@ function onYouTubeIframeAPIReady() {
     player.a.setAttribute = function() {
         console.log(arguments);
     }
-    playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(player);
+    playerManager.setMediaElement(document.getElementById("youtube-player"));
+
 }
 
 function onPlayerReady() {
-    playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(player);
+    playerManager.setMediaElement(document.getElementById("youtube-player"));
     context.start(appConfig);
     context.setApplicationState("Ready to play");
     ytReady = true;
