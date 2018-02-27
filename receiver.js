@@ -76,7 +76,7 @@ window.onload = function() {
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
     });
 
-    document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + video_id + '" />';
+    document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + videoId + '" />';
 
     videoEl.load().then(function () {
         videoEl.play();
@@ -89,7 +89,7 @@ window.onload = function() {
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
-    video_id = loadRequestData.media.contentId;
+    videoId = loadRequestData.media.contentId;
     loadRequestData.media.contentUrl = contentId;
     loadRequestData.media.streamType = "BUFFERED";
     var customData = loadRequestData.customData;
@@ -146,6 +146,10 @@ function messageHandle(event) {
     console.log(event);
     switch(json_parsed.type){
         case "loadVideo":
+            try {
+                document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + json_parsed.videoId + '" />';
+
+            }catch(e) {}
             if(!mobile_hack) {
                 if(ytReady){
                     loading = true;
