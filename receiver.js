@@ -23,8 +23,8 @@ var videoEl;
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.context = cast.framework.CastReceiverContext.getInstance();
+var playerManager = context.getPlayerManager();
 window.onload = function() {
-    var playerManager = context.getPlayerManager();
     videoEl = document.getElementById("youtube-player");
     player = new YoutubeVideo({
         el: videoEl
