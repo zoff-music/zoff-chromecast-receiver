@@ -32,8 +32,8 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     loadRequestData.media.contentId = contentId;
     var customData = loadRequestData.customData;
     if(ytReady) {
-        //playerManager.setMediaElement(player);
-        playerManager.setMediaElement(document.getElementById("youtube-player"));
+        playerManager.setMediaElement(player);
+        //playerManager.setMediaElement(document.getElementById("youtube-player"));
         player.loadVideoById(video_id);
     }
     for(var i = 0; i < customData.length; i++) {
@@ -422,14 +422,14 @@ function onYouTubeIframeAPIReady() {
     player.a.setAttribute = function() {
         console.log(arguments);
     }
-    //playerManager.setMediaElement(player);
-    playerManager.setMediaElement(document.getElementById("youtube-player"));
+    playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(document.getElementById("youtube-player"));
 
 }
 
 function onPlayerReady() {
     //playerManager.setMediaElement(player);
-    playerManager.setMediaElement(document.getElementById("youtube-player"));
+    //playerManager.setMediaElement(document.getElementById("youtube-player"));
     context.start(appConfig);
     context.setApplicationState("Ready to play");
     ytReady = true;
