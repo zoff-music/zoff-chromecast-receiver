@@ -21,10 +21,36 @@ var showInfoTimer;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
-window.castReceiverManager = cast.framework.CastReceiverContext.getInstance();
+window.context = cast.framework.CastReceiverContext.getInstance();
+const playerManager = context.getPlayerManager();
+
+// intercept the LOAD request to be able to read in a contentId and get data
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
+    var contentId = loadRequestData.media.contentId;
+    var customData = loadRequestData.customData;
+    video_id = contentId;
+    if(ytReady) {
+        player.loadVideoById(video_id);
+    }
+    for(var i = 0; i < customData.length; i++) {
+        messageHandle({data: customData[i]});
+    }
+
+    //loadRequestData.media.metadata =
+
+    //return loadRequestData;
+    return loadRequestData;
+});
+
+playerManager.addEventListener(cast.framework.events.category.CORE, event => {
+    console.log(event);
+});
+
 var NAMESPACE = 'urn:x-cast:zoff.me';
-//var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
-castReceiverManager.addCustomMessageListener(NAMESPACE, function(event) {
+//var customMessageBus = context.getCastMessageBus('urn:x-cast:zoff.me');
+context.addCustomMessageListener(NAMESPACE, messageHandle);
+
+function messageHandle(event) {
     console.log(event);
     var json_parsed;
     try {
@@ -55,7 +81,7 @@ castReceiverManager.addCustomMessageListener(NAMESPACE, function(event) {
                         player.seekTo(json_parsed.seekTo + startSeconds);
                     }
                     if(initial){
-                        $("#player").toggleClass("hide");
+                        $("#youtube-player").toggleClass("hide");
                         $(".uil-ring-css").toggleClass("hide");
                         $(".zoff-info").toggleClass("center");
                         $(".zoff-info").toggleClass("lower_left");
@@ -265,7 +291,8 @@ castReceiverManager.addCustomMessageListener(NAMESPACE, function(event) {
             console.log("Inserted script");
             break;
     }
-});
+}
+
 /**
 * Application config
 **/
@@ -290,20 +317,41 @@ appConfig.statusText = 'Ready to play';
 // 100 minutes for testing, use default 10sec in prod by not setting this value
 appConfig.maxInactivity = 86400;
 
-window.castReceiverManager.addEventListener('SENDER_DISCONNECTED', function(event) {
+window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
     console.log(event);
-    if(window.castReceiverManager.getSenders().length == 0 &&
+    if(window.context.getSenders().length == 0 &&
     event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
         window.close();
     }
 });
-/*window.castReceiverManager.onSenderDisconnected = function(event) {
-    console.log(event);
-    if(window.castReceiverManager.getSenders().length == 0 &&
-    event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
-        window.close();
-    }
-}*/
+
+const playerData = {};
+const playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
+
+// Update ui according to player state
+playerDataBinder.addEventListener(
+    cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
+    e => {
+      switch (e.value) {
+        case cast.framework.ui.State.LAUNCHING:
+            console.log("Player is LAUNCHING");
+        case cast.framework.ui.State.IDLE:
+            console.log("Player is IDLE");
+            break;
+        case cast.framework.ui.State.LOADING:
+            console.log("Player is LOADING");
+            break;
+        case cast.framework.ui.State.BUFFERING:
+            console.log("Player is BUFFERING");
+            break;
+        case cast.framework.ui.State.PAUSED:
+            console.log("Player is PAUSED");
+            break;
+        case cast.framework.ui.State.PLAYING:
+            console.log("Player is PLAYING");
+            break;
+      }
+    });
 
 window.addEventListener('load', function() {
     var tag = document.createElement('script');
@@ -344,7 +392,7 @@ function durationSetter(){
             if(mobile_hack && socket) {
                 socket.emit("end", {id: videoId, channel: channel, pass: userpass});
             } else {
-                castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
+                context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
             }
         }
     }catch(err){}
@@ -356,7 +404,7 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
+    player = new YT.Player('youtube-player', {
         height: 562,
         width: 1000,
         playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
@@ -369,7 +417,8 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerReady() {
-    window.castReceiverManager.start(appConfig);
+    context.start(appConfig);
+    context.setApplicationState("Ready to play");
     ytReady = true;
     if(videoId){
         loading = true;
@@ -380,6 +429,8 @@ function onPlayerReady() {
             seekTo = null;
         }
     }
+    cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
+    //playerManager.setMediaElement(document.getElementById("youtube-player"));
 }
 
 function errorHandler(event){
@@ -395,7 +446,7 @@ function errorHandler(event){
                     userpass: userpass
                 });
             } else {
-                castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+                context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
             }
     }
 }
@@ -405,7 +456,7 @@ function onPlayerStateChange(event) {
         if(mobile_hack && socket) {
             socket.emit("end", {id: videoId, channel: channel, pass: userpass});
         } else {
-            castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
+            context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
         }
 
     } else if(event.data == 1){
@@ -425,9 +476,21 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
-        castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
+        var mediaInfo = new cast.framework.messages.MediaInformation({
+            contentId: video_id,
+            contentType: "video/*",
+            duration: endSeconds - startSeconds,
+            metadata: new cast.framework.messages.GenericMediaMetadata({
+                images: "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg",
+                title: player.getVideoData().title
+            })
+        });
+
+        //playerManager.setMediaInformation(mediaInfo, true);
+        cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
-        castReceiverManager.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
     }
 }
 
