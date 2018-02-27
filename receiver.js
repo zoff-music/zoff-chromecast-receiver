@@ -18,6 +18,7 @@ var socket_id;
 var socket;
 var hide_timer;
 var showInfoTimer;
+var videoEl;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
@@ -26,6 +27,10 @@ var playerManager = context.getPlayerManager();
 
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
+    document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + loadRequestData.media.contentId + '" />';
+    player = new YoutubeVideo({
+        el: videoEl
+    });
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     video_id = loadRequestData.media.contentId;
@@ -33,9 +38,9 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     loadRequestData.media.streamType = "BUFFERED";
     var customData = loadRequestData.customData;
     if(ytReady) {
-        playerManager.setMediaElement(player);
+        playerManager.setMediaElement(videoEl);
         //playerManager.setMediaElement(document.getElementById("youtube-player"));
-        player.loadVideoById(video_id);
+        //player.loadVideoById(video_id);
     }
     for(var i = 0; i < customData.length; i++) {
         messageHandle({data: customData[i]});
@@ -99,10 +104,10 @@ function messageHandle(event) {
                         endSeconds = json_parse.duration;
                     }
                     if(prev_video != videoId){
-                        player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+                        //player.loadVideoById({'videoId': json_parsed.videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
                     }
                     if(json_parsed.seekTo){
-                        player.seekTo(json_parsed.seekTo + startSeconds);
+                        //player.seekTo(json_parsed.seekTo + startSeconds);
                     }
                     if(initial){
                         $("#youtube-player").toggleClass("hide");
@@ -143,26 +148,26 @@ function messageHandle(event) {
             $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://zoff.me/" + channel);
             break;
         case "playPauseVideo":
-            if(player.getPlayerState() == 1) {
+            /*if(player.getPlayerState() == 1) {
                 player.pauseVideo();
             } else {
                 player.playVideo();
-            }
+            }*/
             break;
         case "stopVideo":
-            player.stopVideo();
+            //player.stopVideo();
             break;
         case "pauseVideo":
-            player.pauseVideo();
+            //player.pauseVideo();
             break;
         case "playVideo":
-            player.playVideo();
+            //player.playVideo();
             break;
         case "mute":
-            player.mute();
+            //player.mute();
             break;
         case "unMute":
-            player.unMute();
+            //player.unMute();
             break;
         case "showJoinInfo":
             clearTimeout(showInfoTimer);
@@ -175,7 +180,7 @@ function messageHandle(event) {
             break;
         case "seekTo":
             if(!mobile_hack) {
-                player.seekTo(json_parsed.seekTo + startSeconds);
+                //player.seekTo(json_parsed.seekTo + startSeconds);
             }
             break;
         case "nextVideo":
@@ -236,7 +241,7 @@ function messageHandle(event) {
                             endSeconds = msg.np[0].duration;
                         }
                         //if(prev_video != videoId){
-                        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+                        //player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
                         //$("#title").fadeIn();
                         if(!$("#title").hasClass("slid-in-title")) {
                             $("#title").addClass("slid-in-title");
@@ -253,7 +258,7 @@ function messageHandle(event) {
                         }, 15000);
                         //}
                         if(seekTo){
-                            player.seekTo(seekTo);
+                            //player.seekTo(seekTo);
                         }
                     }
                 });
@@ -378,14 +383,15 @@ playerDataBinder.addEventListener(
       }
     });
 
+/*
 window.addEventListener('load', function() {
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-});
+});*/
 
-function durationSetter(){
+function durationSetter(){/*
     try{
         duration = endSeconds;//player.getDuration();
         dMinutes = Math.floor(duration / 60);
@@ -421,7 +427,7 @@ function durationSetter(){
             }
         }
     }catch(err){}
-    setTimeout(durationSetter, 1000);
+    setTimeout(durationSetter, 1000);*/
 }
 
 function pad(n){
@@ -429,6 +435,7 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
+    /*
     player = new YT.Player('youtube-player', {
         height: 562,
         width: 1000,
@@ -438,15 +445,19 @@ function onYouTubeIframeAPIReady() {
             'onStateChange': onPlayerStateChange,
             'onError': errorHandler
         }
-    });
+    });*/
+
 
     //playerManager.setMediaElement(player);
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
 
 }
 
+videoEl = document.getElementById("youtube-player");
+
+
 function onPlayerReady() {
-    player.setAttribute = function() {
+    /*player.setAttribute = function() {
         player.a.setAttribute(arguments[0], arguments[1]);
     }
     player.state = "playing";
@@ -463,11 +474,11 @@ function onPlayerReady() {
             player.seekTo(seekTo);
             seekTo = null;
         }
-    }
+    }*/
     //cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
 }
 
-function errorHandler(event){
+function errorHandler(event){/*
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
             if(mobile_hack && socket) {
@@ -482,8 +493,60 @@ function errorHandler(event){
             } else {
                 context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
             }
-    }
+    }*/
 }
+
+videoEl.addEventListener('playing', function () {
+    //player.a.dispatchEvent(new Event("PLAYING"));
+    loading = false;
+    if(seekTo){
+        //player.seekTo(seekTo);
+        seekTo = null;
+    }
+
+    if(started == false) {
+        started = true;
+        clearTimeout(hide_timer);
+        hide_timer = setTimeout(function() {
+            hidden_info = true;
+            //$("#title").fadeOut();
+            $("#title").removeClass("slid-in-title");
+            $("#next_song").removeClass("slid-in");
+        }, 15000);
+    }
+    var metadata = new cast.framework.messages.GenericMediaMetadata();
+    metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
+    metadata.title = "player.getVideoData().title";
+    var mediaInfo = new cast.framework.messages.MediaInformation();
+    mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
+    mediaInfo.contentType = "video/*";
+    mediaInfo.duration = endSeconds - startSeconds;
+    mediaInfo.metadata = metadata;
+    playerManager.setMediaElement(player);
+    playerManager.setMediaInformation(mediaInfo, true);
+    context.setApplicationState("player.getVideoData().title");
+    //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
+    context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
+});
+
+videoEl.addEventListener('ended', function () {
+    if(mobile_hack && socket) {
+        socket.emit("end", {id: videoId, channel: channel, pass: userpass});
+    } else {
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
+    }
+});
+
+videoEl.addEventListener('pause', function () {
+    context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
+});
+
+videoEl.load().then(function () {
+    videoEl.play();
+    playerManager.setMediaElement(videoEl);
+    context.start(appConfig);
+    return videoEl.play();
+})
 
 function onPlayerStateChange(event) {
     if (event.data==YT.PlayerState.ENDED) {
@@ -494,10 +557,10 @@ function onPlayerStateChange(event) {
         }
 
     } else if(event.data == 1){
-        player.a.dispatchEvent(new Event("PLAYING"));
+        //player.a.dispatchEvent(new Event("PLAYING"));
         loading = false;
         if(seekTo){
-            player.seekTo(seekTo);
+            //player.seekTo(seekTo);
             seekTo = null;
         }
 
@@ -513,7 +576,7 @@ function onPlayerStateChange(event) {
         }
         var metadata = new cast.framework.messages.GenericMediaMetadata();
         metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
-        metadata.title = player.getVideoData().title;
+        metadata.title = "player.getVideoData().title";
         var mediaInfo = new cast.framework.messages.MediaInformation();
         mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
         mediaInfo.contentType = "video/*";
@@ -521,7 +584,7 @@ function onPlayerStateChange(event) {
         mediaInfo.metadata = metadata;
         playerManager.setMediaElement(player);
         playerManager.setMediaInformation(mediaInfo, true);
-        context.setApplicationState(player.getVideoData().title);
+        context.setApplicationState("player.getVideoData().title");
         //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
