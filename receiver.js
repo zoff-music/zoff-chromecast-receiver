@@ -51,6 +51,25 @@ playerManager.addEventListener(cast.framework.events.category.CORE, event => {
     console.log(event);
 });
 
+playerManager.addEventListener(cast.framework.events.category.DEBUG, event => {
+    console.log(event);
+});
+
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.MEDIA_STATUS, status => {
+    console.log(status);
+    status.customData = {};
+    status.playerState = "PLAYING";
+    return status;
+});
+
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.PLAY, status => {
+    console.log(status);
+});
+
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.SEEK, status => {
+    console.log(status);
+});
+
 var NAMESPACE = 'urn:x-cast:zoff.me';
 //var customMessageBus = context.getCastMessageBus('urn:x-cast:zoff.me');
 context.addCustomMessageListener(NAMESPACE, messageHandle);
@@ -333,7 +352,7 @@ window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
 const playerData = {};
 const playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
 
-// Update ui according to player state
+/// Update ui according to player state
 playerDataBinder.addEventListener(
     cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
     e => {
