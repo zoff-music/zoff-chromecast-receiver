@@ -338,6 +338,7 @@ playerDataBinder.addEventListener(
             console.log("Player is LAUNCHING");
         case cast.framework.ui.State.IDLE:
             console.log("Player is IDLE");
+            console.log(e);
             break;
         case cast.framework.ui.State.LOADING:
             console.log("Player is LOADING");
