@@ -419,19 +419,16 @@ function onYouTubeIframeAPIReady() {
             'onError': errorHandler
         }
     });
-    
-    player.prototype.a = {
-        setAttribute: function() {
-            console.log(arguments);
-        }
-    };
-    playerManager.setMediaElement(player);
+
+    //playerManager.setMediaElement(player);
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
 
 }
 
 function onPlayerReady() {
-    //playerManager.setMediaElement(player);
+    console.log("a");
+    console.log(player.a.setAttribute);
+    playerManager.setMediaElement(player);
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
     context.start(appConfig);
     context.setApplicationState("Ready to play");
