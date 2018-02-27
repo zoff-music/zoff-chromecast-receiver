@@ -417,6 +417,9 @@ function onYouTubeIframeAPIReady() {
             'onError': errorHandler
         }
     });
+    player.a.setAttribute = function() {
+        console.log(arguments);
+    }
     playerManager.setMediaElement(player);
 }
 
