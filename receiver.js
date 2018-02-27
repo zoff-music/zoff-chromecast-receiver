@@ -28,8 +28,9 @@ var playerManager = context.getPlayerManager();
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
-    var customData = loadRequestData.customData;
     video_id = loadRequestData.media.contentId;
+    loadRequestData.media.contentUrl = contentId;
+    var customData = loadRequestData.customData;
     if(ytReady) {
         //playerManager.setMediaElement(player);
         playerManager.setMediaElement(document.getElementById("youtube-player"));
