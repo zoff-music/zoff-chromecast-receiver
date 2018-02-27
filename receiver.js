@@ -29,10 +29,64 @@ window.onload = function() {
     player = new YoutubeVideo({
         el: videoEl
     });
+
+
+    videoEl.addEventListener('playing', function () {
+        //player.a.dispatchEvent(new Event("PLAYING"));
+        loading = false;
+        if(seekTo){
+            //player.seekTo(seekTo);
+            seekTo = null;
+        }
+
+        if(started == false) {
+            started = true;
+            clearTimeout(hide_timer);
+            hide_timer = setTimeout(function() {
+                hidden_info = true;
+                //$("#title").fadeOut();
+                $("#title").removeClass("slid-in-title");
+                $("#next_song").removeClass("slid-in");
+            }, 15000);
+        }
+        var metadata = new cast.framework.messages.GenericMediaMetadata();
+        metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
+        metadata.title = "player.getVideoData().title";
+        var mediaInfo = new cast.framework.messages.MediaInformation();
+        mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
+        mediaInfo.contentType = "video/*";
+        mediaInfo.duration = endSeconds - startSeconds;
+        mediaInfo.metadata = metadata;
+        playerManager.setMediaElement(player);
+        playerManager.setMediaInformation(mediaInfo, true);
+        context.setApplicationState("player.getVideoData().title");
+        //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
+    });
+
+    videoEl.addEventListener('ended', function () {
+        if(mobile_hack && socket) {
+            socket.emit("end", {id: videoId, channel: channel, pass: userpass});
+        } else {
+            context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
+        }
+    });
+
+    videoEl.addEventListener('pause', function () {
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
+    });
+
+    document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + video_id + '" />';
+
+    videoEl.load().then(function () {
+        videoEl.play();
+        playerManager.setMediaElement(videoEl);
+        context.start(appConfig);
+        return videoEl.play();
+    });
 }
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
-    document.getElementById("youtube-player").innerHTML = '<source type="video/youtube" src="https://www.youtube.com/watch?v=' + loadRequestData.media.contentId + '" />';
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
     video_id = loadRequestData.media.contentId;
@@ -495,58 +549,6 @@ function errorHandler(event){/*
             }
     }*/
 }
-
-videoEl.addEventListener('playing', function () {
-    //player.a.dispatchEvent(new Event("PLAYING"));
-    loading = false;
-    if(seekTo){
-        //player.seekTo(seekTo);
-        seekTo = null;
-    }
-
-    if(started == false) {
-        started = true;
-        clearTimeout(hide_timer);
-        hide_timer = setTimeout(function() {
-            hidden_info = true;
-            //$("#title").fadeOut();
-            $("#title").removeClass("slid-in-title");
-            $("#next_song").removeClass("slid-in");
-        }, 15000);
-    }
-    var metadata = new cast.framework.messages.GenericMediaMetadata();
-    metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
-    metadata.title = "player.getVideoData().title";
-    var mediaInfo = new cast.framework.messages.MediaInformation();
-    mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
-    mediaInfo.contentType = "video/*";
-    mediaInfo.duration = endSeconds - startSeconds;
-    mediaInfo.metadata = metadata;
-    playerManager.setMediaElement(player);
-    playerManager.setMediaInformation(mediaInfo, true);
-    context.setApplicationState("player.getVideoData().title");
-    //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
-    context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
-});
-
-videoEl.addEventListener('ended', function () {
-    if(mobile_hack && socket) {
-        socket.emit("end", {id: videoId, channel: channel, pass: userpass});
-    } else {
-        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
-    }
-});
-
-videoEl.addEventListener('pause', function () {
-    context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
-});
-
-videoEl.load().then(function () {
-    videoEl.play();
-    playerManager.setMediaElement(videoEl);
-    context.start(appConfig);
-    return videoEl.play();
-});
 
 function onPlayerStateChange(event) {
     if (event.data==YT.PlayerState.ENDED) {
