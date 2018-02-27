@@ -22,7 +22,14 @@ var showInfoTimer;
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.context = cast.framework.CastReceiverContext.getInstance();
-const playerManager = context.getPlayerManager();
+var playerManager = context.getPlayerManager();
+playerManager.a.setAttribute = function() {
+    console.log(arguments);
+}
+
+playerManager.a.a.setAttribute = function() {
+    console.log(arguments);
+}
 
 // intercept the LOAD request to be able to read in a contentId and get data
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
