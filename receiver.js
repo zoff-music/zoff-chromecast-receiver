@@ -58,7 +58,6 @@ playerManager.addEventListener(cast.framework.events.category.DEBUG, event => {
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.MEDIA_STATUS, status => {
     console.log(status);
     status.customData = {};
-    status.playerState = "PLAYING";
     return status;
 });
 
@@ -350,30 +349,6 @@ window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
 });
 
 /// Update ui according to player state
-playerDataBinder.addEventListener(
-    cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
-    e => {
-      switch (e.value) {
-        case cast.framework.ui.State.LAUNCHING:
-            console.log("Player is LAUNCHING");
-        case cast.framework.ui.State.IDLE:
-            console.log("Player is IDLE");
-            console.log(e);
-            break;
-        case cast.framework.ui.State.LOADING:
-            console.log("Player is LOADING");
-            break;
-        case cast.framework.ui.State.BUFFERING:
-            console.log("Player is BUFFERING");
-            break;
-        case cast.framework.ui.State.PAUSED:
-            console.log("Player is PAUSED");
-            break;
-        case cast.framework.ui.State.PLAYING:
-            console.log("Player is PLAYING");
-            break;
-      }
-    });
 
 /*window.addEventListener('load', function() {
     var tag = document.createElement('script');
@@ -436,6 +411,30 @@ function onYouTubeIframeAPIReady() {
         "LOADING": YT.PlayerState.UNSTARTED
     };
     playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
+    playerDataBinder.addEventListener(
+        cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
+        e => {
+          switch (e.value) {
+            case cast.framework.ui.State.LAUNCHING:
+                console.log("Player is LAUNCHING");
+            case cast.framework.ui.State.IDLE:
+                console.log("Player is IDLE");
+                console.log(e);
+                break;
+            case cast.framework.ui.State.LOADING:
+                console.log("Player is LOADING");
+                break;
+            case cast.framework.ui.State.BUFFERING:
+                console.log("Player is BUFFERING");
+                break;
+            case cast.framework.ui.State.PAUSED:
+                console.log("Player is PAUSED");
+                break;
+            case cast.framework.ui.State.PLAYING:
+                console.log("Player is PLAYING");
+                break;
+          }
+    });
 
     player = new YT.Player('youtube-player', {
         height: 562,
