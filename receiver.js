@@ -402,6 +402,7 @@ function pad(n){
 var playerData;
 var playerDataBinder;
 
+function onYouTubeIframeAPIReady() {
 // Trying to hook up with events from youtube
     playerData = {
         "PLAYING": YT.PlayerState.PLAYING,
