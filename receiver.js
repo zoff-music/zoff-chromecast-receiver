@@ -19,6 +19,7 @@ var socket;
 var hide_timer;
 var showInfoTimer;
 
+/*
 cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 cast.receiver.MediaManager.customizedStatusCallback = function (mediaStatus) {
@@ -29,7 +30,7 @@ cast.receiver.MediaManager.customizedStatusCallback = function (mediaStatus) {
 cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaStatus) {
     console.log(mediaStatus);
     return getCurrentData();
-}
+}*/
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
@@ -381,14 +382,15 @@ function generateData() {
 }
 
 function onPlayerReady() {
-    player.load = function() {
+    /*player.load = function() {
             return true;
     }
     mediaElement = player;  // eg. <video id='media'/>
     mediaManager = new cast.receiver.MediaManager(mediaElement);
     mediaManager.customizedStatusCallback = function(mediaStatus) {
+        console.log(mediaStatus);
         return generateData();
-    }
+    }*/
 
     window.castReceiverManager.start(appConfig);
     ytReady = true;
@@ -462,7 +464,7 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
-        mediaManager.setMediaInformation(generateData(), true);
+        //mediaManager.setMediaInformation(generateData(), true);
         //mediaManager.customizedStatusCallback(getCurrentData());
         mediaManager.broadcastStatus(true);
         customMessageBus.broadcast(JSON.stringify({type: 1}));
