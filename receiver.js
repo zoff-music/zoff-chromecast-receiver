@@ -402,7 +402,7 @@ function pad(n){
 var playerData;
 var playerDataBinder;
 
-function onYouTubeIframeAPIReady() {
+// Trying to hook up with events from youtube
     playerData = {
         "PLAYING": YT.PlayerState.PLAYING,
         "PAUSED": YT.PlayerState.PAUSED,
@@ -411,7 +411,9 @@ function onYouTubeIframeAPIReady() {
         "playing": YT.PlayerState.PLAYING,
         "paused": YT.PlayerState.PAUSED,
         "buffering": YT.PlayerState.BUFFERING,
-        "loading": YT.PlayerState.UNSTARTED
+        "loading": YT.PlayerState.UNSTARTED,
+        1: "playing",
+        2: "paused",
     };
     playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
     console.log("yes");
