@@ -399,7 +399,46 @@ function pad(n){
     return n < 10 ? "0"+Math.floor(n) : Math.floor(n);
 }
 
+playerData;
+playerDataBinder;
+
 function onYouTubeIframeAPIReady() {
+    playerData = {
+        "PLAYING": YT.PlayerState.PLAYING,
+        "PAUSED": YT.PlayerState.PAUSED,
+        "BUFFERING": YT.PlayerState.BUFFERING,
+        "LOADING": YT.PlayerState.UNSTARTED,
+        "playing": YT.PlayerState.PLAYING,
+        "paused": YT.PlayerState.PAUSED,
+        "buffering": YT.PlayerState.BUFFERING,
+        "loading": YT.PlayerState.UNSTARTED
+    };
+    playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
+    console.log("yes");
+    playerDataBinder.addEventListener(
+        cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
+        e => {
+          switch (e.value) {
+            case cast.framework.ui.State.LAUNCHING:
+                console.log("Player is LAUNCHING");
+            case cast.framework.ui.State.IDLE:
+                console.log("Player is IDLE");
+                console.log(e);
+                break;
+            case cast.framework.ui.State.LOADING:
+                console.log("Player is LOADING");
+                break;
+            case cast.framework.ui.State.BUFFERING:
+                console.log("Player is BUFFERING");
+                break;
+            case cast.framework.ui.State.PAUSED:
+                console.log("Player is PAUSED");
+                break;
+            case cast.framework.ui.State.PLAYING:
+                console.log("Player is PLAYING");
+                break;
+          }
+      });
     player = new YT.Player('youtube-player', {
         height: 562,
         width: 1000,
@@ -411,7 +450,7 @@ function onYouTubeIframeAPIReady() {
         }
     });
 
-    
+
 
     //playerManager.setMediaElement(player);
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
