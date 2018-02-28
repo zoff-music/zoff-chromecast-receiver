@@ -523,7 +523,7 @@ function onPlayerStateChange(event) {
         metadata.title = player.getVideoData().title;
         var mediaInfo = new cast.framework.messages.MediaInformation();
         mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
-        mediaInfo.contentType = "video/*";
+        mediaInfo.contentType = "video/youtube";
         mediaInfo.duration = endSeconds - startSeconds;
         mediaInfo.metadata = metadata;
         playerManager.setMediaElement(player);
