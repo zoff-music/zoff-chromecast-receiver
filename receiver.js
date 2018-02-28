@@ -23,30 +23,10 @@ var dummy_div;
 
 
 function setMediaElement() {
-    //playerManager.setMediaElement(player);
+    playerManager.setMediaElement(player);
     //playerManager.setMediaElement(player.a);
     //playerManager.setMediaElement(iframe_player);
-    /*dummy_div.removeEventListener("ERROR");
-    dummy_div.removeEventListener("error");
-    dummy_div.removeEventListener("CLIP_ENDED");
-    dummy_div.removeEventListener("clip_ended");
-    dummy_div.removeEventListener("STOPPED");
-    dummy_div.removeEventListener("stopped");
-    dummy_div.removeEventListener("MEDIA_FINISHED");
-    dummy_div.removeEventListener("media_finished");
-    dummy_div.removeEventListener("LOAD_FAILED");
-    dummy_div.removeEventListener("load_failed");*/
-    playerManager.setMediaElement(dummy_div);
-    /*dummy_div.removeEventListener("ERROR");
-    dummy_div.removeEventListener("error");
-    dummy_div.removeEventListener("CLIP_ENDED");
-    dummy_div.removeEventListener("clip_ended");
-    dummy_div.removeEventListener("STOPPED");
-    dummy_div.removeEventListener("stopped");
-    dummy_div.removeEventListener("MEDIA_FINISHED");
-    dummy_div.removeEventListener("media_finished");
-    dummy_div.removeEventListener("LOAD_FAILED");
-    dummy_div.removeEventListener("load_failed");*/
+    //playerManager.setMediaElement(dummy_div);
     setInterval(function() {
         console.log("dispatching");
         dispatch("playing");
