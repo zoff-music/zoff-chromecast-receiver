@@ -404,13 +404,31 @@ var playerData;
 var playerDataBinder;
 
 function onYouTubeIframeAPIReady() {
+
+
+    player = new YT.Player('youtube-player', {
+        height: 562,
+        width: 1000,
+        playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': errorHandler
+        }
+    });
+
     playerData = {
         "PLAYING": YT.PlayerState.PLAYING,
         "PAUSED": YT.PlayerState.PAUSED,
         "BUFFERING": YT.PlayerState.BUFFERING,
-        "LOADING": YT.PlayerState.UNSTARTED
+        "LOADING": YT.PlayerState.UNSTARTED,
+        "playing": YT.PlayerState.PLAYING,
+        "paused": YT.PlayerState.PAUSED,
+        "buffering": YT.PlayerState.BUFFERING,
+        "loading": YT.PlayerState.UNSTARTED
     };
     playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
+    console.log("yes");
     playerDataBinder.addEventListener(
         cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
         e => {
@@ -434,17 +452,6 @@ function onYouTubeIframeAPIReady() {
                 console.log("Player is PLAYING");
                 break;
           }
-    });
-
-    player = new YT.Player('youtube-player', {
-        height: 562,
-        width: 1000,
-        playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': errorHandler
-        }
     });
 
     //playerManager.setMediaElement(player);
