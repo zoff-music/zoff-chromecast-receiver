@@ -399,8 +399,8 @@ function pad(n){
     return n < 10 ? "0"+Math.floor(n) : Math.floor(n);
 }
 
-playerData;
-playerDataBinder;
+var playerData;
+var playerDataBinder;
 
 function onYouTubeIframeAPIReady() {
     playerData = {
