@@ -23,26 +23,20 @@ var dummy_div;
 
 
 function setMediaElement() {
-    playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(player);
     //playerManager.setMediaElement(player.a);
     //playerManager.setMediaElement(iframe_player);
-    //playerManager.setMediaElement(document.getElementById(dummy_div));
+    playerManager.setMediaElement(document.getElementById(dummy_div));
 }
 
 function setVariables() {
-    dummy_div = document.getElementById("dummy-div-caf");
-    dummy_div.contentType = "video";
-    dummy_div.state = "playing";
-    dummy_div.a.state = player.state;
-    dummy_div.b = true;
-    dummy_div.i = iframe_player.b;
-    dummy_div.getState = function() {
-        return player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
-    }
+    player.state = "playing";
     iframe_player = player.getIframe();
     iframe_player.contentType = "video";
     iframe_player.state = "playing";
-    iframe_player.a.state = player.state;
+    iframe_player.a = {
+        state: player.state
+    };
     iframe_player.b = true;
     iframe_player.i = iframe_player.b;
     iframe_player.getState = function() {
@@ -51,7 +45,7 @@ function setVariables() {
     player.setAttribute = function() {
         player.a.setAttribute(arguments[0], arguments[1]);
     }
-    player.state = "playing";
+
     player.a.state = player.state;
     player.contentType = "video";
     player.a.contentType = player.contentType;
@@ -61,7 +55,19 @@ function setVariables() {
         return player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
     }
     player.c.getState = player.getState;
-
+    dummy_div = document.getElementById("dummy-div-caf");
+    dummy_div.contentType = "video";
+    dummy_div.state = "playing";
+    dummy_div.volume = 100;
+    dummy_div.a.volume = 100;
+    dummy_div.a = {
+        state: player.state
+    };
+    dummy_div.b = true;
+    dummy_div.i = iframe_player.b;
+    dummy_div.getState = function() {
+        return player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    }
 }
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
@@ -73,16 +79,16 @@ var playerManager = context.getPlayerManager();
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
     console.log(loadRequestData);
     var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
-    video_id = loadRequestData.media.contentId;
+    videoId = loadRequestData.media.contentId;
     loadRequestData.media.contentUrl = contentId;
     loadRequestData.media.streamType = "BUFFERED";
     var customData = loadRequestData.customData;
     if(ytReady) {
         setMediaElement();
-        dispatchEvent("loadeddata");
+        dispatch("loadeddata");
         dispatch("PLAYING");
         dispatch("playing");
-        player.loadVideoById(video_id);
+        player.loadVideoById(videoId);
     }
     for(var i = 0; i < customData.length; i++) {
         messageHandle({data: customData[i]});
@@ -511,10 +517,10 @@ function onPlayerReady() {
     setVariables();
     try {
         dispatch("loadeddata");
-        player.b.dispatchEvent(new Event("PLAYING"));
+        /*player.b.dispatchEvent(new Event("PLAYING"));
         player.b.dispatchEvent(new Event("playing"));
         player.dispatchEvent(new Event("playing"));
-        player.dispatchEvent(new Event("PLAYING"));
+        player.dispatchEvent(new Event("PLAYING"));*/
         dispatch("PLAYING");
         dispatch("playing");
         dispatch("play");
@@ -600,10 +606,10 @@ function onPlayerStateChange(event) {
 
 function generateMediaInfo() {
     var metadata = new cast.framework.messages.GenericMediaMetadata();
-    metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
+    metadata.images = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
     metadata.title = player.getVideoData().title;
     var mediaInfo = new cast.framework.messages.MediaInformation();
-    mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
+    mediaInfo.contentId = "https://youtube.com/watch/?v=" + videoId;
     mediaInfo.contentType = "video/*";
     mediaInfo.duration = endSeconds - startSeconds;
     mediaInfo.metadata = metadata;
@@ -612,11 +618,12 @@ function generateMediaInfo() {
 
 function dispatch(evt) {
     try {
-        window.dispatchEvent(new Event(evt));
-        document.dispatchEvent(new Event(evt));
-        player.a.dispatchEvent(new Event(evt));
-        iframe_player.dispatchEvent(new Event(evt));
-        dummy_div.dispatchEvent(new Event(evt));
+        var event = new Event(evt);
+        window.dispatchEvent(event);
+        document.dispatchEvent(event);
+        player.a.dispatchEvent(event);
+        iframe_player.dispatchEvent(event);
+        dummy_div.dispatchEvent(event);
     } catch(e) {
         console.error("Error dispatching something", e);
     }
