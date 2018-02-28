@@ -19,6 +19,18 @@ var socket;
 var hide_timer;
 var showInfoTimer;
 
+cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
+
+cast.receiver.MediaManager.customizedStatusCallback = function (mediaStatus) {
+    console.log(mediaStatus);
+    return getCurrentData();
+}
+
+cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaStatus) {
+    console.log(mediaStatus);
+    return getCurrentData();
+}
+
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
@@ -354,7 +366,30 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+var mediaElement;
+var mediaManager;
+
+function generateData() {
+    var metadata = new cast.receiver.media.GenericMediaMetadata()
+    metadata.title = player.getVideoData().title;
+    metadata.images = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
+    var mediaInfo = new cast.receiver.media.MediaInformation();
+    mediaInfo.metadata = metadata;
+    mediaInfo.contentId = videoId;
+    mediaInfo.contentType = "video/*";
+    return mediaInfo;
+}
+
 function onPlayerReady() {
+    player.load = function() {
+            return true;
+    }
+    mediaElement = player;  // eg. <video id='media'/>
+    mediaManager = new cast.receiver.MediaManager(mediaElement);
+    mediaManager.customizedStatusCallback = function(mediaStatus) {
+        return generateData();
+    }
+
     window.castReceiverManager.start(appConfig);
     ytReady = true;
     if(videoId){
@@ -386,6 +421,22 @@ function errorHandler(event){
     }
 }
 
+function getCurrentData() {
+    var data = new cast.receiver.media.MediaStatus();
+    var extended = new cast.receiver.media.ExtendedMediaStatus();
+    extended.playerState = player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    extended.opt_media = generateData();
+    data.currentItemId = videoId;
+    data.extendedStatus = extended;
+    data.currentTime = player.getCurrentTime();
+    data.playerState = extended.playerState;
+    data.volume.level = player.getVolume() / 100;
+    data.volume.mute = false;
+    data.media = extended.opt_media;
+    data.supportedMediaCommands = 15;
+    return data;
+}
+
 function onPlayerStateChange(event) {
     if (event.data==YT.PlayerState.ENDED) {
         if(mobile_hack && socket) {
@@ -411,8 +462,12 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
+        mediaManager.setMediaInformation(generateData(), true);
+        //mediaManager.customizedStatusCallback(getCurrentData());
+        mediaManager.broadcastStatus(true);
         customMessageBus.broadcast(JSON.stringify({type: 1}));
     } else if(event.data == 2) {
+        //mediaManager.customizedStatusCallback(getCurrentData());
         customMessageBus.broadcast(JSON.stringify({type: 2}));
     }
 }
