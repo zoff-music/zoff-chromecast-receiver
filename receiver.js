@@ -349,7 +349,12 @@ window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
     }
 });
 
-const playerData = {};
+const playerData = {
+    "PLAYING": YT.PlayerState.PLAYING,
+    "PAUSED": YT.PlayerState.PAUSED,
+    "BUFFERING": YT.PlayerState.BUFFERING,
+    "LOADING": YT.PlayerState.UNSTARTED
+};
 const playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
 
 /// Update ui according to player state
