@@ -349,13 +349,12 @@ window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
     }
 });
 
-
-/*window.addEventListener('load', function() {
+window.addEventListener('load', function() {
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-});*
+});
 
 function durationSetter(){
     try{
@@ -411,6 +410,8 @@ function onYouTubeIframeAPIReady() {
             'onError': errorHandler
         }
     });
+
+    
 
     //playerManager.setMediaElement(player);
     //playerManager.setMediaElement(document.getElementById("youtube-player"));
