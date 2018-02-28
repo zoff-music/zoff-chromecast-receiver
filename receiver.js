@@ -26,7 +26,32 @@ function setMediaElement() {
     //playerManager.setMediaElement(player);
     //playerManager.setMediaElement(player.a);
     //playerManager.setMediaElement(iframe_player);
-    playerManager.setMediaElement(document.getElementById(dummy_div));
+    /*dummy_div.removeEventListener("ERROR");
+    dummy_div.removeEventListener("error");
+    dummy_div.removeEventListener("CLIP_ENDED");
+    dummy_div.removeEventListener("clip_ended");
+    dummy_div.removeEventListener("STOPPED");
+    dummy_div.removeEventListener("stopped");
+    dummy_div.removeEventListener("MEDIA_FINISHED");
+    dummy_div.removeEventListener("media_finished");
+    dummy_div.removeEventListener("LOAD_FAILED");
+    dummy_div.removeEventListener("load_failed");*/
+    playerManager.setMediaElement(dummy_div);
+    /*dummy_div.removeEventListener("ERROR");
+    dummy_div.removeEventListener("error");
+    dummy_div.removeEventListener("CLIP_ENDED");
+    dummy_div.removeEventListener("clip_ended");
+    dummy_div.removeEventListener("STOPPED");
+    dummy_div.removeEventListener("stopped");
+    dummy_div.removeEventListener("MEDIA_FINISHED");
+    dummy_div.removeEventListener("media_finished");
+    dummy_div.removeEventListener("LOAD_FAILED");
+    dummy_div.removeEventListener("load_failed");*/
+    setInterval(function() {
+        console.log("dispatching");
+        dispatch("playing");
+        dispatch("PLAYING");
+    }, 3000);
 }
 
 function setVariables() {
@@ -56,12 +81,26 @@ function setVariables() {
     }
     player.c.getState = player.getState;
     dummy_div = document.getElementById("dummy-div-caf");
+    dummy_div.getVolume = function() {
+        return {
+            volume: player.getVolume() / 100,
+            level: player.getVolume() / 100,
+        };
+    };
+    dummy_div.c = {
+        getVolume: dummy_div.getVolume
+    };
+    dummy_div.mediaElement = {
+        volume: 0
+    };
+    dummy_div.volume = 0;
     dummy_div.contentType = "video";
     dummy_div.state = "playing";
-    dummy_div.volume = 100;
-    dummy_div.a.volume = 100;
+    /*dummy_div.volume = 100;
+    dummy_div.a.volume = 100;*/
     dummy_div.a = {
-        state: player.state
+        state: player.state,
+        volume: 0
     };
     dummy_div.b = true;
     dummy_div.i = iframe_player.b;
@@ -407,6 +446,11 @@ window.addEventListener('load', function() {
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    dummy_div.addEventListener("ended", function() {
+        dummy_div.currentTime = 0;
+        dummy_div.load();
+        dummy_div.volume = 0;
+    });
 });
 
 function durationSetter(){
@@ -498,7 +542,15 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('youtube-player', {
         height: 562,
         width: 1000,
-        playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
+        playerVars: {
+            'autoplay': 0,
+            'controls': 0,
+            rel:"0",
+            wmode:"transparent",
+            iv_load_policy: "3",
+            showinfo: "0",
+            origin: "https://cast.zoff.me"
+        },
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
@@ -588,8 +640,8 @@ function onPlayerStateChange(event) {
             }, 15000);
         }
         var mediaInfo = generateMediaInfo();
-        setMediaElement()
-        playerManager.setMediaInformation(mediaInfo, true);
+        //setMediaElement()
+        //playerManager.setMediaInformation(mediaInfo, true);
         context.setApplicationState(player.getVideoData().title);
         dispatch("PLAYING");
         dispatch("playing");
@@ -608,11 +660,13 @@ function generateMediaInfo() {
     var metadata = new cast.framework.messages.GenericMediaMetadata();
     metadata.images = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
     metadata.title = player.getVideoData().title;
+    metadata.volume = 1;
     var mediaInfo = new cast.framework.messages.MediaInformation();
     mediaInfo.contentId = "https://youtube.com/watch/?v=" + videoId;
     mediaInfo.contentType = "video/*";
     mediaInfo.duration = endSeconds - startSeconds;
     mediaInfo.metadata = metadata;
+    mediaInfo.volume = 1;
     return mediaInfo;
 }
 
