@@ -349,14 +349,6 @@ window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
     }
 });
 
-const playerData = {
-    "PLAYING": YT.PlayerState.PLAYING,
-    "PAUSED": YT.PlayerState.PAUSED,
-    "BUFFERING": YT.PlayerState.BUFFERING,
-    "LOADING": YT.PlayerState.UNSTARTED
-};
-const playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
-
 /// Update ui according to player state
 playerDataBinder.addEventListener(
     cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
@@ -433,7 +425,18 @@ function pad(n){
     return n < 10 ? "0"+Math.floor(n) : Math.floor(n);
 }
 
+var playerData;
+var playerDataBinder;
+
 function onYouTubeIframeAPIReady() {
+    playerData = {
+        "PLAYING": YT.PlayerState.PLAYING,
+        "PAUSED": YT.PlayerState.PAUSED,
+        "BUFFERING": YT.PlayerState.BUFFERING,
+        "LOADING": YT.PlayerState.UNSTARTED
+    };
+    playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
+
     player = new YT.Player('youtube-player', {
         height: 562,
         width: 1000,
