@@ -18,6 +18,51 @@ var socket_id;
 var socket;
 var hide_timer;
 var showInfoTimer;
+var iframe_player;
+var dummy_div;
+
+
+function setMediaElement() {
+    playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(player.a);
+    //playerManager.setMediaElement(iframe_player);
+    //playerManager.setMediaElement(document.getElementById(dummy_div));
+}
+
+function setVariables() {
+    dummy_div = document.getElementById("dummy-div-caf");
+    dummy_div.contentType = "video";
+    dummy_div.state = "playing";
+    dummy_div.a.state = player.state;
+    dummy_div.b = true;
+    dummy_div.i = iframe_player.b;
+    dummy_div.getState = function() {
+        return player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    }
+    iframe_player = player.getIframe();
+    iframe_player.contentType = "video";
+    iframe_player.state = "playing";
+    iframe_player.a.state = player.state;
+    iframe_player.b = true;
+    iframe_player.i = iframe_player.b;
+    iframe_player.getState = function() {
+        return player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    }
+    player.setAttribute = function() {
+        player.a.setAttribute(arguments[0], arguments[1]);
+    }
+    player.state = "playing";
+    player.a.state = player.state;
+    player.contentType = "video";
+    player.a.contentType = player.contentType;
+    player.b = true;
+    player.i = true;
+    player.getState = function() {
+        return player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    }
+    player.c.getState = player.getState;
+
+}
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
@@ -33,8 +78,10 @@ playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, lo
     loadRequestData.media.streamType = "BUFFERED";
     var customData = loadRequestData.customData;
     if(ytReady) {
-        playerManager.setMediaElement(player);
-        //playerManager.setMediaElement(document.getElementById("youtube-player"));
+        setMediaElement();
+        dispatchEvent("loadeddata");
+        dispatch("PLAYING");
+        dispatch("playing");
         player.loadVideoById(video_id);
     }
     for(var i = 0; i < customData.length; i++) {
@@ -58,7 +105,7 @@ playerManager.addEventListener(cast.framework.events.category.DEBUG, event => {
 playerManager.setMessageInterceptor(cast.framework.messages.MessageType.MEDIA_STATUS, status => {
     console.log(status);
     status.customData = {};
-    status.playerState = "PLAYING";
+    //status.playerState = "PLAYING";
     return status;
 });
 
@@ -461,12 +508,21 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerReady() {
-    player.setAttribute = function() {
-        player.a.setAttribute(arguments[0], arguments[1]);
+    setVariables();
+    try {
+        dispatch("loadeddata");
+        player.b.dispatchEvent(new Event("PLAYING"));
+        player.b.dispatchEvent(new Event("playing"));
+        player.dispatchEvent(new Event("playing"));
+        player.dispatchEvent(new Event("PLAYING"));
+        dispatch("PLAYING");
+        dispatch("playing");
+        dispatch("play");
+    } catch(e) {
+        console.error("Dispatching event failed", e);
     }
-    player.state = "playing";
-    playerManager.setMediaElement(player);
-    //playerManager.setMediaElement(document.getElementById("youtube-player"));
+    setMediaElement();
+
     context.start(appConfig);
     //context.setApplicationState("Ready to play");
     ytReady = true;
@@ -509,7 +565,6 @@ function onPlayerStateChange(event) {
         }
 
     } else if(event.data == 1){
-        player.a.dispatchEvent(new Event("PLAYING"));
         loading = false;
         if(seekTo){
             player.seekTo(seekTo);
@@ -526,21 +581,44 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
-        var metadata = new cast.framework.messages.GenericMediaMetadata();
-        metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
-        metadata.title = player.getVideoData().title;
-        var mediaInfo = new cast.framework.messages.MediaInformation();
-        mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
-        mediaInfo.contentType = "video/*";
-        mediaInfo.duration = endSeconds - startSeconds;
-        mediaInfo.metadata = metadata;
-        playerManager.setMediaElement(player);
+        var mediaInfo = generateMediaInfo();
+        setMediaElement()
         playerManager.setMediaInformation(mediaInfo, true);
         context.setApplicationState(player.getVideoData().title);
+        dispatch("PLAYING");
+        dispatch("playing");
+        dispatch("play");
         //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
+        dispatch("PAUSED");
+        dispatch("paused");
+        dispatch("pause");
         context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
+    }
+}
+
+function generateMediaInfo() {
+    var metadata = new cast.framework.messages.GenericMediaMetadata();
+    metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
+    metadata.title = player.getVideoData().title;
+    var mediaInfo = new cast.framework.messages.MediaInformation();
+    mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
+    mediaInfo.contentType = "video/*";
+    mediaInfo.duration = endSeconds - startSeconds;
+    mediaInfo.metadata = metadata;
+    return mediaInfo;
+}
+
+function dispatch(evt) {
+    try {
+        window.dispatchEvent(new Event(evt));
+        document.dispatchEvent(new Event(evt));
+        player.a.dispatchEvent(new Event(evt));
+        iframe_player.dispatchEvent(new Event(evt));
+        dummy_div.dispatchEvent(new Event(evt));
+    } catch(e) {
+        console.error("Error dispatching something", e);
     }
 }
 
