@@ -466,7 +466,7 @@ function onPlayerStateChange(event) {
         }
         //mediaManager.setMediaInformation(generateData(), true);
         //mediaManager.customizedStatusCallback(getCurrentData());
-        mediaManager.broadcastStatus(true);
+        //mediaManager.broadcastStatus(true);
         customMessageBus.broadcast(JSON.stringify({type: 1}));
     } else if(event.data == 2) {
         //mediaManager.customizedStatusCallback(getCurrentData());
