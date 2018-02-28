@@ -1,356 +1,355 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8" />
-	<script src="cast_receiver.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	<script src="receiver.js"></script>
-	<title>Zoff Chromecast Receiver</title>
-	<style>
-		body{
-			background: black;
-            font-family: sans-serif;
-			overflow: hidden;
-			margin: 0px;
-		}
-		#player{
-			width: 100vw;
-			height: 100vh;
-			/*margin-left: -8px;
-			margin-top: -8px;*/
-		}
+    <head>
+    	<meta charset="utf-8" />
+        <script type="text/javascript" src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    	<script src="receiver.js"></script>
+    	<title>Zoff Chromecast Receiver</title>
+    	<style>
+    		body{
+    			background: black;
+                font-family: sans-serif;
+    			overflow: hidden;
+    			margin: 0px;
+    		}
 
-		.zoff-info {
-			position: absolute;
-			bottom: 0px;
-			/* width: 100%; */
-			left: 0;
-			right: 0;
-			text-align: left;
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-		}
+            #youtube-player {
+                height: 100vh;
+                width: 100vw;
+            }
 
-		.zoff-channel-info {
-			color: white;
-			padding: 20px;
-			display: flex;
-			align-items: center;
-			font-size: 1.5rem;
-			font-family: sans-serif;
-			text-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
-		}
+    		.zoff-info {
+    			position: absolute;
+    			bottom: 0px;
+    			/* width: 100%; */
+    			left: 0;
+    			right: 0;
+    			text-align: left;
+    			display: flex;
+    			flex-direction: row;
+    			align-items: center;
+    		}
 
-		#zoff-logo {
-			width: 100%;
-		}
+    		.zoff-channel-info {
+    			color: white;
+    			padding: 20px;
+    			display: flex;
+    			align-items: center;
+    			font-size: 1.5rem;
+    			font-family: sans-serif;
+    			text-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
+    		}
 
-		.center{
-			display: block;
-			position: absolute;
-			top: 40%;
-			transform: translateY(-50%);
-			left: 17%;
-			right: 0;
-			margin: auto;
-			text-align: center;
-			width: 50%;
-			bottom: auto;
-		}
+    		#zoff-logo {
+    			width: 100%;
+    		}
 
-		.lower_left{
-			position: absolute;
-			bottom: 0px;
-			width: 15%;
-			left: 0;
-			right: 0;
-			text-align: left;
-		}
+    		.center{
+    			display: block;
+    			position: absolute;
+    			top: 40%;
+    			transform: translateY(-50%);
+    			left: 17%;
+    			right: 0;
+    			margin: auto;
+    			text-align: center;
+    			width: 50%;
+    			bottom: auto;
+    		}
 
-		.hide{
-			display: none;
-		}
+    		.lower_left{
+    			position: absolute;
+    			bottom: 0px;
+    			width: 15%;
+    			left: 0;
+    			right: 0;
+    			text-align: left;
+    		}
 
-		#next_song {
-		    display: flex;
-		    position: absolute;
-		    background: rgba(0,0,0,.5);
-		    right: 0px;
-		    bottom: 40px;
-		    /* border: 1px solid #fff; */
-		    width: 26rem;
-		    height: 7rem;
-		    -webkit-transition: all 1s;
-		    transition: all 1s;
-		    -webkit-transform: translateX(120%);
-		    -webkit-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75);
-		    -moz-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75);
-		    box-shadow: 0px 0px 150px 0px rgba(0,0,0,0.75);
-		}
+    		.hide{
+    			display: none;
+    		}
 
-		#next_pic{
-			height: 7rem;
-		}
+    		#next_song {
+    		    display: flex;
+    		    position: absolute;
+    		    background: rgba(0,0,0,.5);
+    		    right: 0px;
+    		    bottom: 40px;
+    		    /* border: 1px solid #fff; */
+    		    width: 26rem;
+    		    height: 7rem;
+    		    -webkit-transition: all 1s;
+    		    transition: all 1s;
+    		    -webkit-transform: translateX(120%);
+    		    -webkit-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75);
+    		    -moz-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75);
+    		    box-shadow: 0px 0px 150px 0px rgba(0,0,0,0.75);
+    		}
 
-		#next_title{
-			align-self: center;
-			overflow: hidden;
-			color: white;
-			display:flex;
-			flex-direction: column;
-			margin: auto;
-		}
+    		#next_pic{
+    			height: 7rem;
+    		}
 
-		#duration{
-			text-align: center;
-		}
+    		#next_title{
+    			align-self: center;
+    			overflow: hidden;
+    			color: white;
+    			display:flex;
+    			flex-direction: column;
+    			margin: auto;
+    		}
 
-		#title {
-		    width: auto;
-		    padding-right: 40px;
-		    position: absolute;
-		    left: 0;
-		    top: 35px;
-		    padding: 10px 20px 10px 10px;
-		    /* height: 65px; */
-		    color: #fff;
-			-webkit-transition: transform 1s;
-		    transition: transform 1s;
-		    transform: translateX(-120%);
-		    background: rgba(0,0,0,.5);
-		    /* -webkit-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75); */
-		    /* -moz-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75); */
-		    /* box-shadow: 0px 0px 60px -5px rgba(0,0,0,0.75); */
-		}
+    		#duration{
+    			text-align: center;
+    		}
 
-		.slid-in-title {
-			transform: translateX(0%) !important;
-		}
+    		#title {
+    		    width: auto;
+    		    padding-right: 40px;
+    		    position: absolute;
+    		    left: 0;
+    		    top: 35px;
+    		    padding: 10px 20px 10px 10px;
+    		    /* height: 65px; */
+    		    color: #fff;
+    			-webkit-transition: transform 1s;
+    		    transition: transform 1s;
+    		    transform: translateX(-120%);
+    		    background: rgba(0,0,0,.5);
+    		    /* -webkit-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75); */
+    		    /* -moz-box-shadow: 0px 0px 175px 0px rgba(0,0,0,0.75); */
+    		    /* box-shadow: 0px 0px 60px -5px rgba(0,0,0,0.75); */
+    		}
 
-		#title_cont{
-			padding-left:10px;
-		}
+    		.slid-in-title {
+    			transform: translateX(0%) !important;
+    		}
 
-		/*width: 100%;*/
-		@-webkit-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
+    		#title_cont{
+    			padding-left:10px;
+    		}
+
+			@-webkit-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
+			@-webkit-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-		}
-		@-webkit-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
+			@-moz-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
+			@-ms-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-		}
-		@-moz-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
+			@-moz-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
+			@-webkit-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-		}
-		@-ms-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
+			@-o-keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
+			@keyframes uil-ring-anim {
+				0% {
+					-ms-transform: rotate(0deg);
+					-moz-transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+					-o-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+				100% {
+					-ms-transform: rotate(360deg);
+					-moz-transform: rotate(360deg);
+					-webkit-transform: rotate(360deg);
+					-o-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
 			}
-		}
-		@-moz-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
+			.uil-ring-css {
+				background: none;
+				width: 130px;
+				height: 130px;
+				transform: scale(.7);
+				position: absolute;
+				left: 0;
+				right: 0;
+				margin: auto;
+				top: 70%;
 			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
+			.uil-ring-css > div {
+	            position: absolute;
+	            width: 100px;
+	            height: 100px;
+	            border: 15px solid white;
+	            border-radius: 50%;
+	            border-bottom-color: transparent;
+	            border-left-color: transparent;
+	            transform: rotate(-45deg);'
+				-ms-animation: uil-ring-anim 1s linear infinite;
+				-moz-animation: uil-ring-anim 1s linear infinite;
+				-webkit-animation: uil-ring-anim 1s linear infinite;
+				-o-animation: uil-ring-anim 1s linear infinite;
+				animation: uil-ring-anim 1s linear infinite;
 			}
-		}
-		@-webkit-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
-			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
-			}
-		}
-		@-o-keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
-			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
-			}
-		}
-		@keyframes uil-ring-anim {
-			0% {
-				-ms-transform: rotate(0deg);
-				-moz-transform: rotate(0deg);
-				-webkit-transform: rotate(0deg);
-				-o-transform: rotate(0deg);
-				transform: rotate(0deg);
-			}
-			100% {
-				-ms-transform: rotate(360deg);
-				-moz-transform: rotate(360deg);
-				-webkit-transform: rotate(360deg);
-				-o-transform: rotate(360deg);
-				transform: rotate(360deg);
-			}
-		}
-		.uil-ring-css {
-			background: none;
-			width: 130px;
-			height: 130px;
-			transform: scale(.7);
-			position: absolute;
-			left: 0;
-			right: 0;
-			margin: auto;
-			top: 70%;
-		}
-		.uil-ring-css > div {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            border: 15px solid white;
-            border-radius: 50%;
-            border-bottom-color: transparent;
-            border-left-color: transparent;
-            transform: rotate(-45deg);'
-			-ms-animation: uil-ring-anim 1s linear infinite;
-			-moz-animation: uil-ring-anim 1s linear infinite;
-			-webkit-animation: uil-ring-anim 1s linear infinite;
-			-o-animation: uil-ring-anim 1s linear infinite;
-			animation: uil-ring-anim 1s linear infinite;
-		}
 
-		.zoff-channel-info-qr, .zoff-channel-info {
-			-webkit-trasition: opacity .5s;
-			-moz-transition: opacity .5s;
-			-o-transition: opacity .5s;
-			-ms-transition: opacity .5s;
-			transition: opacity .5s;
-		}
+    		.zoff-channel-info-qr, .zoff-channel-info {
+    			-webkit-trasition: opacity .5s;
+    			-moz-transition: opacity .5s;
+    			-o-transition: opacity .5s;
+    			-ms-transition: opacity .5s;
+    			transition: opacity .5s;
+    		}
 
-		.join-info-full {
-			-webkit-trasition: opacity .5s;
-			-moz-transition: opacity .5s;
-			-o-transition: opacity .5s;
-			-ms-transition: opacity .5s;
-			transition: opacity .5s;
-			height: 100vh;
-			width: 100vw;
-			position: absolute;
-			left: 0px;
-			top: 0px;
-			display: flex;
-			justify-content: center;
-			flex-direction: column;
-			align-items: center;
-			background: rgba(0,0,0,.8);
-			color: white;
-			font-family: sans-serif;
-			font-size: 2rem;
-			opacity: 1;
-		}
+    		.join-info-full {
+    			-webkit-trasition: opacity .5s;
+    			-moz-transition: opacity .5s;
+    			-o-transition: opacity .5s;
+    			-ms-transition: opacity .5s;
+    			transition: opacity .5s;
+    			height: 100vh;
+    			width: 100vw;
+    			position: absolute;
+    			left: 0px;
+    			top: 0px;
+    			display: flex;
+    			justify-content: center;
+    			flex-direction: column;
+    			align-items: center;
+    			background: rgba(0,0,0,.8);
+    			color: white;
+    			font-family: sans-serif;
+    			font-size: 2rem;
+    			opacity: 1;
+    		}
 
-		.no-opacity {
-			opacity: 0;
-		}
+    		.no-opacity {
+    			opacity: 0;
+    		}
 
-		.join-info-image {
-			width: 300px;
-		}
+    		.join-info-image {
+    			width: 300px;
+    		}
 
-		.slid-in {
-			-webkit-transform: translateX(0px) !important;
-		}
-	</style>
-</head>
-<body>
-	<div id="wrapper">
-		<div id="title"><p id="title_cont"></p></div>
-		<div id="next_song">
-			<img id="next_pic" src="https://zoff.me/assets/images/loading.png" alt="next_picture">
-			<div id="next_title"><div id="duration">00:00/00:00</div><div id="next_title_content">Coolest song</div></div>
-		</div>
-		<div class="zoff-info center">
-			<img id="zoff-logo" src="z.svg" class="" alt="logo">
-			<div class="zoff-channel-info hide"></div>
-		</div>
-		<div class="uil-ring-css" style="transform:scale(0.7);">
-			<div></div>
-		</div>
-		<div id="player" class="hide"></div>
-		</div>
-		<div class="join-info-full no-opacity">
-			<p>To join this channel, go to</p>
-			<p>zoff.me/<span class="channel-name-link"></span></p>
-			<img class="join-info-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr">
-		</div>
-	</body>
-	</html>
+    		.slid-in {
+    			-webkit-transform: translateX(0px) !important;
+    		}
+    	</style>
+    </head>
+    <body>
+    	<div id="wrapper">
+    		<div id="title"><p id="title_cont"></p></div>
+    		<div id="next_song">
+    			<img id="next_pic" src="https://zoff.me/assets/images/loading.png" alt="next_picture">
+    			<div id="next_title"><div id="duration">00:00/00:00</div><div id="next_title_content">Coolest song</div></div>
+    		</div>
+    		<div class="zoff-info center">
+    			<img id="zoff-logo" src="z.svg" class="" alt="logo">
+    			<div class="zoff-channel-info hide"></div>
+    		</div>
+    		<div class="uil-ring-css" style="transform:scale(0.7);">
+    			<div></div>
+    		</div>
+    		<div id="youtube-player" class="hide castMediaElement"></div>
+    	</div>
+    	<div class="join-info-full no-opacity">
+    		<p>To join this channel, go to</p>
+    		<p>zoff.me/<span class="channel-name-link"></span></p>
+    		<img class="join-info-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr">
+    	</div>
+        <!--<cast-media-player id="player" style="display:none;"></cast-media-player>-->
+    </body>
+</html>

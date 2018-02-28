@@ -21,10 +21,67 @@ var showInfoTimer;
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
-window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
-customMessageBus.onMessage = function(event) {
-    var json_parsed = JSON.parse(event.data);
+window.context = cast.framework.CastReceiverContext.getInstance();
+var playerManager = context.getPlayerManager();
+
+// intercept the LOAD request to be able to read in a contentId and get data
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.LOAD, loadRequestData => {
+    console.log(loadRequestData);
+    var contentId = "https://www.youtube.com/watch?v=" + loadRequestData.media.contentId;
+    video_id = loadRequestData.media.contentId;
+    loadRequestData.media.contentUrl = contentId;
+    loadRequestData.media.streamType = "BUFFERED";
+    var customData = loadRequestData.customData;
+    if(ytReady) {
+        playerManager.setMediaElement(player);
+        //playerManager.setMediaElement(document.getElementById("youtube-player"));
+        player.loadVideoById(video_id);
+    }
+    for(var i = 0; i < customData.length; i++) {
+        messageHandle({data: customData[i]});
+    }
+
+    //loadRequestData.media.metadata =
+
+    return loadRequestData;
+    //return true;
+});
+
+playerManager.addEventListener(cast.framework.events.category.CORE, event => {
+    console.log(event);
+});
+
+playerManager.addEventListener(cast.framework.events.category.DEBUG, event => {
+    console.log(event);
+});
+
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.MEDIA_STATUS, status => {
+    console.log(status);
+    status.customData = {};
+    status.playerState = "PLAYING";
+    return status;
+});
+
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.PLAY, status => {
+    console.log(status);
+});
+
+playerManager.setMessageInterceptor(cast.framework.messages.MessageType.SEEK, status => {
+    console.log(status);
+});
+
+var NAMESPACE = 'urn:x-cast:zoff.me';
+//var customMessageBus = context.getCastMessageBus('urn:x-cast:zoff.me');
+context.addCustomMessageListener(NAMESPACE, messageHandle);
+
+function messageHandle(event) {
+    console.log(event);
+    var json_parsed;
+    try {
+        json_parsed = JSON.parse(event.data);
+    } catch(e) {
+        json_parsed = event.data;
+    }
     console.log(event);
     switch(json_parsed.type){
         case "loadVideo":
@@ -48,13 +105,12 @@ customMessageBus.onMessage = function(event) {
                         player.seekTo(json_parsed.seekTo + startSeconds);
                     }
                     if(initial){
-                        $("#player").toggleClass("hide");
+                        $("#youtube-player").toggleClass("hide");
                         $(".uil-ring-css").toggleClass("hide");
                         $(".zoff-info").toggleClass("center");
                         $(".zoff-info").toggleClass("lower_left");
                         $(".zoff-channel-info").toggleClass("hide");
                         initial = false;
-                        durationSetter();
                     }
                     if(started) {
                         //$("#title").fadeIn();
@@ -140,129 +196,13 @@ customMessageBus.onMessage = function(event) {
                 }, 15000);
             }
             break;
-        case "mobilespecs":
-            socket_id = json_parsed.socketid;
-            guid = json_parsed.guid;
-            adminpass = json_parsed.adminpass;
-            userpass = json_parsed.userpass;
-            channel = json_parsed.channel;
-            mobile_hack = true;
-
-            var oScript = document.createElement("script");
-            oScript.type = "text\/javascript";
-            oScript.onload = function() {
-                socket = io.connect('https://zoff.me:8080', {
-                    'sync disconnect on unload':true,
-                    'secure': true,
-                    'force new connection': true
-                });
-
-                console.log("Tried to connect to socket.io zoff");
-
-                socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                socket.emit('pos', {channel: channel, pass: userpass});
-                socket.on("np", function(msg) {
-                    console.log("Gotten np");
-                    console.log(msg);
-                    if(msg.np) {
-                        var conf       = msg.conf[0];
-                        var time       = msg.time;
-                        var seekTo     = time - conf.startTime;
-                        prev_video = videoId;
-                        videoId = msg.np[0].id;
-                        startSeconds = msg.np[0].start;
-                        endSeconds = msg.np[0].end;
-                        if(startSeconds == undefined) {
-                            startSeconds = 0;
-                        }
-                        if(endSeconds == undefined) {
-                            endSeconds = msg.np[0].duration;
-                        }
-                        //if(prev_video != videoId){
-                        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-                        //$("#title").fadeIn();
-                        if(!$("#title").hasClass("slid-in-title")) {
-                            $("#title").addClass("slid-in-title");
-                        }
-                        if(!$("#next_song").hasClass("slid-in")) {
-                            $("#next_song").addClass("slid-in");
-                        }
-                        clearTimeout(hide_timer);
-                        hide_timer = setTimeout(function() {
-                            hidden_info = true;
-                            //$("#title").fadeOut();
-                            $("#title").removeClass("slid-in-title");
-                            $("#next_song").removeClass("slid-in");
-                        }, 15000);
-                        //}
-                        if(seekTo){
-                            player.seekTo(seekTo);
-                        }
-                    }
-                });
-
-                socket.on('connect_failed', function(){
-                    console.log("connect failed");
-                    if(!connect_error){
-                        connect_error = true;
-                    }
-                });
-
-                socket.on("connect_error", function(){
-                    console.log("connect error");
-                    if(!connect_error){
-                        connect_error = true;
-                    }
-                });
-
-                socket.on("connect", function(){
-                    console.log("connected");
-                    if(connect_error){
-                        connect_error = false;
-                        socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                        socket.emit('pos', {channel: channel, pass: userpass});
-                    }
-                });
-
-                socket.on("self_ping", function() {
-                    if(channel != undefined && channel.toLowerCase() != "") {
-                        socket.emit("self_ping", {channel: channel.toLowerCase()});
-                    }
-                });
-
-                socket.on("next_song", function(msg) {
-                    console.log("Gotten next_song");
-                    console.log(msg);
-                    nextVideo = msg.videoId;
-                    nextTitle = msg.title;
-                    $("#next_title_content").html("Next:<br>" + nextTitle);
-                    $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-                    if(!$("#next_song").hasClass("slid-in")) {
-                        $("#next_song").addClass("slid-in");
-                    }
-
-                    clearTimeout(hide_timer);
-                    hide_timer = setTimeout(function() {
-                        hidden_info = true;
-                        //$("#title").fadeOut();
-                        $("#title").removeClass("slid-in-title");
-                        $("#next_song").removeClass("slid-in");
-                    }, 15000);
-                });
-
-            }
-
-            oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
-            console.log("Inserted script");
-            break;
     }
 }
+
 /**
 * Application config
 **/
-var appConfig = new cast.receiver.CastReceiverManager.Config();
+var appConfig = new cast.framework.CastReceiverOptions();
 
 /**
 * Text that represents the application status. It should meet
@@ -281,15 +221,17 @@ appConfig.statusText = 'Ready to play';
 * @type {number|undefined}
 **/
 // 100 minutes for testing, use default 10sec in prod by not setting this value
-//appConfig.maxInactivity = 6000;
+appConfig.maxInactivity = 86400;
 
-window.castReceiverManager.onSenderDisconnected = function(event) {
+window.context.addEventListener('SENDER_DISCONNECTED', function(event) {
     console.log(event);
-    if(window.castReceiverManager.getSenders().length == 0 &&
+    if(window.context.getSenders().length == 0 &&
     event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
         window.close();
     }
-}
+});
+
+
 
 window.addEventListener('load', function() {
     var tag = document.createElement('script');
@@ -298,51 +240,51 @@ window.addEventListener('load', function() {
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 });
 
-function durationSetter(){
-    try{
-        duration = endSeconds;//player.getDuration();
-        dMinutes = Math.floor(duration / 60);
-        dSeconds = duration - dMinutes * 60;
-        currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
-        if(currDurr - startSeconds > duration) {
-            currDurr = duration - startSeconds;
-        }
-        currDurr = currDurr - startSeconds;
-        minutes = Math.floor(currDurr / 60);
-        seconds = currDurr - (minutes * 60);
-
-        if(endSeconds - player.getCurrentTime() <= 15 && hidden_info) {
-            clearTimeout(hide_timer);
-            hidden_info = false;
-            //$("#title").fadeIn();
-            if(!$("#title").hasClass("slid-in-title")) {
-                $("#title").addClass("slid-in-title");
-            }
-            if(!$("#next_song").hasClass("slid-in")) {
-                $("#next_song").addClass("slid-in");
-            }
-        }
-        if($("#title_cont").text() != player.getVideoData().title) {
-            $("#title_cont").text(player.getVideoData().title);
-        }
-        $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
-        if(player.getCurrentTime() > endSeconds) {
-            if(mobile_hack && socket) {
-                socket.emit("end", {id: videoId, channel: channel, pass: userpass});
-            } else {
-                customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
-            }
-        }
-    }catch(err){}
-    setTimeout(durationSetter, 1000);
-}
-
 function pad(n){
     return n < 10 ? "0"+Math.floor(n) : Math.floor(n);
 }
 
 function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
+    // Trying to hook up with events from youtube
+    playerData = {
+        "PLAYING": YT.PlayerState.PLAYING,
+        "PAUSED": YT.PlayerState.PAUSED,
+        "BUFFERING": YT.PlayerState.BUFFERING,
+        "LOADING": YT.PlayerState.UNSTARTED,
+        "playing": YT.PlayerState.PLAYING,
+        "paused": YT.PlayerState.PAUSED,
+        "buffering": YT.PlayerState.BUFFERING,
+        "loading": YT.PlayerState.UNSTARTED,
+        1: "playing",
+        2: "paused",
+    };
+    playerDataBinder = new cast.framework.ui.PlayerDataBinder(playerData);
+    console.log("yes");
+    playerDataBinder.addEventListener(
+        cast.framework.ui.PlayerDataEventType.STATE_CHANGED,
+        e => {
+          switch (e.value) {
+            case cast.framework.ui.State.LAUNCHING:
+                console.log("Player is LAUNCHING");
+            case cast.framework.ui.State.IDLE:
+                console.log("Player is IDLE");
+                console.log(e);
+                break;
+            case cast.framework.ui.State.LOADING:
+                console.log("Player is LOADING");
+                break;
+            case cast.framework.ui.State.BUFFERING:
+                console.log("Player is BUFFERING");
+                break;
+            case cast.framework.ui.State.PAUSED:
+                console.log("Player is PAUSED");
+                break;
+            case cast.framework.ui.State.PLAYING:
+                console.log("Player is PLAYING");
+                break;
+          }
+      });
+    player = new YT.Player('youtube-player', {
         height: 562,
         width: 1000,
         playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
@@ -352,10 +294,21 @@ function onYouTubeIframeAPIReady() {
             'onError': errorHandler
         }
     });
+
+    //playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(document.getElementById("youtube-player"));
+
 }
 
 function onPlayerReady() {
-    window.castReceiverManager.start(appConfig);
+    player.setAttribute = function() {
+        player.a.setAttribute(arguments[0], arguments[1]);
+    }
+    player.state = "playing";
+    playerManager.setMediaElement(player);
+    //playerManager.setMediaElement(document.getElementById("youtube-player"));
+    context.start(appConfig);
+    //context.setApplicationState("Ready to play");
     ytReady = true;
     if(videoId){
         loading = true;
@@ -366,6 +319,7 @@ function onPlayerReady() {
             seekTo = null;
         }
     }
+    //cast.framework.PlayerManager.setMediaElement(document.getElementById("youtube-player"));
 }
 
 function errorHandler(event){
@@ -381,7 +335,7 @@ function errorHandler(event){
                     userpass: userpass
                 });
             } else {
-                customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+                context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
             }
     }
 }
@@ -391,10 +345,11 @@ function onPlayerStateChange(event) {
         if(mobile_hack && socket) {
             socket.emit("end", {id: videoId, channel: channel, pass: userpass});
         } else {
-            customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+            context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: -1, videoId: videoId}));
         }
 
     } else if(event.data == 1){
+        player.a.dispatchEvent(new Event("PLAYING"));
         loading = false;
         if(seekTo){
             player.seekTo(seekTo);
@@ -411,22 +366,20 @@ function onPlayerStateChange(event) {
                 $("#next_song").removeClass("slid-in");
             }, 15000);
         }
-        customMessageBus.broadcast(JSON.stringify({type: 1}));
+        var metadata = new cast.framework.messages.GenericMediaMetadata();
+        metadata.images = "https://img.youtube.com/vi/" + video_id + "/mqdefault.jpg";
+        metadata.title = player.getVideoData().title;
+        var mediaInfo = new cast.framework.messages.MediaInformation();
+        mediaInfo.contentId = "https://youtube.com/watch/?v=" + video_id;
+        mediaInfo.contentType = "video/*";
+        mediaInfo.duration = endSeconds - startSeconds;
+        mediaInfo.metadata = metadata;
+        playerManager.setMediaElement(player);
+        playerManager.setMediaInformation(mediaInfo, true);
+        context.setApplicationState(player.getVideoData().title);
+        //cast.framework.PlayerManager.setMediaInformation(mediaInfo, true);
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 1}));
     } else if(event.data == 2) {
-        customMessageBus.broadcast(JSON.stringify({type: 2}));
+        context.sendCustomMessage(NAMESPACE, undefined, JSON.stringify({type: 2}));
     }
-}
-
-function change_info(info) {
-    var qr = info ? "" : "-qr";
-    var info_text = info ? "-qr" : "";
-    $(".zoff-channel-info" + qr).css("opacity", 0);
-    setTimeout(function() {
-        $(".zoff-channel-info" + qr).css("display", "none");
-        $(".zoff-channel-info" + info_text).css("display", "block");
-        $(".zoff-channel-info" + info_text).css("opacity", 1);
-        setTimeout(function() {
-            change_info(!info);
-        }, 10000);
-    }, 500);
 }
