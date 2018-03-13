@@ -156,8 +156,8 @@ customMessageBus.onMessage = function(event) {
         case "mobilespecs":
             socket_id = json_parsed.socketid;
             guid = json_parsed.guid;
-            adminpass = json_parsed.adminpass;
-            userpass = json_parsed.userpass;
+            //adminpass = json_parsed.adminpass;
+            //userpass = json_parsed.userpass;
             channel = json_parsed.channel;
             mobile_hack = true;
 
@@ -173,7 +173,7 @@ customMessageBus.onMessage = function(event) {
                 console.log("Tried to connect to socket.io zoff");
 
                 socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                socket.emit('pos', {channel: channel, pass: userpass});
+                socket.emit('pos', {channel: channel});//, pass: userpass});
                 socket.on("np", function(msg) {
                     console.log("Gotten np");
                     console.log(msg);
@@ -233,7 +233,7 @@ customMessageBus.onMessage = function(event) {
                     if(connect_error){
                         connect_error = false;
                         socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                        socket.emit('pos', {channel: channel, pass: userpass});
+                        socket.emit('pos', {channel: channel});//, pass: userpass});
                     }
                 });
 
@@ -341,7 +341,7 @@ function durationSetter(){
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(player.getCurrentTime() > endSeconds) {
             if(mobile_hack && socket) {
-                socket.emit("end", {id: videoId, channel: channel, pass: userpass});
+                socket.emit("end", {id: videoId, channel: channel});//, pass: userpass});
             } else {
                 customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
             }
@@ -413,9 +413,9 @@ function errorHandler(event){
                 socket.emit("skip", {
                     error: event.data,
                     id: videoId,
-                    pass: adminpass,
+                    //pass: adminpass,
                     channel: channel.toLowerCase(),
-                    userpass: userpass
+                    //userpass: userpass
                 });
             } else {
                 customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
@@ -442,7 +442,7 @@ function getCurrentData() {
 function onPlayerStateChange(event) {
     if (event.data==YT.PlayerState.ENDED) {
         if(mobile_hack && socket) {
-            socket.emit("end", {id: videoId, channel: channel, pass: userpass});
+            socket.emit("end", {id: videoId, channel: channel});//, pass: userpass});
         } else {
             customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
         }
