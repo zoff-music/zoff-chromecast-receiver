@@ -156,6 +156,12 @@ customMessageBus.onMessage = function(event) {
         case "mobilespecs":
             socket_id = json_parsed.socketid;
             guid = json_parsed.guid;
+            if(json_parsed.adminpass) {
+                adminpass = json_parsed.adminpass;
+            }
+            if(json_parsed.userpass) {
+                userpass = json_parsed.userpass;
+            }
             //adminpass = json_parsed.adminpass;
             //userpass = json_parsed.userpass;
             channel = json_parsed.channel;
@@ -173,7 +179,9 @@ customMessageBus.onMessage = function(event) {
                 console.log("Tried to connect to socket.io zoff");
 
                 socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                socket.emit('pos', {channel: channel});//, pass: userpass});
+                var pos = {channel: channel};
+                if(userpass) pos.pass = userpass;
+                socket.emit('pos', pos);//, pass: userpass});
                 socket.on("np", function(msg) {
                     console.log("Gotten np");
                     console.log(msg);
@@ -233,7 +241,9 @@ customMessageBus.onMessage = function(event) {
                     if(connect_error){
                         connect_error = false;
                         socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                        socket.emit('pos', {channel: channel});//, pass: userpass});
+                        var pos = {channel: channel};
+                        if(userpass) pos.userpass = userpass;
+                        socket.emit('pos', pos);//, pass: userpass});
                     }
                 });
 
@@ -341,7 +351,9 @@ function durationSetter(){
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(player.getCurrentTime() > endSeconds) {
             if(mobile_hack && socket) {
-                socket.emit("end", {id: videoId, channel: channel});//, pass: userpass});
+                var end = {id: videoId, channel: channel};
+                if(userpass) end.pass = userpass;
+                socket.emit("end", end);//, pass: userpass});
             } else {
                 customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
             }
@@ -410,13 +422,16 @@ function errorHandler(event){
         event.data == 101 || event.data == 150){
             if(mobile_hack && socket) {
                 curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
-                socket.emit("skip", {
+                var skip = {
                     error: event.data,
                     id: videoId,
                     //pass: adminpass,
                     channel: channel.toLowerCase(),
                     //userpass: userpass
-                });
+                }
+                if(userpass) skip.userpass = userpass;
+                if(adminpass) skip.pass = adminpass;
+                socket.emit("skip", skip);
             } else {
                 customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
             }
@@ -442,7 +457,9 @@ function getCurrentData() {
 function onPlayerStateChange(event) {
     if (event.data==YT.PlayerState.ENDED) {
         if(mobile_hack && socket) {
-            socket.emit("end", {id: videoId, channel: channel});//, pass: userpass});
+            var end = {id: videoId, channel: channel};
+            if(userpass) end.pass = userpass;
+            socket.emit("end", end);//, pass: userpass});
         } else {
             customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
         }
