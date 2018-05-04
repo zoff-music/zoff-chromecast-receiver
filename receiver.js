@@ -84,8 +84,15 @@ function playVideo() {
 
 function loadVideoById(id, start, end) {
     if(videoSource != "soundcloud") {
+        soundcloud_player.pause();
+        if(!$("#player_overlay").hasClass("hide")) {
+            $("#player_overlay").addClass("hide");
+        }
         player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
     } else {
+        try {
+            player.stopVideo();
+        } catch(e) {}
         SC.stream("/tracks/" + id).then(function(_player){
             soundcloud_player = _player;
             soundcloud_player.bind("finish", soundcloudFinish);
