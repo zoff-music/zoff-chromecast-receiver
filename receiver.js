@@ -14,6 +14,7 @@ var channel;
 var guid;
 var adminpass;
 var userpass;
+var thumbnail;
 var socket_id;
 var socket;
 var hide_timer;
@@ -86,11 +87,15 @@ function loadVideoById(id, start, end) {
         player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
     } else {
         SC.stream("/tracks/" + id).then(function(_player){
-            console.log(_player);
             soundcloud_player = _player;
             soundcloud_player.bind("finish", soundcloudFinish);
             soundcloud_player.bind("pause", soundcloudPause);
             soundcloud_player.bind("play", soundcloudPlay);
+            $("#player_overlay").removeClass("hide");
+            $("#player_overlay").css("background",  "url('" + thumbnail + "')");
+            $("#player_overlay").css("background-size", "auto");
+            $("#player_overlay").css("background-position", "20%");
+            $("#player_overlay").css("background-color", "#2d2d2d");
             SC.get('/tracks', {
                 ids: id
             }).then(function(tracks) {
@@ -100,12 +105,10 @@ function loadVideoById(id, start, end) {
                 document.querySelector(".soundcloud_info_container .green").href = sound.purchase_url;
                 document.querySelector(".soundcloud_info_container .red").href = sound.user.permalink_url;*/
             });
-            if(_autoplay) {
-                _player.play().then(function(){
-                    seekTo(seekTo);
-                }).catch(function(e){
-                });
-            }
+            _player.play().then(function(){
+                seekTo(seekTo);
+            }).catch(function(e){
+            });
           });
     }
 }
@@ -114,8 +117,8 @@ function getPlayerState() {
     if(videoSource != "soundcloud") {
         return player.getPlayerState()
     } else {
-        if(player.getState() == "playing") return YT.PlayerState.PLAYING;
-        else if(player.getState() == "paused") return YT.PlayerState.PAUSED;
+        if(soundcloud_player.getState() == "playing") return YT.PlayerState.PLAYING;
+        else if(soundcloud_player.getState() == "paused") return YT.PlayerState.PAUSED;
         else return YT.PlayerState.ENDED;
     }
 }
@@ -133,14 +136,17 @@ function unMute() {
 }
 
 function soundcloudFinish() {
+    if(videoSource != "soundcloud") return;
     customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: YT.PlayerState.ENDED }));
-},
+}
 
 function soundcloudPause() {
+    if(videoSource != "soundcloud") return;
     customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: YT.PlayerState.PAUSED }));
 }
 
 function soundcloudPlay() {
+    if(videoSource != "soundcloud") return;
     customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: YT.PlayerState.PLAYING }));
 }
 
@@ -157,6 +163,7 @@ customMessageBus.onMessage = function(event) {
                     prev_video = videoId;
                     videoId = json_parsed.videoId;
                     videoSource = json_parse.source;
+                    thumbnail = json_parse.thumbnail;
                     startSeconds = json_parsed.start;
                     endSeconds = json_parsed.end;
                     if(startSeconds == undefined) {
@@ -303,7 +310,8 @@ customMessageBus.onMessage = function(event) {
                         var seekTo     = time - conf.startTime;
                         prev_video = videoId;
                         videoId = msg.np[0].id;
-                        videoSource = msg.np[0].source;
+                        thumbnail = "";
+                        videoSource = "youtube";
                         startSeconds = msg.np[0].start;
                         endSeconds = msg.np[0].end;
                         if(startSeconds == undefined) {
@@ -311,6 +319,11 @@ customMessageBus.onMessage = function(event) {
                         }
                         if(endSeconds == undefined) {
                             endSeconds = msg.np[0].duration;
+                        }
+
+                        if(msg.np[0].source && msg.np[0].source != "youtube") {
+                            videoSource = msg.np[0].source;
+                            thumbnail = msg.np[0].thumbnail;
                         }
                         //if(prev_video != videoId){
                         loadVideoById(videoId, startSeconds, endSeconds);
@@ -372,7 +385,11 @@ customMessageBus.onMessage = function(event) {
                     nextVideo = msg.videoId;
                     nextTitle = msg.title;
                     $("#next_title_content").html("Next:<br>" + nextTitle);
-                    $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+                    if(msg.source != "soundcloud") {
+                        $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+                    } else {
+                        $("#next_pic").attr("src", msg.thumbnail);
+                    }
                     if(!$("#next_song").hasClass("slid-in")) {
                         $("#next_song").addClass("slid-in");
                     }
@@ -478,7 +495,7 @@ function durationSetter(){
             }
         }
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
-        if(getCurrentTime() > endSeconds) {
+        if(getCurrentTime() + 1 > endSeconds) {
             if(mobile_hack && socket) {
                 var end = {id: videoId, channel: channel};
                 if(userpass) end.pass = userpass;
@@ -535,7 +552,7 @@ function onPlayerReady() {
 
     window.castReceiverManager.start(appConfig);
     ytReady = true;
-    if(videoId){
+    if(videoId && videoSource == "youtube"){
         loading = true;
         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
         player.playVideo();
@@ -543,10 +560,13 @@ function onPlayerReady() {
             player.seekTo(seekTo);
             seekTo = null;
         }
+    } else {
+        loadVideoById(videoId, startSeconds, endSeconds);
     }
 }
 
 function errorHandler(event){
+    if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
             if(mobile_hack && socket) {
@@ -584,6 +604,7 @@ function getCurrentData() {
 }
 
 function onPlayerStateChange(event) {
+    if(videoSource == "soundcloud") return;
     if (event.data==YT.PlayerState.ENDED) {
         if(mobile_hack && socket) {
             var end = {id: videoId, channel: channel};

@@ -20,7 +20,17 @@
 			margin-top: -8px;*/
 		}
 
+		#player_overlay {
+			height: 100vh;
+			width: 100vw;
+			z-index: 1;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+		}
+
 		.zoff-info {
+			z-index: 9;
 			position: absolute;
 			bottom: 0px;
 			/* width: 100%; */
@@ -73,6 +83,7 @@
 		}
 
 		#next_song {
+			z-index: 9;
 		    display: flex;
 		    position: absolute;
 		    background: rgba(0,0,0,.5);
@@ -94,6 +105,7 @@
 		}
 
 		#next_title{
+			z-index: 9;
 			align-self: center;
 			overflow: hidden;
 			color: white;
@@ -297,6 +309,7 @@
 		}
 
 		.join-info-full {
+			z-index: 999;
 			-webkit-trasition: opacity .5s;
 			-moz-transition: opacity .5s;
 			-o-transition: opacity .5s;
@@ -346,6 +359,8 @@
 			<div></div>
 		</div>
 		<div id="player" class="hide"></div>
+        <div id="player_overlay" class="hide valign-wrapper">
+        </div>
 		</div>
 		<div class="join-info-full no-opacity">
 			<p>To join this channel, go to</p>
