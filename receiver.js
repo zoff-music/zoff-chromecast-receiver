@@ -84,20 +84,18 @@ function playVideo() {
 }
 
 function loadVideoById(id, start, end) {
-    console.log(videoSource);
+    console.log("loadVideoById",id,start,end,videoSource);
     if(videoSource != "soundcloud") {
         soundcloud_player.pause();
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
-        console.log("I'm trying to load here 2");
 
         player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
     } else {
         try {
             player.stopVideo();
         } catch(e) {}
-        console.log("Starting soundcloud");
         if(currentSoundcloudVideo != id) {
             currentSoundcloudVideo = id;
             SC.stream("/tracks/" + id).then(function(_player){
@@ -110,7 +108,6 @@ function loadVideoById(id, start, end) {
                 $("#player_overlay").css("background-size", "auto");
                 $("#player_overlay").css("background-position", "20%");
                 $("#player_overlay").css("background-color", "#2d2d2d");
-                console.log("playing soundcloud");
                 _player.play().then(function(){
                     seekToFunction(seekTo);
                 }).catch(function(e){
@@ -182,7 +179,6 @@ customMessageBus.onMessage = function(event) {
                     if(endSeconds == undefined) {
                         endSeconds = json_parsed.duration;
                     }
-                    console.log(prev_video, videoId);
                     if(prev_video != videoId){
                         loadVideoById(json_parsed.videoId, startSeconds, endSeconds);
                     }
@@ -514,7 +510,6 @@ function durationSetter(){
                 $("#title_cont").text(player.getVideoData().title);
             }
         }
-        console.log(getCurrentTime(), endSeconds);
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(getCurrentTime() + 1 > endSeconds) {
             if(mobile_hack && socket) {
@@ -575,7 +570,6 @@ function onPlayerReady() {
     ytReady = true;
     if(videoId && videoSource == "youtube"){
         loading = true;
-        console.log("I'm trying to load here, 1");
         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
         player.playVideo();
         if(seekTo){
@@ -588,8 +582,6 @@ function onPlayerReady() {
 }
 
 function errorHandler(event){
-    console.log(videoSource, event.data);
-    return;
     if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
