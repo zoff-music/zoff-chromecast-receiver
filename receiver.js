@@ -14,6 +14,7 @@ var channel;
 var guid;
 var adminpass;
 var userpass;
+var currentSoundcloudVideo = "";
 var thumbnail;
 var socket_id;
 var socket;
@@ -161,7 +162,7 @@ window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:zoff.me');
 customMessageBus.onMessage = function(event) {
     var json_parsed = JSON.parse(event.data);
-    console.log(event);
+    console.log(json_parsed.type, event);
     switch(json_parsed.type){
         case "loadVideo":
             if(!mobile_hack) {
