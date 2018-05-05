@@ -264,7 +264,7 @@ customMessageBus.onMessage = function(event) {
             if(!mobile_hack) {
                 nextVideo = json_parsed.videoId;
                 nextTitle = json_parsed.title;
-                if(json_parse.source == "soundcloud") {
+                if(json_parsed.source == "soundcloud") {
                     $("#next_pic").attr("src", json_parsed.thumbnail);
                 } else {
                     $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
