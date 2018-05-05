@@ -457,7 +457,7 @@ window.addEventListener('load', function() {
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    tagSearch = document.createElement('script');
+    /*tagSearch = document.createElement('script');
     tagSearch.setAttribute("async", true);
     tagSearch.src        = "https://connect.soundcloud.com/sdk/sdk-3.3.0.js";
     firstScriptTag = document.getElementsByTagName('script')[0];
@@ -469,7 +469,7 @@ window.addEventListener('load', function() {
       }, function() {
           console.log("Loaded streamer");
       });
-    }
+  }*/
 });
 
 function durationSetter(){
