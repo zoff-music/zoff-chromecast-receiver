@@ -264,6 +264,7 @@ customMessageBus.onMessage = function(event) {
             if(!mobile_hack) {
                 nextVideo = json_parsed.videoId;
                 nextTitle = json_parsed.title;
+                console.log(json_parsed.source == "soundcloud");
                 if(json_parsed.source == "soundcloud") {
                     $("#next_pic").attr("src", json_parsed.thumbnail);
                 } else {
@@ -461,7 +462,10 @@ window.addEventListener('load', function() {
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
+    SC.initialize({
+      client_id: 'ed53fc01f248f15becddf8eb52cc91ef'
+    }, function() {
+    });
     /*tagSearch = document.createElement('script');
     tagSearch.setAttribute("async", true);
     tagSearch.src        = "https://connect.soundcloud.com/sdk/sdk-3.3.0.js";
