@@ -97,8 +97,8 @@ function loadVideoById(id, start, end) {
         } catch(e) {}
         console.log("Starting soundcloud");
         if(currentSoundcloudVideo != id) {
+            currentSoundcloudVideo = id;
             SC.stream("/tracks/" + id).then(function(_player){
-                currentSoundcloudVideo = id;
                 soundcloud_player = _player;
                 soundcloud_player.bind("finish", soundcloudFinish);
                 soundcloud_player.bind("pause", soundcloudPause);
@@ -584,6 +584,8 @@ function onPlayerReady() {
 }
 
 function errorHandler(event){
+    console.log(videoSource, event.data);
+    return;
     if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
