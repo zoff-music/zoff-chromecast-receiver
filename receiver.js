@@ -169,15 +169,15 @@ customMessageBus.onMessage = function(event) {
                     loading = true;
                     prev_video = videoId;
                     videoId = json_parsed.videoId;
-                    videoSource = json_parse.source;
-                    thumbnail = json_parse.thumbnail;
+                    videoSource = json_parsed.source;
+                    thumbnail = json_parsed.thumbnail;
                     startSeconds = json_parsed.start;
                     endSeconds = json_parsed.end;
                     if(startSeconds == undefined) {
                         startSeconds = 0;
                     }
                     if(endSeconds == undefined) {
-                        endSeconds = json_parse.duration;
+                        endSeconds = json_parsed.duration;
                     }
                     if(prev_video != videoId){
                         loadVideoById(json_parsed.videoId, startSeconds, endSeconds);
@@ -213,7 +213,7 @@ customMessageBus.onMessage = function(event) {
                     }
                 } else {
                     videoId = json_parsed.videoId;
-                    videoSource = json_parse.source;
+                    videoSource = json_parsed.source;
                     if(json_parsed.seekTo){
                         seekTo = json_parsed.seekTo + startSeconds;
                     }
