@@ -42,7 +42,7 @@ cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaS
 
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
-function seekTo(value) {
+function seekToFunction(value) {
     if(videoSource != "soundcloud") {
         player.seekTo(value)
     } else {
@@ -113,7 +113,7 @@ function loadVideoById(id, start, end) {
                 document.querySelector(".soundcloud_info_container .red").href = sound.user.permalink_url;*/
             });
             _player.play().then(function(){
-                seekTo(seekTo);
+                seekToFunction(seekTo);
             }).catch(function(e){
             });
           });
@@ -183,7 +183,7 @@ customMessageBus.onMessage = function(event) {
                         loadVideoById(json_parsed.videoId, startSeconds, endSeconds);
                     }
                     if(json_parsed.seekTo){
-                        seekTo(json_parsed.seekTo + startSeconds);
+                        seekToFunction(json_parsed.seekTo + startSeconds);
                     }
                     if(initial){
                         $("#player").toggleClass("hide");
@@ -257,15 +257,20 @@ customMessageBus.onMessage = function(event) {
             break;
         case "seekTo":
             if(!mobile_hack) {
-                seekTo(json_parsed.seekTo + startSeconds);
+                seekToFunction(json_parsed.seekTo + startSeconds);
             }
             break;
         case "nextVideo":
             if(!mobile_hack) {
                 nextVideo = json_parsed.videoId;
                 nextTitle = json_parsed.title;
+                if(json_parse.source == "soundcloud") {
+                    $("#next_pic").attr("src", json_parsed.thumbnail);
+                } else {
+                    $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+                }
                 $("#next_title_content").html("Next Song:<br>" + nextTitle);
-                $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+
                 if(!$("#next_song").hasClass("slid-in")) {
                     $("#next_song").addClass("slid-in");
                 }
@@ -350,7 +355,7 @@ customMessageBus.onMessage = function(event) {
                         }, 15000);
                         //}
                         if(seekTo){
-                            seekTo(seekTo);
+                            seekToFunction(seekTo);
                         }
                     }
                 });
