@@ -90,6 +90,8 @@ function loadVideoById(id, start, end) {
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
+        console.log("I'm trying to load here 2");
+
         player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
     } else {
         try {
@@ -266,7 +268,7 @@ customMessageBus.onMessage = function(event) {
             if(!mobile_hack) {
                 nextVideo = json_parsed.videoId;
                 nextTitle = json_parsed.title;
-                console.log(json_parsed.source == "soundcloud");
+                console.log(json_parsed.source);
                 if(json_parsed.source == "soundcloud") {
                     $("#next_pic").attr("src", json_parsed.thumbnail);
                 } else {
@@ -488,7 +490,7 @@ function durationSetter(){
         duration = endSeconds;//player.getDuration();
         dMinutes = Math.floor(duration / 60);
         dSeconds = duration - dMinutes * 60;
-        currDurr = player.getCurrentTime() !== undefined ? Math.floor(player.getCurrentTime()) : seekTo;
+        currDurr = getCurrentTime() !== undefined ? Math.floor(getCurrentTime()) : seekTo;
         if(currDurr - startSeconds > duration) {
             currDurr = duration - startSeconds;
         }
@@ -512,6 +514,7 @@ function durationSetter(){
                 $("#title_cont").text(player.getVideoData().title);
             }
         }
+        console.log(getCurrentTime(), endSeconds);
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(getCurrentTime() + 1 > endSeconds) {
             if(mobile_hack && socket) {
@@ -572,6 +575,7 @@ function onPlayerReady() {
     ytReady = true;
     if(videoId && videoSource == "youtube"){
         loading = true;
+        console.log("I'm trying to load here, 1");
         player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
         player.playVideo();
         if(seekTo){
