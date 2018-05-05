@@ -147,17 +147,17 @@ function unMute() {
 
 function soundcloudFinish() {
     if(videoSource != "soundcloud") return;
-    customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: YT.PlayerState.ENDED }));
+    customMessageBus.broadcast(JSON.stringify({type: YT.PlayerState.ENDED, videoId: videoId }));
 }
 
 function soundcloudPause() {
     if(videoSource != "soundcloud") return;
-    customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: YT.PlayerState.PAUSED }));
+    customMessageBus.broadcast(JSON.stringify({type: YT.PlayerState.PAUSED, videoId: videoId }));
 }
 
 function soundcloudPlay() {
     if(videoSource != "soundcloud") return;
-    customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: YT.PlayerState.PLAYING }));
+    customMessageBus.broadcast(JSON.stringify({type: YT.PlayerState.PLAYING, videoId: videoId }));
 }
 
 window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
