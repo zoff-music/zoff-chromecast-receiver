@@ -144,7 +144,7 @@ function unMute() {
 
 function soundcloudFinish() {
     if(videoSource != "soundcloud") return;
-    customMessageBus.broadcast(JSON.stringify({type: YT.PlayerState.ENDED, videoId: videoId }));
+    customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId }));
 }
 
 function soundcloudPause() {
