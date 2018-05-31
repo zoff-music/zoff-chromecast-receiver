@@ -221,8 +221,8 @@ customMessageBus.onMessage = function(event) {
             }
             channel = json_parsed.channel;
             $(".zoff-channel-info").text("/" + channel);
-            $(".channel-name-link").text(channel);
-            $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://client.zoff.me/" + channel);
+            $(".channel-name-link").text(encodeURIComponent(channel));
+            $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://client.zoff.me/" + encodeURIComponent(channel));
             break;
         case "playPauseVideo":
             if(getPlayerState() == 1) {
