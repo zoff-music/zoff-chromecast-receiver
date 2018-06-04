@@ -10,6 +10,7 @@ var mobile_hack = false;
 var connect_error = false;
 var startSeconds = 0;
 endSeconds = 99999;
+var sentEnd = false;
 var channel;
 var guid;
 var adminpass;
@@ -17,7 +18,7 @@ var userpass;
 var currentSoundcloudVideo = "";
 var thumbnail;
 var socket_id;
-var socket;
+var _socketIo;
 var hide_timer;
 var showInfoTimer;
 var videoSource = "";
@@ -298,25 +299,27 @@ customMessageBus.onMessage = function(event) {
             //userpass = json_parsed.userpass;
             channel = json_parsed.channel;
             mobile_hack = true;
+            console.log("Json_parsed: ", json_parsed);
 
             var oScript = document.createElement("script");
             oScript.type = "text\/javascript";
             oScript.onload = function() {
-                socket = io.connect('https://zoff.me:8080', {
-                    'sync disconnect on unload':true,
+                _socketIo = io.connect('https://zoff.me:8080', {
                     'secure': true,
-                    'force new connection': true
                 });
 
                 console.log("Tried to connect to socket.io zoff");
-
-                socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                console.log("This channel = ", channel);
+                //_socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
                 var pos = {channel: channel};
                 if(userpass) pos.pass = userpass;
-                socket.emit('pos', pos);//, pass: userpass});
-                socket.on("np", function(msg) {
+                if(_socketIo.connected) {
+                    _socketIo.emit('pos', pos);//, pass: userpass});
+                }
+                _socketIo.on("np", function(msg) {
                     console.log("Gotten np");
                     console.log(msg);
+                    sentEnd = false;
                     if(msg.np) {
                         var conf       = msg.conf[0];
                         var time       = msg.time;
@@ -361,38 +364,53 @@ customMessageBus.onMessage = function(event) {
                     }
                 });
 
-                socket.on('connect_failed', function(){
+                _socketIo.on('connect_failed', function(){
                     console.log("connect failed");
                     if(!connect_error){
                         connect_error = true;
                     }
                 });
 
-                socket.on("connect_error", function(){
+                _socketIo.on("connect_error", function(){
                     console.log("connect error");
                     if(!connect_error){
                         connect_error = true;
                     }
                 });
 
-                socket.on("connect", function(){
-                    console.log("connected");
+                _socketIo.on("reconnect", function(e) {
+                    console.log("Reconnect event", e);
+                });
+
+                _socketIo.on("reconnected", function(e) {
+                    console.log("Reconnect event", e);
+                });
+
+                _socketIo.on("connect", function(){
+                    console.log("connected to _socketIo.io");
+                    if(_socketIo.connected) {
+                        _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                    }
                     if(connect_error){
                         connect_error = false;
-                        socket.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                        /*if(_socketIo.connected) {
+                            _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                        }*/
                         var pos = {channel: channel};
                         if(userpass) pos.userpass = userpass;
-                        socket.emit('pos', pos);//, pass: userpass});
+                        if(_socketIo.connected) {
+                            _socketIo.emit('pos', pos);//, pass: userpass});
+                        }
                     }
                 });
 
-                socket.on("self_ping", function() {
-                    if(channel != undefined && channel.toLowerCase() != "") {
-                        socket.emit("self_ping", {channel: channel.toLowerCase()});
+                _socketIo.on("self_ping", function() {
+                    if(channel != undefined && channel.toLowerCase() != "" && _socketIo.connected) {
+                        _socketIo.emit("self_ping", {channel: channel.toLowerCase()});
                     }
                 });
 
-                socket.on("next_song", function(msg) {
+                _socketIo.on("next_song", function(msg) {
                     console.log("Gotten next_song");
                     console.log(msg);
                     nextVideo = msg.videoId;
@@ -418,7 +436,7 @@ customMessageBus.onMessage = function(event) {
 
             }
 
-            oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js";
+            oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.slim.js";
             var firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
             console.log("Inserted script");
@@ -512,10 +530,14 @@ function durationSetter(){
         }
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(getCurrentTime() + 1 > endSeconds) {
-            if(mobile_hack && socket) {
+            if(mobile_hack && _socketIo) {
                 var end = {id: videoId, channel: channel};
                 if(userpass) end.pass = userpass;
-                socket.emit("end", end);//, pass: userpass});
+                if(_socketIo.connected && !sentEnd) {
+                    sentEnd = true;
+                    console.log("Here it has ended");
+                    _socketIo.emit("end", end);//, pass: userpass});
+                }
             } else {
                 customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
             }
@@ -585,7 +607,7 @@ function errorHandler(event){
     if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 ||
         event.data == 101 || event.data == 150){
-            if(mobile_hack && socket) {
+            if(mobile_hack && _socketIo) {
                 curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
                 var skip = {
                     error: event.data,
@@ -596,7 +618,9 @@ function errorHandler(event){
                 }
                 if(userpass) skip.userpass = userpass;
                 if(adminpass) skip.pass = adminpass;
-                socket.emit("skip", skip);
+                if(_socketIo.connected) {
+                    _socketIo.emit("skip", skip);
+                }
             } else {
                 customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
             }
@@ -622,10 +646,16 @@ function getCurrentData() {
 function onPlayerStateChange(event) {
     if(videoSource == "soundcloud") return;
     if (event.data==YT.PlayerState.ENDED) {
-        if(mobile_hack && socket) {
+        console.log("video ended", mobile_hack, _socketIo);
+        if(mobile_hack && _socketIo) {
             var end = {id: videoId, channel: channel};
             if(userpass) end.pass = userpass;
-            socket.emit("end", end);//, pass: userpass});
+            console.log("emit here");
+            if(_socketIo.connected && !sentEnd) {
+                console.log("ended here also");
+                sentEnd = true;
+                _socketIo.emit("end", end);//, pass: userpass});
+            }
         } else {
             customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
         }
