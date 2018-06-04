@@ -390,6 +390,11 @@ customMessageBus.onMessage = function(event) {
                     console.log("connected to _socketIo.io");
                     if(_socketIo.connected) {
                         _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                        var pos = {channel: channel};
+                        if(userpass) pos.userpass = userpass;
+                        if(_socketIo.connected) {
+                            _socketIo.emit('pos', pos);//, pass: userpass});
+                        }
                     }
                     if(connect_error){
                         connect_error = false;
