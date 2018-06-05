@@ -45,6 +45,7 @@ cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaS
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 function seekToFunction(value) {
+    if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
         player.seekTo(value)
     } else {
@@ -365,9 +366,9 @@ customMessageBus.onMessage = function(event) {
                             $("#next_song").removeClass("slid-in");
                         }, 15000);
                         //}
-                        if(seekTo){
+                        /*if(seekTo){
                             seekToFunction(seekTo);
-                        }
+                        }*/
                     }
                 });
 
