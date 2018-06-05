@@ -310,13 +310,11 @@ customMessageBus.onMessage = function(event) {
 
                 console.log("Tried to connect to socket.io zoff");
                 console.log("This channel = ", channel);
-                document.cookie = "_uI=" + guid;
+                //document.cookie = "_uI=" + guid;
                 //_socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
                 var pos = {channel: channel};
                 if(userpass) pos.pass = userpass;
-                if(_socketIo.connected) {
-                    _socketIo.emit('pos', pos);//, pass: userpass});
-                }
+
                 _socketIo.on("np", function(msg) {
                     console.log("Gotten np");
                     console.log(msg);
@@ -393,9 +391,11 @@ customMessageBus.onMessage = function(event) {
                         _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
                         var pos = {channel: channel};
                         if(userpass) pos.userpass = userpass;
-                        if(_socketIo.connected) {
-                            _socketIo.emit('pos', pos);//, pass: userpass});
-                        }
+                        setTimeout(function() {
+                            if(_socketIo.connected) {
+                                _socketIo.emit('pos', pos);//, pass: userpass});
+                            }
+                        }, 1000);
                     }
                     if(connect_error){
                         connect_error = false;
