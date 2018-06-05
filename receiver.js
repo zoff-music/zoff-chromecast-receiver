@@ -31,7 +31,10 @@ var soundcloud_player = {
     setVolume: function(){},
     currentTime: function(){}
 }
-
+cast.receiver.MediaManager.prototype.customizedStatusCallback = function() {
+    console.log("asd");
+    return generateData();
+}
 /*
 cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
