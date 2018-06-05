@@ -309,6 +309,7 @@ customMessageBus.onMessage = function(event) {
                 }
                 if(_socketIo.connected) {
                     _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                    var pos = {channel: channel};
                     _socketIo.emit('pos', pos);
                 }
                 return;
