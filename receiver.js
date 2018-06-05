@@ -26,7 +26,8 @@ var soundcloud_player = {
     seek: function(){},
     play: function(){},
     pause: function(){},
-    setVolume: function(){}
+    setVolume: function(){},
+    currentTime: function(){}
 }
 
 /*
@@ -94,17 +95,17 @@ function loadVideoById(id, start, end) {
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
-        /*try {
+        try {
             if(player.getVideoUrl().indexOf(id) > -1) {
                 console.log("Seeking to ", start);
                 player.seekTo(start);
             } else {
                 throw "player object not existing yet";
             }
-        } catch(e) {*/
+        } catch(e) {
             console.log("Starting at ", start);
             player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-        //}
+        }
     } else {
         try {
             console.log("stopping here");
@@ -375,7 +376,8 @@ customMessageBus.onMessage = function(event) {
                         }, 15000);
                         //}
                         setTimeout(function() {
-                            if(player.getPlayerState() == -1 && videoSource == "youtube") && player.getCurrentTime() < startSeconds) {
+                            console.log("videoSource is", videoSource);
+                            if(player.getPlayerState() == -1 && videoSource == "youtube" && player.getCurrentTime() < startSeconds) {
                                 seekToFunction(startSeconds);
                                 player.playVideo();
                             } else if(videoSource && "soundcloud" && soundcloud_player.currentTime() / 1000 < startSeconds) {
@@ -586,7 +588,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: 562,
         width: 1000,
-        playerVars: { 'autoplay': 0, 'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
+        playerVars: {'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
