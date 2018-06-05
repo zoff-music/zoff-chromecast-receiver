@@ -13,6 +13,7 @@ endSeconds = 99999;
 var sentEnd = false;
 var channel;
 var guid;
+var title = "";
 var adminpass;
 var userpass;
 var currentSoundcloudVideo = "";
@@ -348,6 +349,8 @@ customMessageBus.onMessage = function(event) {
                             videoSource = msg.np[0].source;
                             thumbnail = msg.np[0].thumbnail;
                         }
+                        title = msg.np[0].title;
+                        window.castReceiverManager.setApplicationState('Now Playing: ' + title);
                         //if(prev_video != videoId){
                         loadVideoById(videoId, startSeconds + (time - conf.startTime), endSeconds);
                         //$("#title").fadeIn();
@@ -545,11 +548,11 @@ function durationSetter(){
                 $("#next_song").addClass("slid-in");
             }
         }
-        if(videoSource != "soundcloud") {
-            if($("#title_cont").text() != player.getVideoData().title) {
-                $("#title_cont").text(player.getVideoData().title);
+        //if(videoSource != "soundcloud") {
+            if($("#title_cont").text() != title) {
+                $("#title_cont").text(title);
             }
-        }
+        //}
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(getCurrentTime() + 1 > endSeconds) {
             if(mobile_hack && _socketIo) {
