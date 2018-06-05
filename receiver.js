@@ -370,6 +370,8 @@ customMessageBus.onMessage = function(event) {
                         videoSource = "youtube";
                         startSeconds = msg.np[0].start;
                         endSeconds = msg.np[0].end;
+                        title = msg.np[0].title;
+                        castReceiverManager.setApplicationState('Now Playing: ' + msg.np[0].title);
                         if(startSeconds == undefined) {
                             startSeconds = 0;
                         }
@@ -578,10 +580,8 @@ function durationSetter(){
                 $("#next_song").addClass("slid-in");
             }
         }
-        if(videoSource != "soundcloud") {
-            if($("#title_cont").text() != player.getVideoData().title) {
-                $("#title_cont").text(player.getVideoData().title);
-            }
+        if($("#title_cont").text() != title) {
+            $("#title_cont").text(title);
         }
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(getCurrentTime() + 1 > endSeconds) {
