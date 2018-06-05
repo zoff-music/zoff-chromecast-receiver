@@ -14,6 +14,7 @@ var sentEnd = false;
 var channel;
 var guid;
 var adminpass;
+var mediaElement;
 var userpass;
 var currentSoundcloudVideo = "";
 var thumbnail;
@@ -102,6 +103,9 @@ function loadVideoById(id, start, end) {
         } catch(e) {
             player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
         }
+        mediaElement = player;
+        mediaManager = new cast.receiver.MediaManager(mediaElement);
+        mediaManager.setMediaInformation(generateData())
     } else {
         try {
             player.stopVideo();
@@ -123,11 +127,16 @@ function loadVideoById(id, start, end) {
                 }).catch(function(e){
                     console.log(e);
                 });
+
+                mediaElement = soundcloud_player;
+                mediaManager = new cast.receiver.MediaManager(mediaElement);
+                mediaManager.setMediaInformation(generateData())
               });
           } else {
               soundcloud_player.seek(start * 1000);
           }
     }
+
 }
 
 function getPlayerState() {
@@ -589,8 +598,24 @@ var mediaManager;
 
 function generateData() {
     var metadata = new cast.receiver.media.GenericMediaMetadata()
-    metadata.title = player.getVideoData().title;
-    metadata.images = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
+    if(videoSource == "youtube") {
+        metadata.title = player.getVideoData().title;
+        metadata.images = [];
+        var image = new cast.receiver.media.Image();
+        image.url = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
+        image.width = 320;
+        image.height = 180;
+        metadata.images.push(image);
+        metadata.image = image;
+        console.log(metadata);
+    } else {
+        metadata.title = "SoundCloud";
+        metadata.images = [];
+        var image = new cast.receiver.media.Image();
+        image.url = thumbnail;
+        metadata.images.push(image);
+        metadata.image = image;
+    }
     var mediaInfo = new cast.receiver.media.MediaInformation();
     mediaInfo.metadata = metadata;
     mediaInfo.contentId = videoId;
