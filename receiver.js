@@ -5,6 +5,7 @@ var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
+var title = "";
 var started = false;
 var mobile_hack = false;
 var connect_error = false;
@@ -105,7 +106,12 @@ function loadVideoById(id, start, end) {
         }
         //mediaElement = player;
         //mediaManager = new cast.receiver.MediaManager(mediaElement);
-        mediaManager.setMediaInformation(generateData())
+        setTimeout(function() {
+            try {
+                title = player.getVideoData().title;
+            } catch(e) {}
+            mediaManager.setMediaInformation(generateData())
+        }, 1000);
     } else {
         try {
             player.stopVideo();
@@ -599,7 +605,7 @@ var mediaManager;
 function generateData() {
     var metadata = new cast.receiver.media.GenericMediaMetadata()
     if(videoSource == "youtube") {
-        metadata.title = player.getVideoData().title;
+        metadata.title = title;
         metadata.images = [];
         var image = new cast.receiver.media.Image();
         image.url = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
@@ -609,7 +615,7 @@ function generateData() {
         metadata.image = image;
         console.log(metadata);
     } else {
-        metadata.title = "SoundCloud";
+        metadata.title = title;
         metadata.images = [];
         var image = new cast.receiver.media.Image();
         image.url = thumbnail;
