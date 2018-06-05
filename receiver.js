@@ -46,6 +46,7 @@ cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaS
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 function seekToFunction(value) {
+    console.log("seeking too " value);
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
         player.seekTo(value)
@@ -89,6 +90,7 @@ function playVideo() {
 }
 
 function loadVideoById(id, start, end) {
+    if(id == null) return;
     console.log("loadVideoById",id,start,end,videoSource);
     if(videoSource != "soundcloud") {
         soundcloud_player.pause();
