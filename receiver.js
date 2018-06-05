@@ -92,15 +92,17 @@ function loadVideoById(id, start, end) {
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
-        try {
+        /*try {
             if(player.getVideoUrl().indexOf(id) > -1) {
+                console.log("Seeking to ", start);
                 player.seekTo(start);
             } else {
                 throw "player object not existing yet";
             }
-        } catch(e) {
+        } catch(e) {*/
+            console.log("Starting at ", start);
             player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-        }
+        //}
     } else {
         try {
             player.stopVideo();
