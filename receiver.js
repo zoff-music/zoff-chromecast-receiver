@@ -308,9 +308,11 @@ customMessageBus.onMessage = function(event) {
                     userpass = json_parsed.userpass;
                 }
                 if(_socketIo.connected) {
-                    _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-                    var pos = {channel: channel};
-                    _socketIo.emit('pos', pos);
+                    setTimeout(function() {
+                        _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                        var pos = {channel: channel};
+                        _socketIo.emit('pos', pos);
+                    }, 1000);
                 }
                 return;
             }
