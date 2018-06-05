@@ -103,8 +103,8 @@ function loadVideoById(id, start, end) {
         } catch(e) {
             player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
         }
-        mediaElement = player;
-        mediaManager = new cast.receiver.MediaManager(mediaElement);
+        //mediaElement = player;
+        //mediaManager = new cast.receiver.MediaManager(mediaElement);
         mediaManager.setMediaInformation(generateData())
     } else {
         try {
@@ -128,8 +128,8 @@ function loadVideoById(id, start, end) {
                     console.log(e);
                 });
 
-                mediaElement = soundcloud_player;
-                mediaManager = new cast.receiver.MediaManager(mediaElement);
+                //mediaElement = soundcloud_player;
+                //mediaManager = new cast.receiver.MediaManager(mediaElement);
                 mediaManager.setMediaInformation(generateData())
               });
           } else {
@@ -633,7 +633,8 @@ function onPlayerReady() {
         console.log(mediaStatus);
         return generateData();
     }*/
-
+    mediaElement = player;
+    mediaManager = new cast.receiver.MediaManager(mediaElement);
     window.castReceiverManager.start(appConfig);
     ytReady = true;
     if(videoId && videoSource == "youtube"){
