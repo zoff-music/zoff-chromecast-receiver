@@ -330,11 +330,12 @@ customMessageBus.onMessage = function(event) {
                         videoId = msg.np[0].id;
                         thumbnail = "";
                         videoSource = "youtube";
-                        startSeconds = msg.np[0].start + seekTo;
+                        startSeconds = msg.np[0].start;
                         endSeconds = msg.np[0].end;
                         if(startSeconds == undefined) {
                             startSeconds = 0;
                         }
+                        startSeconds += time - conf.startTime;
                         if(endSeconds == undefined) {
                             endSeconds = msg.np[0].duration;
                         }
