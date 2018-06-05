@@ -33,7 +33,22 @@ var soundcloud_player = {
 }
 cast.receiver.MediaManager.prototype.customizedStatusCallback = function() {
     console.log("asd");
-    return generateData();
+    var data = new cast.receiver.media.MediaStatus();
+    data.currentTime = getCurrentTime();
+    data.media = generateData();
+    data.playerState = "PLAYING";
+    console.log("Data", data);
+    return data;
+}
+
+cast.receiver.MediaManager.customizedStatusCallback = function() {
+    console.log("asd");
+    var data = new cast.receiver.media.MediaStatus();
+    data.currentTime = getCurrentTime();
+    data.media = generateData();
+    data.playerState = "PLAYING";
+    console.log("Data", data);
+    return data;
 }
 /*
 cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
@@ -644,6 +659,33 @@ function onPlayerReady() {
     }*/
     mediaElement = player;
     mediaManager = new cast.receiver.MediaManager(mediaElement);
+    /*mediaManager.onGetStatus = function() {
+        console.log("asd");
+        var data = new cast.receiver.media.MediaStatus();
+        data.currentTime = getCurrentTime();
+        data.media = generateData();
+        data.playerState = "PLAYING";
+        console.log("Data", data);
+        return data;
+    };*/
+    mediaManager.customizedStatusCallback = function() {
+        console.log("asd");
+        var data = new cast.receiver.media.MediaStatus();
+        data.currentTime = getCurrentTime();
+        data.media = generateData();
+        data.playerState = "PLAYING";
+        console.log("Data", data);
+        return data;
+    };
+    mediaManager.prototype.customizedStatusCallback = function() {
+        console.log("asd");
+        var data = new cast.receiver.media.MediaStatus();
+        data.currentTime = getCurrentTime();
+        data.media = generateData();
+        data.playerState = "PLAYING";
+        console.log("Data", data);
+        return data;
+    };
     window.castReceiverManager.start(appConfig);
     ytReady = true;
     if(videoId && videoSource == "youtube"){
