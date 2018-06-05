@@ -54,6 +54,7 @@ function seekToFunction(value) {
 }
 
 function pauseVideo() {
+    console.log("pausing here 2");
     if(videoSource != "soundcloud") {
         player.pauseVideo()
     } else {
@@ -63,6 +64,7 @@ function pauseVideo() {
 
 function stopVideo() {
     if(videoSource != "soundcloud") {
+        console.log("stopping here 3");
         player.stopVideo()
     } else {
         soundcloud_player.pause();
@@ -105,6 +107,7 @@ function loadVideoById(id, start, end) {
         //}
     } else {
         try {
+            console.log("stopping here");
             player.stopVideo();
         } catch(e) {}
         if(currentSoundcloudVideo != id) {
@@ -236,6 +239,7 @@ customMessageBus.onMessage = function(event) {
             $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://client.zoff.me/r/" + btoa(encodeURIComponent(channel)));
             break;
         case "playPauseVideo":
+            console.log("pausing here");
             if(getPlayerState() == 1) {
                 pauseVideo();
             } else {
@@ -243,9 +247,11 @@ customMessageBus.onMessage = function(event) {
             }
             break;
         case "stopVideo":
+        console.log("stopping here2");
             stopVideo();
             break;
         case "pauseVideo":
+            console.log("pausing here  1");
             pauseVideo();
             break;
         case "playVideo":
@@ -368,6 +374,15 @@ customMessageBus.onMessage = function(event) {
                             $("#next_song").removeClass("slid-in");
                         }, 15000);
                         //}
+                        setTimeout(function() {
+                            if(player.getPlayerState() == -1 && videoSource == "youtube") && player.getCurrentTime() < startSeconds) {
+                                seekToFunction(startSeconds);
+                                player.playVideo();
+                            } else if(videoSource && "soundcloud" && soundcloud_player.currentTime() / 1000 < startSeconds) {
+                                seekToFunction(startSeconds);
+                                soundcloud_player.play();
+                            }
+                        }, 1500);
                         /*if(seekTo){
                             seekToFunction(seekTo);
                         }*/
