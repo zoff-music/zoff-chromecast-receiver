@@ -677,15 +677,7 @@ function onPlayerReady() {
         console.log("Data", data);
         return data;
     };
-    mediaManager.prototype.customizedStatusCallback = function() {
-        console.log("asd");
-        var data = new cast.receiver.media.MediaStatus();
-        data.currentTime = getCurrentTime();
-        data.media = generateData();
-        data.playerState = "PLAYING";
-        console.log("Data", data);
-        return data;
-    };
+
     window.castReceiverManager.start(appConfig);
     ytReady = true;
     if(videoId && videoSource == "youtube"){
