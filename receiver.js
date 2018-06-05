@@ -10,7 +10,7 @@ var mobile_hack = false;
 var connect_error = false;
 var startSeconds = 0;
 endSeconds = 99999;
-var sentEnd = false;
+var sentEnd = 0;
 var channel;
 var guid;
 var title = "";
@@ -348,7 +348,7 @@ customMessageBus.onMessage = function(event) {
                 _socketIo.on("np", function(msg) {
                     console.log("Gotten np");
                     console.log(msg);
-                    sentEnd = false;
+                    sentEnd = 0;
                     if(msg.np) {
                         var conf       = msg.conf[0];
                         var time       = msg.time;
@@ -579,8 +579,8 @@ function durationSetter(){
             if(mobile_hack && _socketIo) {
                 var end = {id: videoId, channel: channel};
                 if(userpass) end.pass = userpass;
-                if(_socketIo.connected && !sentEnd) {
-                    sentEnd = true;
+                if(_socketIo.connected && sentEnd > 5) {
+                    sentEnd += 1;
                     _socketIo.emit("end", end);//, pass: userpass});
                 }
             } else {
@@ -694,8 +694,8 @@ function onPlayerStateChange(event) {
         if(mobile_hack && _socketIo) {
             var end = {id: videoId, channel: channel};
             if(userpass) end.pass = userpass;
-            if(_socketIo.connected && !sentEnd) {
-                sentEnd = true;
+            if(_socketIo.connected && sentEnd > 5) {
+                sentEnd += 1;
                 _socketIo.emit("end", end);//, pass: userpass});
             }
         } else {
