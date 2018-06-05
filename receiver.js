@@ -22,6 +22,7 @@ var socket_id;
 var _socketIo;
 var hide_timer;
 var showInfoTimer;
+var mobileSpecsAlready = false;
 var videoSource = "";
 var soundcloud_player = {
     seek: function(){},
@@ -296,6 +297,23 @@ customMessageBus.onMessage = function(event) {
             }
             break;
         case "mobilespecs":
+            if(mobileSpecsAlready) {
+                channel = json_parsed.channel;
+                socket_id = json_parsed.socketid;
+                guid = json_parsed.guid;
+                if(json_parsed.adminpass) {
+                    adminpass = json_parsed.adminpass;
+                }
+                if(json_parsed.userpass) {
+                    userpass = json_parsed.userpass;
+                }
+                if(_socketIo.connected) {
+                    _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                    _socketIo.emit('pos', pos);
+                }
+                return;
+            }
+            mobileSpecsAlready = true;
             socket_id = json_parsed.socketid;
             guid = json_parsed.guid;
             if(json_parsed.adminpass) {
