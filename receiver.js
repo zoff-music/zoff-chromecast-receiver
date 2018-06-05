@@ -46,7 +46,6 @@ cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaS
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 function seekToFunction(value) {
-    console.log("seeking too " + value);
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
         player.seekTo(value)
@@ -56,7 +55,6 @@ function seekToFunction(value) {
 }
 
 function pauseVideo() {
-    console.log("pausing here 2");
     if(videoSource != "soundcloud") {
         player.pauseVideo()
     } else {
@@ -66,7 +64,6 @@ function pauseVideo() {
 
 function stopVideo() {
     if(videoSource != "soundcloud") {
-        console.log("stopping here 3");
         player.stopVideo()
     } else {
         soundcloud_player.pause();
@@ -91,7 +88,6 @@ function playVideo() {
 
 function loadVideoById(id, start, end) {
     if(id == null) return;
-    console.log("loadVideoById",id,start,end,videoSource);
     if(videoSource != "soundcloud") {
         soundcloud_player.pause();
         if(!$("#player_overlay").hasClass("hide")) {
@@ -99,18 +95,15 @@ function loadVideoById(id, start, end) {
         }
         try {
             if(player.getVideoUrl().indexOf(id) > -1) {
-                console.log("Seeking to ", start);
                 player.seekTo(start);
             } else {
                 throw "player object not existing yet";
             }
         } catch(e) {
-            console.log("Starting at ", start);
             player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
         }
     } else {
         try {
-            console.log("stopping here");
             player.stopVideo();
         } catch(e) {}
         if(currentSoundcloudVideo != id) {
@@ -242,7 +235,6 @@ customMessageBus.onMessage = function(event) {
             $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://client.zoff.me/r/" + btoa(encodeURIComponent(channel)));
             break;
         case "playPauseVideo":
-            console.log("pausing here");
             if(getPlayerState() == 1) {
                 pauseVideo();
             } else {
@@ -250,11 +242,9 @@ customMessageBus.onMessage = function(event) {
             }
             break;
         case "stopVideo":
-        console.log("stopping here2");
             stopVideo();
             break;
         case "pauseVideo":
-            console.log("pausing here  1");
             pauseVideo();
             break;
         case "playVideo":
@@ -284,7 +274,6 @@ customMessageBus.onMessage = function(event) {
             if(!mobile_hack) {
                 nextVideo = json_parsed.videoId;
                 nextTitle = json_parsed.title;
-                console.log(json_parsed.source);
                 if(json_parsed.source == "soundcloud") {
                     $("#next_pic").attr("src", json_parsed.thumbnail);
                 } else {
@@ -377,7 +366,6 @@ customMessageBus.onMessage = function(event) {
                         }, 15000);
                         //}
                         setTimeout(function() {
-                            console.log("videoSource is", videoSource);
                             if(player.getPlayerState() == -1 && videoSource == "youtube" && player.getCurrentTime() < startSeconds) {
                                 seekToFunction(startSeconds);
                                 player.playVideo();
@@ -446,7 +434,6 @@ customMessageBus.onMessage = function(event) {
                 });
 
                 _socketIo.on("next_song", function(msg) {
-                    console.log("Gotten next_song");
                     console.log(msg);
                     nextVideo = msg.videoId;
                     nextTitle = msg.title;
@@ -546,7 +533,6 @@ function durationSetter(){
         currDurr = currDurr - startSeconds;
         minutes = Math.floor(currDurr / 60);
         seconds = currDurr - (minutes * 60);
-        console.log(minutes, seconds, getCurrentTime());
 
         if(endSeconds - getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
@@ -571,7 +557,6 @@ function durationSetter(){
                 if(userpass) end.pass = userpass;
                 if(_socketIo.connected && !sentEnd) {
                     sentEnd = true;
-                    console.log("Here it has ended");
                     _socketIo.emit("end", end);//, pass: userpass});
                 }
             } else {
@@ -682,13 +667,10 @@ function getCurrentData() {
 function onPlayerStateChange(event) {
     if(videoSource == "soundcloud") return;
     if (event.data==YT.PlayerState.ENDED) {
-        console.log("video ended", mobile_hack, _socketIo);
         if(mobile_hack && _socketIo) {
             var end = {id: videoId, channel: channel};
             if(userpass) end.pass = userpass;
-            console.log("emit here");
             if(_socketIo.connected && !sentEnd) {
-                console.log("ended here also");
                 sentEnd = true;
                 _socketIo.emit("end", end);//, pass: userpass});
             }
