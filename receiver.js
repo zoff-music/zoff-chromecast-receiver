@@ -46,7 +46,7 @@ cast.receiver.MediaManager.prototype.customizedStatusCallback = function (mediaS
 //cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
 function seekToFunction(value) {
-    console.log("seeking too " value);
+    console.log("seeking too " + value);
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
         player.seekTo(value)
@@ -351,7 +351,6 @@ customMessageBus.onMessage = function(event) {
                         if(startSeconds == undefined) {
                             startSeconds = 0;
                         }
-                        startSeconds += time - conf.startTime;
                         if(endSeconds == undefined) {
                             endSeconds = msg.np[0].duration;
                         }
@@ -361,7 +360,7 @@ customMessageBus.onMessage = function(event) {
                             thumbnail = msg.np[0].thumbnail;
                         }
                         //if(prev_video != videoId){
-                        loadVideoById(videoId, startSeconds, endSeconds);
+                        loadVideoById(videoId, startSeconds + (time - conf.startTime), endSeconds);
                         //$("#title").fadeIn();
                         if(!$("#title").hasClass("slid-in-title")) {
                             $("#title").addClass("slid-in-title");
@@ -547,6 +546,7 @@ function durationSetter(){
         currDurr = currDurr - startSeconds;
         minutes = Math.floor(currDurr / 60);
         seconds = currDurr - (minutes * 60);
+        console.log(minutes, seconds, getCurrentTime());
 
         if(endSeconds - getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
