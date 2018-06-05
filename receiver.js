@@ -91,8 +91,11 @@ function loadVideoById(id, start, end) {
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
-
-        player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+        if(player.getVideoUrl().indexOf(id) > -1) {
+            player.seekTo(start);
+        } else {
+            player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+        }
     } else {
         try {
             player.stopVideo();
@@ -110,13 +113,13 @@ function loadVideoById(id, start, end) {
                 $("#player_overlay").css("background-position", "20%");
                 $("#player_overlay").css("background-color", "#2d2d2d");
                 _player.play().then(function(){
-                    seekToFunction(seekTo);
+                    seekToFunction(start);
                 }).catch(function(e){
                     console.log(e);
                 });
               });
           } else {
-              soundcloud_player.seek(seekTo * 1000);
+              soundcloud_player.seek(start * 1000);
           }
     }
 }
@@ -327,7 +330,7 @@ customMessageBus.onMessage = function(event) {
                         videoId = msg.np[0].id;
                         thumbnail = "";
                         videoSource = "youtube";
-                        startSeconds = msg.np[0].start;
+                        startSeconds = msg.np[0].start + seekTo;
                         endSeconds = msg.np[0].end;
                         if(startSeconds == undefined) {
                             startSeconds = 0;
