@@ -22,6 +22,17 @@ var thumbnail;
 var socket_id;
 var _socketIo;
 var fooPlayer = {
+    events: {
+      error: function() {
+
+      },
+      loadedmetadata: function() {
+
+      },
+      ended: function() {
+
+      }
+    },
     currentTime: function() {
         return getCurrentTime();
     },
@@ -38,6 +49,9 @@ var fooPlayer = {
     },
     addEventListener: function() {
       console.log("addEventListener");
+      if(arguments.length > 1) {
+        fooPlayer.events[arguments[0]] = argument[1];
+      }
       for(var i = 0; i < arguments.length; i++) {
         console.log(arguments[i]);
       }
@@ -70,6 +84,7 @@ mediaManager.onLoad = function (event) {
   } else {
 
   }
+  fooPlayer.loadedmetadata();
   mediaManager.setMediaInformation(generateData(), true);
   mediaManager.sendLoadComplete();
   mediaManager.setMediaInformation(generateData(), true);
@@ -646,6 +661,7 @@ function durationSetter(){
                     _socketIo.emit("end", end);//, pass: userpass});
                 }
             } else {
+                console.log("ended");
                 customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
             }
         }
