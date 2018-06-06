@@ -33,6 +33,20 @@ var fooPlayer = {
 
       }
     },
+    play: function() {
+      if(videoSource == "youtube") {
+          player.playVideo();
+      } else {
+          soundcloud_player.play();
+      }
+    },
+    pause: function() {
+      if(videoSource == "youtube") {
+          player.pauseVideo();
+      } else {
+          soundcloud_player.pause();
+      }
+    },
     currentTime: 0,
     getTitle: function() {
         return title;
@@ -152,6 +166,15 @@ mediaManager.onPlay = function(event) {
     }
 }
 
+mediaManager.onPause = function(event) {
+    console.log("onPlay", event);
+    if(videoSource == "youtube") {
+        player.pauseVideo();
+    } else {
+        soundcloud_player.pause();
+    }
+}
+
 cast.receiver.MediaManager.prototype.customizedStatusCallback = function() {
     console.log("asd");
     var data = new cast.receiver.media.MediaStatus();
@@ -163,7 +186,7 @@ cast.receiver.MediaManager.prototype.customizedStatusCallback = function() {
 }
 
 cast.receiver.MediaManager.customizedStatusCallback = function() {
-    console.log("asd");
+    console.log("bce");
     var data = new cast.receiver.media.MediaStatus();
     data.currentTime = getCurrentTime();
     data.media = generateData();
@@ -249,7 +272,10 @@ function loadVideoById(id, start, end) {
             try {
                 //title = player.getVideoData().title;
             } catch(e) {}
-            mediaManager.setMediaInformation(generateData())
+            mediaManager.setMediaInformation(generateData(), true);
+            mediaManager.sendLoadComplete();
+            mediaManager.setMediaInformation(generateData(), true);
+            fooPlayer.events.loadedmetadata();
         }, 1000);
     } else {
         try {
@@ -275,7 +301,10 @@ function loadVideoById(id, start, end) {
 
                 //mediaElement = soundcloud_player;
                 //mediaManager = new cast.receiver.MediaManager(mediaElement);
-                mediaManager.setMediaInformation(generateData())
+                mediaManager.setMediaInformation(generateData(), true);
+                mediaManager.sendLoadComplete();
+                mediaManager.setMediaInformation(generateData(), true);
+                fooPlayer.events.loadedmetadata();
               });
           } else {
               soundcloud_player.seek(start * 1000);
@@ -796,11 +825,32 @@ function onPlayerReady() {
     };*/
     mediaManager.customizedStatusCallback = function(event) {
       console.log("customized", event);
-        console.log("asd");
+        console.log("qwesasd");
         var data = new cast.receiver.media.MediaStatus();
         data.currentTime = getCurrentTime();
         data.media = generateData();
-        data.playerState = "PLAYING";
+        if(videoSource == "youtube") {
+            switch(player.getPlayerState()){
+              case 1:
+                  data.playerState = "PLAYING";
+                  break;
+              case 2:
+                data.playerState = "PAUSED";
+                break;
+              case 0:
+                data.playerState = "ENDED";
+                break;
+              case 3:
+                data.playerState = "BUFFERING";
+                break;
+            }
+        } else {
+          if(soundcloud_player.isPlaying()) {
+            data.playerState = "PLAYING";
+          } else {
+            data.playerState = "PAUSED";
+          }
+        }
         console.log("Data", data);
         return data;
     };
