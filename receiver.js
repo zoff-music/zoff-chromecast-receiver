@@ -35,6 +35,18 @@ var fooPlayer = {
     },
     duration: function() {
         return endSeconds;
+    },
+    addEventListener: function() {
+      console.log("addEventListener");
+      for(var i = 0; i < arguments.length; i++) {
+        console.log(arguments[i]);
+      }
+    },
+    attachEvent: function() {
+      console.log("attachEvent");
+      for(var i = 0; i < arguments.length; i++) {
+        console.log(arguments[i]);
+      }
     }
 }
 var hide_timer;
