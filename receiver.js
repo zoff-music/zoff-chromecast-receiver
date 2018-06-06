@@ -370,6 +370,8 @@ customMessageBus.onMessage = function(event) {
                     if(startSeconds == undefined) {
                         startSeconds = 0;
                     }
+                    title = videoId;
+                    console.log("here and stuff");
                     if(endSeconds == undefined) {
                         endSeconds = json_parsed.duration;
                     }
