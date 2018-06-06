@@ -110,7 +110,8 @@ var soundcloud_player = {
 }
 
 mediaElement = fooPlayer;
-mediaManager = new cast.receiver.MediaManager(mediaElement, 15);
+mediaManager = new cast.receiver.MediaManager(mediaElement, 1+8+4);
+mediaManager.setSupportedMediaCommands(1+8+4);
 mediaManager.onLoad = function (event) {
     console.log("onLoad", event);
     if(!mobile_hack) {
