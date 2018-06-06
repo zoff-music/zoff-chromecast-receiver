@@ -111,7 +111,6 @@ var soundcloud_player = {
 
 mediaElement = fooPlayer;
 mediaManager = new cast.receiver.MediaManager(mediaElement, 1+8+4);
-mediaManager.setSupportedMediaCommands(1+8+4);
 mediaManager.onLoad = function (event) {
     console.log("onLoad", event);
     if(!mobile_hack) {
@@ -807,6 +806,7 @@ function onPlayerReady() {
     };
 
     window.castReceiverManager.start(appConfig);
+    mediaManager.setSupportedMediaCommands(1+8+4);
     ytReady = true;
     if(videoId && videoSource == "youtube"){
         loading = true;
