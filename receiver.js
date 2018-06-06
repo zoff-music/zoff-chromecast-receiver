@@ -33,9 +33,7 @@ var fooPlayer = {
 
       }
     },
-    currentTime: function() {
-        return getCurrentTime();
-    },
+    currentTime: 0,
     getTitle: function() {
         return title;
     },
@@ -65,7 +63,7 @@ var fooPlayer = {
 }
 var hide_timer;
 var showInfoTimer;
-var videoSource = "";
+var videoSource = "youtube";
 var soundcloud_player = {
     seek: function(){},
     play: function(){},
@@ -78,7 +76,7 @@ mediaElement = fooPlayer;
 mediaManager = new cast.receiver.MediaManager(mediaElement);
 mediaManager.onLoad = function (event) {
   console.log("onLoad", event);
-  videoSource = event.data.contentType;
+  videoSource = event.data.media.contentType;
   if(videoSource == "youtube") {
       //loadVideoById(event.data.contentId, event.data)
   } else {
@@ -638,7 +636,7 @@ function durationSetter(){
         minutes = Math.floor(currDurr / 60);
         seconds = currDurr - (minutes * 60);
         fooPlayer.duration = duration;
-
+        fooPlayer.currentTime = getCurrentTime();
         if(endSeconds - getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
             hidden_info = false;
