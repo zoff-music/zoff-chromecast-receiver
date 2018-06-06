@@ -22,15 +22,25 @@ var thumbnail;
 var socket_id;
 var _socketIo;
 var fooAttributes = {
-  setAttribute: function(){},
-  removeAttribute: function(){},
-  getAttribute: function(){}
+  setAttribute: function(){
+    console.log("setAttribute-thing", arguments);
+  },
+  removeAttribute: function(){
+    console.log("removeAttribute-thing", arguments);
+  },
+  getAttribute: function(){
+    console.log("getAttribute-thing", arguments);
+  },
+  load: function() {
+    console.log("load-thing", arguments);
+  },
 };
 var fooPlayer = {
     c: fooAttributes,
-    setAttribute: function(){},
-    removeAttribute: function(){},
-    getAttribute: function(){},
+    setAttribute: fooAttributes.setAttribute,
+    removeAttribute: fooAttributes.removeAttribute,
+    getAttribute: fooAttributes.getAttribute,
+    load: fooAttributes.load,
     events: {
       error: function() {
 
