@@ -5,7 +5,7 @@ var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
-var title = "";
+var title = "temptitle";
 var started = false;
 var mobile_hack = false;
 var connect_error = false;
@@ -281,6 +281,7 @@ customMessageBus.onMessage = function(event) {
                     prev_video = videoId;
                     videoId = json_parsed.videoId;
                     videoSource = json_parsed.source;
+                    if(videoSource == undefined) videoSource = "youtube";
                     thumbnail = json_parsed.thumbnail;
                     startSeconds = json_parsed.start;
                     endSeconds = json_parsed.end;
@@ -711,6 +712,7 @@ function generateData() {
         metadata.image = image;
     }
     var mediaInfo = new cast.receiver.media.MediaInformation();
+    mediaInfo.duration = endSeconds - startSeconds;
     mediaInfo.metadata = metadata;
     mediaInfo.contentId = videoId;
     mediaInfo.contentType = "video/*";
