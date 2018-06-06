@@ -50,7 +50,7 @@ var fooPlayer = {
     addEventListener: function() {
       console.log("addEventListener");
       if(arguments.length > 1) {
-        fooPlayer.events[arguments[0]] = argument[1];
+        fooPlayer.events[arguments[0]] = arguments[1];
       }
       for(var i = 0; i < arguments.length; i++) {
         console.log(arguments[i]);
