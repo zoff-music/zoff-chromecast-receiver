@@ -76,7 +76,6 @@ mediaElement = fooPlayer;
 mediaManager = new cast.receiver.MediaManager(mediaElement);
 mediaManager.onLoad = function (event) {
   console.log("onLoad", event);
-  videoSource = event.data.media.contentType;
   if(!mobile_hack) {
       if(ytReady){
           loading = true;
@@ -130,6 +129,9 @@ mediaManager.onLoad = function (event) {
           }
       }
   }
+
+  title = event.data.media.metadata.title;
+  castReceiverManager.setApplicationState('Now Playing: ' + title);
   channel = event.data.media.customData.channel;
   $(".zoff-channel-info").text("/" + channel);
   $(".channel-name-link").text(encodeURIComponent(channel));
