@@ -84,10 +84,10 @@ mediaManager.onLoad = function (event) {
   } else {
 
   }
-  fooPlayer.events.loadedmetadata();
   mediaManager.setMediaInformation(generateData(), true);
   mediaManager.sendLoadComplete();
   mediaManager.setMediaInformation(generateData(), true);
+  fooPlayer.events.loadedmetadata();
 }
 
 mediaManager.onPlay = function(event) {
@@ -626,7 +626,7 @@ window.addEventListener('load', function() {
 
 function durationSetter(){
     try{
-        duration = endSeconds;//player.getDuration();
+        duration = endSeconds - startSeconds;//player.getDuration();
         dMinutes = Math.floor(duration / 60);
         dSeconds = duration - dMinutes * 60;
         currDurr = getCurrentTime() !== undefined ? Math.floor(getCurrentTime()) : seekTo;
@@ -636,6 +636,7 @@ function durationSetter(){
         currDurr = currDurr - startSeconds;
         minutes = Math.floor(currDurr / 60);
         seconds = currDurr - (minutes * 60);
+        fooPlayer.duration = duration;
 
         if(endSeconds - getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
