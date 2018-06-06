@@ -77,11 +77,63 @@ mediaManager = new cast.receiver.MediaManager(mediaElement);
 mediaManager.onLoad = function (event) {
   console.log("onLoad", event);
   videoSource = event.data.media.contentType;
-  if(videoSource == "youtube") {
-      //loadVideoById(event.data.contentId, event.data)
-  } else {
+  if(!mobile_hack) {
+      if(ytReady){
+          loading = true;
+          prev_video = videoId;
+          videoId = event.data.media.contentId;
+          videoSource = event.data.media.contentType;
+          if(videoSource == undefined) videoSource = "youtube";
+          thumbnail = event.data.media.customData.thumbnail;
+          startSeconds = event.data.media.customData.start;
+          endSeconds = event.data.media.customData.end;
+          if(startSeconds == undefined) {
+              startSeconds = 0;
+          }
+          if(prev_video != videoId){
+              loadVideoById(videoId, startSeconds, endSeconds);
+          }
+          if(event.data.media.customData.seekTo){
+              seekToFunction(event.data.media.customData.seekTo + startSeconds);
+          }
+          if(initial){
+              $("#player").toggleClass("hide");
+              $(".uil-ring-css").toggleClass("hide");
+              $(".zoff-info").toggleClass("center");
+              $(".zoff-info").toggleClass("lower_left");
+              $(".zoff-channel-info").toggleClass("hide");
+              initial = false;
+              durationSetter();
+          }
+          if(started) {
+              //$("#title").fadeIn();
+              if(!$("#title").hasClass("slid-in-title")) {
+                  $("#title").addClass("slid-in-title");
+              }
+              if(!$("#next_song").hasClass("slid-in")) {
+                  $("#next_song").addClass("slid-in");
+              }
+              clearTimeout(hide_timer);
+              hide_timer = setTimeout(function() {
+                  hidden_info = true;
+                  //$("#title").fadeOut();
+                  $("#title").removeClass("slid-in-title");
+                  $("#next_song").removeClass("slid-in");
 
+              }, 15000);
+          }
+      } else {
+          videoId = event.data.media.contentId;
+          videoSource = event.data.media.contentType;
+          if(event.data.media.customData.seekTo){
+              seekTo = event.data.media.customData.seekTo + startSeconds;
+          }
+      }
   }
+  channel = event.data.media.customData.channel;
+  $(".zoff-channel-info").text("/" + channel);
+  $(".channel-name-link").text(encodeURIComponent(channel));
+  $(".join-info-image").attr("src", "https://chart.googleapis.com/chart?chs=300x300&cht=qr&choe=UTF-8&chld=L|1&chl=https://client.zoff.me/r/" + btoa(encodeURIComponent(channel)));
   mediaManager.setMediaInformation(generateData(), true);
   mediaManager.sendLoadComplete();
   mediaManager.setMediaInformation(generateData(), true);
