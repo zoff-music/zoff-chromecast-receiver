@@ -712,10 +712,10 @@ function durationSetter(){
         //}
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
         if(Math.ceil(getCurrentTime()) + 1 > endSeconds) {
-            if(mobile_hack && _socketIo) {
+            if(mobile_hack && _socketIo != undefined) {
                 var end = {id: videoId, channel: channel};
                 if(userpass) end.pass = userpass;
-                if(_socketIo.connected && sentEnd > 5) {
+                if(_socketIo.connected && sentEnd < 5) {
                     sentEnd += 1;
                     _socketIo.emit("end", end);//, pass: userpass});
                 }
@@ -865,7 +865,7 @@ function onPlayerStateChange(event) {
         if(mobile_hack && _socketIo) {
             var end = {id: videoId, channel: channel};
             if(userpass) end.pass = userpass;
-            if(_socketIo.connected && sentEnd > 5) {
+            if(_socketIo.connected && sentEnd < 5) {
                 sentEnd += 1;
                 _socketIo.emit("end", end);//, pass: userpass});
             }
