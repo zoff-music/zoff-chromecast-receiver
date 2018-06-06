@@ -21,6 +21,22 @@ var currentSoundcloudVideo = "";
 var thumbnail;
 var socket_id;
 var _socketIo;
+var fooPlayer = {
+    currentTime: function() {
+        return getCurrentTime();
+    },
+    getTitle: function() {
+        return title;
+    },
+    title: title,
+    src: videoId,
+    getDuration: function() {
+        return endSeconds;
+    },
+    duration: function() {
+        return endSeconds;
+    }
+}
 var hide_timer;
 var showInfoTimer;
 var videoSource = "";
@@ -31,6 +47,31 @@ var soundcloud_player = {
     setVolume: function(){},
     currentTime: function(){}
 }
+
+mediaElement = fooPlayer;
+mediaManager = new cast.receiver.MediaManager(mediaElement);
+mediaManager.onLoad = function (event) {
+  console.log("onLoad", event);
+  videoSource = event.data.contentType;
+  if(videoSource == "youtube") {
+      //loadVideoById(event.data.contentId, event.data)
+  } else {
+
+  }
+  mediaManager.setMediaInformation(generateData(), true);
+  mediaManager.sendLoadComplete();
+  mediaManager.setMediaInformation(generateData(), true);
+}
+
+mediaManager.onPlay = function(event) {
+    console.log("onPlay", event);
+    if(videoSource == "youtube") {
+        player.playVideo();
+    } else {
+        soundcloud_player.play();
+    }
+}
+
 cast.receiver.MediaManager.prototype.customizedStatusCallback = function() {
     console.log("asd");
     var data = new cast.receiver.media.MediaStatus();
@@ -657,13 +698,6 @@ function onPlayerReady() {
         console.log(mediaStatus);
         return generateData();
     }*/
-    mediaElement = player;
-    mediaManager = new cast.receiver.MediaManager(mediaElement);
-    mediaManager.onLoad = function (event) {
-      console.log(event);
-      console.log("onLoad event");
-      mediaManager.sendLoadComplete();
-    }
     /*mediaManager.onGetStatus = function() {
         console.log("asd");
         var data = new cast.receiver.media.MediaStatus();
