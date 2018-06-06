@@ -21,7 +21,16 @@ var currentSoundcloudVideo = "";
 var thumbnail;
 var socket_id;
 var _socketIo;
+var fooAttributes = {
+  setAttribute: function(){},
+  removeAttribute: function(){},
+  getAttribute: function(){}
+};
 var fooPlayer = {
+    c: fooAttributes,
+    setAttribute: function(){},
+    removeAttribute: function(){},
+    getAttribute: function(){},
     events: {
       error: function() {
 
