@@ -84,7 +84,7 @@ mediaManager.onLoad = function (event) {
   } else {
 
   }
-  fooPlayer.loadedmetadata();
+  fooPlayer.events.loadedmetadata();
   mediaManager.setMediaInformation(generateData(), true);
   mediaManager.sendLoadComplete();
   mediaManager.setMediaInformation(generateData(), true);
