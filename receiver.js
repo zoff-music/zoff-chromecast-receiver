@@ -662,6 +662,7 @@ function onPlayerReady() {
     mediaManager.onLoad = function (event) {
       console.log(event);
       console.log("onLoad event");
+      mediaManager.sendLoadComplete();
     }
     /*mediaManager.onGetStatus = function() {
         console.log("asd");
