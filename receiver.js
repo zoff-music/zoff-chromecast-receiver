@@ -106,7 +106,7 @@ var soundcloud_player = {
 }
 
 mediaElement = fooPlayer;
-mediaManager = new cast.receiver.MediaManager(mediaElement);
+mediaManager = new cast.receiver.MediaManager(mediaElement, 3);
 mediaManager.onLoad = function (event) {
   console.log("onLoad", event);
   if(!mobile_hack) {
@@ -194,25 +194,6 @@ mediaManager.onPause = function(event) {
     }
 }
 
-cast.receiver.MediaManager.prototype.customizedStatusCallback = function() {
-    console.log("asd");
-    var data = new cast.receiver.media.MediaStatus();
-    data.currentTime = getCurrentTime();
-    data.media = generateData();
-    data.playerState = "PLAYING";
-    console.log("Data", data);
-    return data;
-}
-
-cast.receiver.MediaManager.customizedStatusCallback = function() {
-    console.log("bce");
-    var data = new cast.receiver.media.MediaStatus();
-    data.currentTime = getCurrentTime();
-    data.media = generateData();
-    data.playerState = "PLAYING";
-    console.log("Data", data);
-    return data;
-}
 /*
 cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 
@@ -853,6 +834,7 @@ function onPlayerReady() {
         var data = new cast.receiver.media.MediaStatus();
         data.currentTime = getCurrentTime();
         data.media = generateData();
+        data.media.streamType = "BUFFERED";
         if(videoSource == "youtube") {
             switch(player.getPlayerState()){
               case 1:
