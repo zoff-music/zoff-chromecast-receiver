@@ -106,7 +106,7 @@ var soundcloud_player = {
 }
 
 mediaElement = fooPlayer;
-mediaManager = new cast.receiver.MediaManager(mediaElement, 3);
+mediaManager = new cast.receiver.MediaManager(mediaElement, 12345);
 mediaManager.onLoad = function (event) {
   console.log("onLoad", event);
   if(!mobile_hack) {
@@ -847,8 +847,8 @@ function onPlayerReady() {
               case 0:
                 data.playerState = "ENDED";
                 break;
-              case 3:
-                data.playerState = "BUFFERING";
+              default:
+                data.playerState = "PLAYING";
                 break;
             }
         } else {
