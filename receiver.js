@@ -832,6 +832,7 @@ function onPlayerReady() {
       console.log("customized", event);
         console.log("qwesasd");
         var data = new cast.receiver.media.MediaStatus();
+        data.mediaSessionId = event.mediaSessionId;
         data.currentTime = getCurrentTime();
         data.media = generateData();
         data.media.streamType = "BUFFERED";
