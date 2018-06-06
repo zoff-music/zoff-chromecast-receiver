@@ -131,6 +131,7 @@ mediaManager.onLoad = function (event) {
   }
 
   title = event.data.media.metadata.title;
+  console.log("title", title, event.data.media.metadata.title);
   castReceiverManager.setApplicationState('Now Playing: ' + title);
   channel = event.data.media.customData.channel;
   $(".zoff-channel-info").text("/" + channel);
@@ -246,7 +247,7 @@ function loadVideoById(id, start, end) {
         //mediaManager = new cast.receiver.MediaManager(mediaElement);
         setTimeout(function() {
             try {
-                title = player.getVideoData().title;
+                //title = player.getVideoData().title;
             } catch(e) {}
             mediaManager.setMediaInformation(generateData())
         }, 1000);
@@ -427,7 +428,9 @@ customMessageBus.onMessage = function(event) {
         case "nextVideo":
             if(!mobile_hack) {
                 nextVideo = json_parsed.videoId;
-                nextTitle = json_parsed.title;
+                if(json_parsed.title) {
+                  nextTitle = json_parsed.title;
+                }
                 if(json_parsed.source == "soundcloud") {
                     $("#next_pic").attr("src", json_parsed.thumbnail);
                 } else {
@@ -791,7 +794,8 @@ function onPlayerReady() {
         console.log("Data", data);
         return data;
     };*/
-    mediaManager.customizedStatusCallback = function() {
+    mediaManager.customizedStatusCallback = function(event) {
+      console.log("customized", event);
         console.log("asd");
         var data = new cast.receiver.media.MediaStatus();
         data.currentTime = getCurrentTime();
