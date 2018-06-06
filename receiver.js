@@ -370,7 +370,10 @@ customMessageBus.onMessage = function(event) {
                     if(startSeconds == undefined) {
                         startSeconds = 0;
                     }
-                    title = videoId;
+                    if(json_parsed.title) {
+                      title = json_parsed.title;
+                      castReceiverManager.setApplicationState('Now Playing: ' + title);
+                    }
                     console.log("here and stuff");
                     if(endSeconds == undefined) {
                         endSeconds = json_parsed.duration;
