@@ -691,6 +691,7 @@ function durationSetter(){
         seconds = currDurr - (minutes * 60);
         fooPlayer.duration = duration;
         fooPlayer.currentTime = getCurrentTime();
+        fooPlayer.title = title;
         if(endSeconds - getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
             hidden_info = false;
