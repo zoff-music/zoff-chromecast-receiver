@@ -11,9 +11,10 @@ var mobile_hack = false;
 var connect_error = false;
 var startSeconds = 0;
 endSeconds = 99999;
-var sentEnd = false;
+var sentEnd = 0;
 var channel;
 var guid;
+var title = "";
 var adminpass;
 var mediaElement;
 var userpass;
@@ -98,7 +99,8 @@ var fooPlayer = {
 }
 var hide_timer;
 var showInfoTimer;
-var videoSource = "youtube";
+var mobileSpecsAlready = false;
+var videoSource = "";
 var soundcloud_player = {
     seek: function(){},
     play: function(){},
@@ -446,6 +448,7 @@ customMessageBus.onMessage = function(event) {
             if(json_parsed.title) {
                 nextTitle = json_parsed.title;
             }
+
             if(json_parsed.source == "soundcloud") {
                 $("#next_pic").attr("src", json_parsed.thumbnail);
             } else {
@@ -632,7 +635,7 @@ customMessageBus.onMessage = function(event) {
     console.log("Inserted script");
     break;
 }
-}
+};
 /**
 * Application config
 **/
@@ -677,7 +680,7 @@ window.addEventListener('load', function() {
 });
 
 function durationSetter(){
-    try{
+    try {
         duration = endSeconds - startSeconds;//player.getDuration();
         dMinutes = Math.floor(duration / 60);
         dSeconds = duration - dMinutes * 60;
@@ -702,16 +705,18 @@ function durationSetter(){
                 $("#next_song").addClass("slid-in");
             }
         }
+        //if(videoSource != "soundcloud") {
         if($("#title_cont").text() != title) {
             $("#title_cont").text(title);
         }
+        //}
         $("#duration").html(pad(minutes)+":"+pad(seconds)+" <span id='dash'>/</span> "+pad(dMinutes)+":"+pad(dSeconds));
-        if(getCurrentTime() + 1 > endSeconds) {
+        if(Math.ceil(getCurrentTime()) + 1 > endSeconds) {
             if(mobile_hack && _socketIo) {
                 var end = {id: videoId, channel: channel};
                 if(userpass) end.pass = userpass;
-                if(_socketIo.connected && !sentEnd) {
-                    sentEnd = true;
+                if(_socketIo.connected && sentEnd > 5) {
+                    sentEnd += 1;
                     _socketIo.emit("end", end);//, pass: userpass});
                 }
             } else {
@@ -719,7 +724,7 @@ function durationSetter(){
                 customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
             }
         }
-    }catch(err){}
+    } catch(err) {}
     setTimeout(durationSetter, 1000);
 }
 
@@ -751,7 +756,6 @@ function generateData() {
         image.height = 180;
         metadata.images.push(image);
         metadata.image = image;
-        console.log(metadata);
     } else {
         metadata.title = title;
         metadata.images = [];
@@ -818,95 +822,92 @@ function onPlayerReady() {
 
 function errorHandler(event){
     if(videoSource == "soundcloud") return;
-    if(event.data == 5 || event.data == 100 ||
-        event.data == 101 || event.data == 150){
-            if(mobile_hack && _socketIo) {
-                curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
-                var skip = {
-                    error: event.data,
-                    id: videoId,
-                    //pass: adminpass,
-                    channel: channel.toLowerCase(),
-                    //userpass: userpass
-                }
-                if(userpass) skip.userpass = userpass;
-                if(adminpass) skip.pass = adminpass;
-                if(_socketIo.connected) {
-                    _socketIo.emit("skip", skip);
-                }
-            } else {
-                customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+    if(event.data == 5 || event.data == 100 || event.data == 101 || event.data == 150) {
+        if(mobile_hack && _socketIo) {
+            curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
+            var skip = {
+                error: event.data,
+                id: videoId,
+                //pass: adminpass,
+                channel: channel.toLowerCase(),
+                //userpass: userpass
             }
+            if(userpass) skip.userpass = userpass;
+            if(adminpass) skip.pass = adminpass;
+            if(_socketIo.connected) {
+                _socketIo.emit("skip", skip);
+            }
+        } else {
+            customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
         }
     }
+}
 
-    function getCurrentData() {
-        var data = new cast.receiver.media.MediaStatus();
-        var extended = new cast.receiver.media.ExtendedMediaStatus();
-        extended.playerState = player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
-        extended.opt_media = generateData();
-        data.currentItemId = videoId;
-        data.extendedStatus = extended;
-        data.currentTime = player.getCurrentTime();
-        data.playerState = extended.playerState;
-        data.volume.level = player.getVolume() / 100;
-        data.volume.mute = false;
-        data.media = extended.opt_media;
-        data.supportedMediaCommands = 15;
-        return data;
-    }
+function getCurrentData() {
+    var data = new cast.receiver.media.MediaStatus();
+    var extended = new cast.receiver.media.ExtendedMediaStatus();
+    extended.playerState = player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    extended.opt_media = generateData();
+    data.currentItemId = videoId;
+    data.extendedStatus = extended;
+    data.currentTime = player.getCurrentTime();
+    data.playerState = extended.playerState;
+    data.volume.level = player.getVolume() / 100;
+    data.volume.mute = false;
+    data.media = extended.opt_media;
+    data.supportedMediaCommands = 15;
+    return data;
+}
 
-    function onPlayerStateChange(event) {
-        if(videoSource == "soundcloud") return;
-        if (event.data==YT.PlayerState.ENDED) {
-            if(mobile_hack && _socketIo) {
-                var end = {id: videoId, channel: channel};
-                if(userpass) end.pass = userpass;
-                if(_socketIo.connected && !sentEnd) {
-                    sentEnd = true;
-                    _socketIo.emit("end", end);//, pass: userpass});
-                }
-            } else {
-                customMessageBus.broadcast(JSON.stringify({type: -1, videoId: videoId}));
+function onPlayerStateChange(event) {
+    if(videoSource == "soundcloud") return;
+    if (event.data==YT.PlayerState.ENDED) {
+        if(mobile_hack && _socketIo) {
+            var end = {id: videoId, channel: channel};
+            if(userpass) end.pass = userpass;
+            if(_socketIo.connected && sentEnd > 5) {
+                sentEnd += 1;
+                _socketIo.emit("end", end);//, pass: userpass});
             }
-
-        } else if(event.data == 1){
-            loading = false;
-            if(seekTo){
-                player.seekTo(seekTo);
-                seekTo = null;
-            }
-
-            if(started == false) {
-                started = true;
-                clearTimeout(hide_timer);
-                hide_timer = setTimeout(function() {
-                    hidden_info = true;
-                    //$("#title").fadeOut();
-                    $("#title").removeClass("slid-in-title");
-                    $("#next_song").removeClass("slid-in");
-                }, 15000);
-            }
-            //mediaManager.setMediaInformation(generateData(), true);
-            //mediaManager.customizedStatusCallback(getCurrentData());
-            //mediaManager.broadcastStatus(true);
-            customMessageBus.broadcast(JSON.stringify({type: 1}));
-        } else if(event.data == 2) {
-            //mediaManager.customizedStatusCallback(getCurrentData());
-            customMessageBus.broadcast(JSON.stringify({type: 2}));
         }
-    }
 
-    function change_info(info) {
-        var qr = info ? "" : "-qr";
-        var info_text = info ? "-qr" : "";
-        $(".zoff-channel-info" + qr).css("opacity", 0);
+    } else if(event.data == 1){
+        loading = false;
+        if(seekTo){
+            player.seekTo(seekTo);
+            seekTo = null;
+        }
+
+        if(started == false) {
+            started = true;
+            clearTimeout(hide_timer);
+            hide_timer = setTimeout(function() {
+                hidden_info = true;
+                //$("#title").fadeOut();
+                $("#title").removeClass("slid-in-title");
+                $("#next_song").removeClass("slid-in");
+            }, 15000);
+        }
+        //mediaManager.setMediaInformation(generateData(), true);
+        //mediaManager.customizedStatusCallback(getCurrentData());
+        //mediaManager.broadcastStatus(true);
+        customMessageBus.broadcast(JSON.stringify({type: 1}));
+    } else if(event.data == 2) {
+        //mediaManager.customizedStatusCallback(getCurrentData());
+        customMessageBus.broadcast(JSON.stringify({type: 2}));
+    }
+}
+
+function change_info(info) {
+    var qr = info ? "" : "-qr";
+    var info_text = info ? "-qr" : "";
+    $(".zoff-channel-info" + qr).css("opacity", 0);
+    setTimeout(function() {
+        $(".zoff-channel-info" + qr).css("display", "none");
+        $(".zoff-channel-info" + info_text).css("display", "block");
+        $(".zoff-channel-info" + info_text).css("opacity", 1);
         setTimeout(function() {
-            $(".zoff-channel-info" + qr).css("display", "none");
-            $(".zoff-channel-info" + info_text).css("display", "block");
-            $(".zoff-channel-info" + info_text).css("opacity", 1);
-            setTimeout(function() {
-                change_info(!info);
-            }, 10000);
-        }, 500);
-    }
+            change_info(!info);
+        }, 10000);
+    }, 500);
+}
