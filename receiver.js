@@ -659,6 +659,10 @@ function onPlayerReady() {
     }*/
     mediaElement = player;
     mediaManager = new cast.receiver.MediaManager(mediaElement);
+    mediaManager.onLoad = function (event) {
+      console.log(event);
+      console.log("onLoad event");
+    }
     /*mediaManager.onGetStatus = function() {
         console.log("asd");
         var data = new cast.receiver.media.MediaStatus();
