@@ -165,7 +165,7 @@ mediaManager.onLoad = function (event) {
                 seekTo = event.data.media.customData.seekTo + startSeconds;
             }
         }
-        if(!mobile_hack && event.data.customData.socket_id && event.data.customData.guid) {
+        /*if(!mobile_hack && event.data.customData.socket_id && event.data.customData.guid) {
             var json_parsed = {};
             json_parsed.socketid = event.data.customData.socket_id;
             json_parsed.guid = event.data.customData.guid;
@@ -179,7 +179,7 @@ mediaManager.onLoad = function (event) {
             //userpass = json_parsed.userpass;
             json_parsed.channel = event.data.customData.channel;
             //mobilespecs(json_parsed)
-        }
+        }*/
     }
 
     title = event.data.media.metadata.title;
