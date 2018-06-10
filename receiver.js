@@ -178,7 +178,7 @@ mediaManager.onLoad = function (event) {
             //adminpass = json_parsed.adminpass;
             //userpass = json_parsed.userpass;
             json_parsed.channel = event.data.customData.channel;
-            mobilespecs(json_parsed)
+            //mobilespecs(json_parsed)
         }
     }
 
