@@ -169,19 +169,19 @@ mediaManager.onLoad = function (event) {
                 seekTo = event.data.media.customData.seekTo + startSeconds;
             }
         }
-        if(!mobile_hack && event.data.customData.socket_id && event.data.customData.guid) {
+        if(!mobile_hack && event.data.media.customData.socket_id && event.data.media.customData.guid) {
             var json_parsed = {};
-            json_parsed.socketid = event.data.customData.socket_id;
-            json_parsed.guid = event.data.customData.guid;
-            if(event.data.customData.adminpass) {
-                json_parsed.adminpass = event.data.customData.adminpass;
+            json_parsed.socketid = event.data.media.customData.socket_id;
+            json_parsed.guid = event.data.media.customData.guid;
+            if(event.data.media.customData.adminpass) {
+                json_parsed.adminpass = event.data.media.customData.adminpass;
             }
             if(event.data.customData.userpass) {
-                json_parsed.userpass = event.data.customData.userpass;
+                json_parsed.userpass = event.data.media.customData.userpass;
             }
             //adminpass = json_parsed.adminpass;
             //userpass = json_parsed.userpass;
-            json_parsed.channel = event.data.customData.channel;
+            json_parsed.channel = event.data.media.customData.channel;
             mobilespecs(json_parsed)
         }
     }
