@@ -106,7 +106,10 @@ var soundcloud_player = {
     play: function(){},
     pause: function(){},
     setVolume: function(){},
-    currentTime: function(){}
+    currentTime: function(){},
+    isPlaying: function() {
+        return false;
+    }
 }
 
 mediaElement = fooPlayer;
