@@ -176,7 +176,7 @@ mediaManager.onLoad = function (event) {
             if(event.data.media.customData.adminpass) {
                 json_parsed.adminpass = event.data.media.customData.adminpass;
             }
-            if(event.data.customData.userpass) {
+            if(event.data.media.customData.userpass) {
                 json_parsed.userpass = event.data.media.customData.userpass;
             }
             //adminpass = json_parsed.adminpass;
