@@ -612,6 +612,7 @@ function mobilespecs(json_parsed) {
             setTimeout(function() {
                 if(_socketIo.connected) {
                     _socketIo.emit('pos', pos);//, pass: userpass});
+                    _socketIo.emit('next_song', pos);
                 }
             }, 1000);
         }
