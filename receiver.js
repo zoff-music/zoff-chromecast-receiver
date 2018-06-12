@@ -110,13 +110,14 @@ var soundcloud_player = {
 }
 
 mediaElement = fooPlayer;
-mediaManager = new cast.receiver.MediaManager(mediaElement, 1+8+4);
+mediaManager = new cast.receiver.MediaManager(mediaElement);
 mediaManager.onLoad = function (event) {
     console.log("onLoad", event);
     if(!mobile_hack) {
         if(ytReady){
             loading = true;
             prev_video = videoId;
+            if(event.data.media.contentID) event.data.media.contentId = event.data.media.contentID;
             videoId = event.data.media.contentId;
             videoSource = event.data.media.contentType;
             if(videoSource == undefined) videoSource = "youtube";
