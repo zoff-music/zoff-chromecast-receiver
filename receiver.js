@@ -607,8 +607,9 @@ function mobilespecs(json_parsed) {
 
     _socketIo.on("connect", function(){
         console.log("connected to _socketIo.io");
-        if(_socketIo.connected) {
+        //if(_socketIo.connected) {
             _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+            console.log("emitted chromecast elements");
             var pos = {channel: channel};
             if(userpass) pos.userpass = userpass;
             setTimeout(function() {
@@ -617,7 +618,7 @@ function mobilespecs(json_parsed) {
                     _socketIo.emit('next_song', pos);
                 }
             }, 1000);
-        }
+        //}
         if(connect_error){
             connect_error = false;
             var pos = {channel: channel};
