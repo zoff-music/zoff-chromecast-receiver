@@ -260,6 +260,7 @@ function playVideo() {
 
 function loadVideoById(id, start, end) {
     if(id == null) return;
+    console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource != "soundcloud") {
         soundcloud_player.pause();
         if(!$("#player_overlay").hasClass("hide")) {
@@ -272,6 +273,7 @@ function loadVideoById(id, start, end) {
                 throw "player object not existing yet";
             }
         } catch(e) {
+            console.log("first place: loadVideoById", videoSource, id, start, end);
             player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
         }
         setTimeout(function() {
