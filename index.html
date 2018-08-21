@@ -83,6 +83,50 @@
 			display: none;
 		}
 
+		#toast-container {
+			/* display:none; *//* width: auto; */
+			position: relative;
+			left: 5%;
+			cursor: pointer;
+			width: 70vw;
+			/* display: flex; */
+			flex-direction: column;
+			align-items: baseline;
+		}
+
+		.toast {
+		    border-radius: 2px;
+		    top: 35px;
+		    width: auto;
+		    margin-top: 10px;
+		    position: relative;
+		    max-width: 100%;
+		    height: auto;
+		    min-height: 48px;
+			z-index: 9999999999999999;
+		    line-height: 1.5em;
+		    background-color: #323232;
+		    padding: 10px 25px;
+		    font-size: 1.1rem;
+		    font-weight: 300;
+		    color: #fff;
+		    display: -webkit-box;
+		    display: -webkit-flex;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-align: center;
+		    -webkit-align-items: center;
+		    -ms-flex-align: center;
+		    align-items: center;
+		    -webkit-box-pack: justify;
+		    -webkit-justify-content: space-between;
+		    -ms-flex-pack: justify;
+		    justify-content: space-between;
+		    cursor: default;
+		    border-radius: 4px;
+		    display: flex;
+		}
+
 		#next_song {
 			z-index: 9;
 		    display: flex;
@@ -367,6 +411,8 @@
 			<p>To join this channel, go to</p>
 			<p>client.zoff.me/<span class="channel-name-link"></span></p>
 			<img class="join-info-image" src="https://chart.googleapis.com/chart?chs=221x221&amp;cht=qr&amp;choe=UTF-8&amp;chld=L|1&amp;chl=https://zoff.me/" alt="qr">
+		</div>
+		<div id="toast-container">
 		</div>
 	</body>
 	</html>
