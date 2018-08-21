@@ -661,7 +661,7 @@ function mobilespecs(json_parsed) {
             toast_id += 1;
             setTimeout(function() {
                 document.getElementById("toast-container").children[0].remove();
-            }, 7000);
+            }, 10000);
 
         }
     });
