@@ -638,12 +638,6 @@ function mobilespecs(json_parsed) {
 
     _socketIo.on("channel", function(msg) {
         if(msg.type == "added") {
-            var msg = {};
-            msg.value = {
-                id: "1qwe",
-                source: "youtube",
-                title: "testsong",
-            }
             var added = msg.value;
             var id = added.id;
             var _title = added.title;
