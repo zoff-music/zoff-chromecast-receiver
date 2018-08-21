@@ -10,6 +10,7 @@ var started = false;
 var mobile_hack = false;
 var connect_error = false;
 var startSeconds = 0;
+var toast_id = 0;
 endSeconds = 99999;
 var sentEnd = 0;
 var channel;
@@ -632,6 +633,42 @@ function mobilespecs(json_parsed) {
     _socketIo.on("self_ping", function() {
         if(channel != undefined && channel.toLowerCase() != "" && _socketIo.connected) {
             _socketIo.emit("self_ping", {channel: channel.toLowerCase()});
+        }
+    });
+
+    _socketIo.on("channel", function(msg) {
+        if(msg.type == "added") {
+            var msg = {};
+            msg.value = {
+                id: "1qwe",
+                source: "youtube",
+                title: "testsong",
+            }
+            var added = msg.value;
+            var id = added.id;
+            var _title = added.title;
+            var new_thumbnail;
+            var this_id = toast_id;
+            if(added.source == "soundcloud") {
+                new_thumbnail = added.thumbnail;
+            } else {
+                new_thumbnail = "https://img.youtube.com/vi/" + id + "/mqdefault.jpg";
+            }
+
+            document.getElementById("toast-container").insertAdjacentHTML("beforeend", '<div class="toast" id="toast-' + toast_id +'"> \
+				<div style="display:flex;"> \
+					<img id="new_added_song_image" style="height:100px;align-self:center;" src="' + new_thumbnail + '"> \
+					<div style="padding-left:32px;padding-right:32px;"> \
+						<p>New song added</p> \
+						<p id="new_song_added_title">' + _title + '</p> \
+					</div> \
+				</div> \
+			</div>');
+            toast_id += 1;
+            setTimeout(function() {
+                document.getElementById("toast-container").children[0].remove();
+            }, 7000);
+
         }
     });
 
