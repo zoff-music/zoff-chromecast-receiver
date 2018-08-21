@@ -236,7 +236,7 @@ function pauseVideo() {
 
 function stopVideo() {
     if(videoSource != "soundcloud") {
-        player.stopVideo()
+        player.pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -287,7 +287,7 @@ function loadVideoById(id, start, end) {
         }, 1000);
     } else {
         try {
-            player.stopVideo();
+            player.pauseVideo();
         } catch(e) {}
         if(currentSoundcloudVideo != id) {
             currentSoundcloudVideo = id;
@@ -698,14 +698,55 @@ window.castReceiverManager.onSenderDisconnected = function(event) {
 }
 
 window.addEventListener('load', function() {
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    SC.initialize({
-        client_id: '***REMOVED***'
-    }, function() {
-    });
+    if(document.querySelectorAll("script[src='https://www.youtube.com/iframe_api']").length == 1){
+            try{
+                Player.onYouTubeIframeAPIReady();
+                //SC.Widget(Player.soundcloud_player).bind("ready", Player.soundcloudReady);
+
+            } catch(error){
+                console.error(error);
+                console.error("Seems YouTube iFrame script isn't correctly loaded. Please reload the page.");
+            }
+
+        } else {
+            tag            = document.createElement('script');
+            tag.src        = "https://www.youtube.com/iframe_api";
+            firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+
+    if(document.querySelectorAll("script[src='https://connect.soundcloud.com/sdk/sdk-3.3.0.js']").length == 1) {
+            try {
+                Player.soundcloudReady();
+            } catch(error) {
+                console.error(error);
+                console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
+            }
+        } else {
+            tagSC            = document.createElement('script');
+            if (tagSC.readyState){  //IE
+                tagSC.onreadystatechange = function(){
+                    if (tagSC.readyState == "loaded" ||
+                            tagSC.readyState == "complete"){
+                        tagSC.onreadystatechange = null;
+                        SC.initialize({
+                            client_id: '***REMOVED***'
+                        }, function() {
+                        });
+                    }
+                };
+            } else {  //Others
+                tagSC.onload = function(){
+                    SC.initialize({
+                        client_id: '***REMOVED***'
+                    }, function() {
+                    });
+                };
+            }
+            tagSC.src        = "https://connect.soundcloud.com/sdk/sdk-3.3.0.js";
+            firstScriptTagSC = document.getElementsByTagName('script')[0];
+            firstScriptTagSC.parentNode.insertBefore(tagSC, firstScriptTagSC);
+        }
 });
 
 function durationSetter(){
