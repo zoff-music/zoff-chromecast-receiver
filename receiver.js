@@ -123,7 +123,11 @@ mediaManager.onLoad = function (event) {
             prev_video = videoId;
             if(event.data.media.contentID) event.data.media.contentId = event.data.media.contentID;
             videoId = event.data.media.contentId;
-            videoSource = event.data.media.contentType;
+            if(event.data.media.contentType == "video/*") {
+                videoSource = event.data.media.customData.source;
+            } else {
+                videoSource = event.data.media.contentType;
+            }
             if(videoSource == undefined) videoSource = "youtube";
             thumbnail = event.data.media.customData.thumbnail;
             startSeconds = event.data.media.customData.start;
@@ -165,7 +169,11 @@ mediaManager.onLoad = function (event) {
             }
         } else {
             videoId = event.data.media.contentId;
-            videoSource = event.data.media.contentType;
+            if(event.data.media.contentType == "video/*") {
+                videoSource = event.data.media.customData.source;
+            } else {
+                videoSource = event.data.media.contentType;
+            }
             if(event.data.media.customData.seekTo){
                 seekTo = event.data.media.customData.seekTo + startSeconds;
             }
