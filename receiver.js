@@ -1,11 +1,13 @@
 var ytReady     = false;
 var videoId     = null;
 var seekTo      = null;
-var ytPlayer;
+var ytPlayers["ytPlayer" + currentYT];
 var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
+var ytPlayers["ytPlayer" + currentYT]s = [];
+var currentYT = 0;
 var SC_widget;
 var scCurrentTime = 0;
 var currDurr = 0;
@@ -65,14 +67,14 @@ var fooPlayer = {
     },
     play: function() {
         if(videoSource == "youtube") {
-            ytPlayer.playVideo();
+            ytPlayers["ytPlayer" + currentYT].playVideo();
         } else {
             soundcloud_player.play();
         }
     },
     pause: function() {
         if(videoSource == "youtube") {
-            ytPlayer.pauseVideo();
+            ytPlayers["ytPlayer" + currentYT].pauseVideo();
         } else {
             soundcloud_player.pause();
         }
@@ -218,7 +220,7 @@ mediaManager.onLoad = function (event) {
 mediaManager.onPlay = function(event) {
     console.log("onPlay", event);
     if(videoSource == "youtube") {
-        ytPlayer.playVideo();
+        ytPlayers["ytPlayer" + currentYT].playVideo();
     } else {
         soundcloud_player.play();
     }
@@ -227,7 +229,7 @@ mediaManager.onPlay = function(event) {
 mediaManager.onPause = function(event) {
     console.log("onPause", event);
     if(videoSource == "youtube") {
-        ytPlayer.pauseVideo();
+        ytPlayers["ytPlayer" + currentYT].pauseVideo();
     } else {
         soundcloud_player.pause();
     }
@@ -236,7 +238,7 @@ mediaManager.onPause = function(event) {
 function seekToFunction(value) {
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
-        ytPlayer.seekTo(value)
+        ytPlayers["ytPlayer" + currentYT].seekTo(value)
     } else {
         soundcloud_player.seek(value * 1000);
     }
@@ -244,7 +246,7 @@ function seekToFunction(value) {
 
 function pauseVideo() {
     if(videoSource != "soundcloud") {
-        ytPlayer.pauseVideo()
+        ytPlayers["ytPlayer" + currentYT].pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -252,7 +254,7 @@ function pauseVideo() {
 
 function stopVideo() {
     if(videoSource != "soundcloud") {
-        ytPlayer.pauseVideo()
+        ytPlayers["ytPlayer" + currentYT].pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -260,7 +262,7 @@ function stopVideo() {
 
 function getCurrentTime() {
     if(videoSource != "soundcloud") {
-        return ytPlayer.getCurrentTime();
+        return ytPlayers["ytPlayer" + currentYT].getCurrentTime();
     } else {
         if(scUsingWidget) {
             return currDurr;
@@ -272,7 +274,7 @@ function getCurrentTime() {
 
 function playVideo() {
     if(videoSource != "soundcloud") {
-        ytPlayer.playVideo()
+        ytPlayers["ytPlayer" + currentYT].playVideo()
     } else {
         soundcloud_player.play();
     }
@@ -282,24 +284,33 @@ function loadVideoById(id, start, end) {
     if(id == null) return;
     console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource != "soundcloud") {
-        if(previousVideoSource == "youtube") {
-            ytPlayer.destroy();
+        if(previousVideoSource == "soundcloud" || previousVideoSource == "") {
+            soundcloud_player.unbind("finish", soundcloudFinish);
+            soundcloud_player.unbind("pause", soundcloudPause);
+            soundcloud_player.unbind("play", soundcloudPlay);
+            soundcloud_player = null;
+            document.querySelector("#sc_player").innerHTML = "";
+
+            document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+            videoId = id;
+            onYouTubeIframeAPIReady();
         }
         try {
-            soundcloud_player.pause();
+            //soundcloud_player.pause();
         } catch(e){}
+
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
         try {
-            if(ytPlayer.getVideoUrl().indexOf(id) > -1) {
-                ytPlayer.seekTo(start);
+            if(ytPlayers["ytPlayer" + currentYT].getVideoUrl().indexOf(id) > -1) {
+                ytPlayers["ytPlayer" + currentYT].seekTo(start);
             } else {
                 throw "player object not existing yet";
             }
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
-            ytPlayer.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+            ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
         }
         setTimeout(function() {
             try {
@@ -311,15 +322,12 @@ function loadVideoById(id, start, end) {
             fooPlayer.events.loadedmetadata();
         }, 1000);
     } else {
-        if(previousVideoSource == "soundcloud") {
-            soundcloud_player.unbind("finish", soundcloudFinish);
-            soundcloud_player.unbind("pause", soundcloudPause);
-            soundcloud_player.unbind("play", soundcloudPlay);
-            soundcloud_player = null;
-            document.querySelector("#sc_player").innerHTML = "";
+        if(previousVideoSource == "youtube" || previousVideoSource == "") {
+            ytPlayers["ytPlayer" + currentYT].destroy();
+            document.querySelector("#player").remove();
         }
         try {
-            ytPlayer.pauseVideo();
+            //ytPlayers["ytPlayer" + currentYT].pauseVideo();
         } catch(e) {}
         if(currentSoundcloudVideo != id) {
             currentSoundcloudVideo = id;
@@ -402,7 +410,7 @@ function addSCWidgetElements() {
 
 function getPlayerState() {
     if(videoSource != "soundcloud") {
-        return ytPlayer.getPlayerState()
+        return ytPlayers["ytPlayer" + currentYT].getPlayerState()
     } else {
         if(soundcloud_player.getState() == "playing") return YT.PlayerState.PLAYING;
         else if(soundcloud_player.getState() == "paused") return YT.PlayerState.PAUSED;
@@ -412,13 +420,13 @@ function getPlayerState() {
 
 function mute() {
     if(videoSource != "soundcloud") {
-        ytPlayer.mute()
+        ytPlayers["ytPlayer" + currentYT].mute()
     }
 }
 
 function unMute() {
     if(videoSource != "soundcloud") {
-        ytPlayer.unMute()
+        ytPlayers["ytPlayer" + currentYT].unMute()
     }
 }
 
@@ -650,9 +658,9 @@ function mobilespecs(json_parsed) {
                 }, 15000);
                 //}
                 setTimeout(function() {
-                    if(ytPlayer.getPlayerState() == -1 && videoSource == "youtube" && ytPlayer.getCurrentTime() < startSeconds) {
+                    if(ytPlayers["ytPlayer" + currentYT].getPlayerState() == -1 && videoSource == "youtube" && ytPlayers["ytPlayer" + currentYT].getCurrentTime() < startSeconds) {
                         seekToFunction(startSeconds);
-                        ytPlayer.playVideo();
+                        ytPlayers["ytPlayer" + currentYT].playVideo();
                     } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
                         seekToFunction(startSeconds);
                         soundcloud_player.play();
@@ -961,7 +969,8 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
-    ytPlayer = new YT.Player('player', {
+    currentYT += 1;
+    ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
         videoId: videoId,
         height: 562,
         width: 1000,
@@ -1010,7 +1019,7 @@ function onYoutubePlayerReady() {
         data.media = generateData();
         data.media.streamType = "BUFFERED";
         if(videoSource == "youtube") {
-            switch(ytPlayer.getPlayerState()){
+            switch(ytPlayers["ytPlayer" + currentYT].getPlayerState()){
                 case 1:
                 data.playerState = "PLAYING";
                 break;
@@ -1043,10 +1052,10 @@ function onYoutubePlayerReady() {
     ytReady = true;
     if(videoId && videoSource == "youtube"){
         loading = true;
-        ytPlayer.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-        ytPlayer.playVideo();
+        ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+        ytPlayers["ytPlayer" + currentYT].playVideo();
         if(seekTo){
-            ytPlayer.seekTo(seekTo);
+            ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
             seekTo = null;
         }
     } else {
@@ -1060,7 +1069,7 @@ function errorHandler(event){
     if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 || event.data == 101 || event.data == 150) {
         if(mobile_hack && _socketIo) {
-            curr_playing = ytPlayer.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
+            curr_playing = ytPlayers["ytPlayer" + currentYT].getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
             var skip = {
                 error: event.data,
                 id: videoId,
@@ -1082,13 +1091,13 @@ function errorHandler(event){
 function getCurrentData() {
     var data = new cast.receiver.media.MediaStatus();
     var extended = new cast.receiver.media.ExtendedMediaStatus();
-    extended.playerState = ytPlayer.getPlayerState() == 1 ? "PLAYING" : ytPlayer.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    extended.playerState = ytPlayers["ytPlayer" + currentYT].getPlayerState() == 1 ? "PLAYING" : ytPlayers["ytPlayer" + currentYT].getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
     extended.opt_media = generateData();
     data.currentItemId = videoId;
     data.extendedStatus = extended;
-    data.currentTime = ytPlayer.getCurrentTime();
+    data.currentTime = ytPlayers["ytPlayer" + currentYT].getCurrentTime();
     data.playerState = extended.playerState;
-    data.volume.level = ytPlayer.getVolume() / 100;
+    data.volume.level = ytPlayers["ytPlayer" + currentYT].getVolume() / 100;
     data.volume.mute = false;
     data.media = extended.opt_media;
     data.supportedMediaCommands = 15;
@@ -1110,7 +1119,7 @@ function onPlayerStateChange(event) {
     } else if(event.data == 1){
         loading = false;
         if(seekTo){
-            ytPlayer.seekTo(seekTo);
+            ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
             seekTo = null;
         }
 
