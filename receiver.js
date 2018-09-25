@@ -1,6 +1,7 @@
 var ytReady     = false;
 var videoId     = null;
 var seekTo      = null;
+var ytPlayer;
 var nextVideo   = null;
 var loading     = false;
 var initial     = true;
@@ -12,6 +13,7 @@ var SC_player;
 var scUsingWidget = true;
 var title = "temptitle";
 var started = false;
+var previousVideoSource = "";
 var mobile_hack = false;
 var connect_error = false;
 var startSeconds = 0;
@@ -63,14 +65,14 @@ var fooPlayer = {
     },
     play: function() {
         if(videoSource == "youtube") {
-            player.playVideo();
+            ytPlayer.playVideo();
         } else {
             soundcloud_player.play();
         }
     },
     pause: function() {
         if(videoSource == "youtube") {
-            player.pauseVideo();
+            ytPlayer.pauseVideo();
         } else {
             soundcloud_player.pause();
         }
@@ -216,7 +218,7 @@ mediaManager.onLoad = function (event) {
 mediaManager.onPlay = function(event) {
     console.log("onPlay", event);
     if(videoSource == "youtube") {
-        player.playVideo();
+        ytPlayer.playVideo();
     } else {
         soundcloud_player.play();
     }
@@ -225,7 +227,7 @@ mediaManager.onPlay = function(event) {
 mediaManager.onPause = function(event) {
     console.log("onPause", event);
     if(videoSource == "youtube") {
-        player.pauseVideo();
+        ytPlayer.pauseVideo();
     } else {
         soundcloud_player.pause();
     }
@@ -234,7 +236,7 @@ mediaManager.onPause = function(event) {
 function seekToFunction(value) {
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
-        player.seekTo(value)
+        ytPlayer.seekTo(value)
     } else {
         soundcloud_player.seek(value * 1000);
     }
@@ -242,7 +244,7 @@ function seekToFunction(value) {
 
 function pauseVideo() {
     if(videoSource != "soundcloud") {
-        player.pauseVideo()
+        ytPlayer.pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -250,7 +252,7 @@ function pauseVideo() {
 
 function stopVideo() {
     if(videoSource != "soundcloud") {
-        player.pauseVideo()
+        ytPlayer.pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -258,7 +260,7 @@ function stopVideo() {
 
 function getCurrentTime() {
     if(videoSource != "soundcloud") {
-        return player.getCurrentTime();
+        return ytPlayer.getCurrentTime();
     } else {
         if(scUsingWidget) {
             return currDurr;
@@ -270,7 +272,7 @@ function getCurrentTime() {
 
 function playVideo() {
     if(videoSource != "soundcloud") {
-        player.playVideo()
+        ytPlayer.playVideo()
     } else {
         soundcloud_player.play();
     }
@@ -280,6 +282,9 @@ function loadVideoById(id, start, end) {
     if(id == null) return;
     console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource != "soundcloud") {
+        if(previousVideoSource == "youtube") {
+            ytPlayer.destroy();
+        }
         try {
             soundcloud_player.pause();
         } catch(e){}
@@ -287,14 +292,14 @@ function loadVideoById(id, start, end) {
             $("#player_overlay").addClass("hide");
         }
         try {
-            if(player.getVideoUrl().indexOf(id) > -1) {
-                player.seekTo(start);
+            if(ytPlayer.getVideoUrl().indexOf(id) > -1) {
+                ytPlayer.seekTo(start);
             } else {
                 throw "player object not existing yet";
             }
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
-            player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+            ytPlayer.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
         }
         setTimeout(function() {
             try {
@@ -306,8 +311,15 @@ function loadVideoById(id, start, end) {
             fooPlayer.events.loadedmetadata();
         }, 1000);
     } else {
+        if(previousVideoSource == "soundcloud") {
+            soundcloud_player.unbind("finish", soundcloudFinish);
+            soundcloud_player.unbind("pause", soundcloudPause);
+            soundcloud_player.unbind("play", soundcloudPlay);
+            soundcloud_player = null;
+            document.querySelector("#sc_player").innerHTML = "";
+        }
         try {
-            player.pauseVideo();
+            ytPlayer.pauseVideo();
         } catch(e) {}
         if(currentSoundcloudVideo != id) {
             currentSoundcloudVideo = id;
@@ -342,6 +354,7 @@ function loadVideoById(id, start, end) {
             soundcloud_player.seek(start * 1000);
         }
     }
+    previousVideoSource = videoSource;
 }
 
 function initializeSCWidget(id) {
@@ -389,7 +402,7 @@ function addSCWidgetElements() {
 
 function getPlayerState() {
     if(videoSource != "soundcloud") {
-        return player.getPlayerState()
+        return ytPlayer.getPlayerState()
     } else {
         if(soundcloud_player.getState() == "playing") return YT.PlayerState.PLAYING;
         else if(soundcloud_player.getState() == "paused") return YT.PlayerState.PAUSED;
@@ -399,13 +412,13 @@ function getPlayerState() {
 
 function mute() {
     if(videoSource != "soundcloud") {
-        player.mute()
+        ytPlayer.mute()
     }
 }
 
 function unMute() {
     if(videoSource != "soundcloud") {
-        player.unMute()
+        ytPlayer.unMute()
     }
 }
 
@@ -637,9 +650,9 @@ function mobilespecs(json_parsed) {
                 }, 15000);
                 //}
                 setTimeout(function() {
-                    if(player.getPlayerState() == -1 && videoSource == "youtube" && player.getCurrentTime() < startSeconds) {
+                    if(ytPlayer.getPlayerState() == -1 && videoSource == "youtube" && ytPlayer.getCurrentTime() < startSeconds) {
                         seekToFunction(startSeconds);
-                        player.playVideo();
+                        ytPlayer.playVideo();
                     } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
                         seekToFunction(startSeconds);
                         soundcloud_player.play();
@@ -798,7 +811,7 @@ window.castReceiverManager.onSenderDisconnected = function(event) {
 window.addEventListener('load', function() {
     if(document.querySelectorAll("script[src='https://www.youtube.com/iframe_api']").length == 1){
             try{
-                Player.onYouTubeIframeAPIReady();
+                onYouTubeIframeAPIReady();
                 //SC.Widget(Player.soundcloud_player).bind("ready", Player.soundcloudReady);
 
             } catch(error){
@@ -948,9 +961,8 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
-    console.log(videoSource);
-    player = new YT.Player('player', {
-        videoId: "KgMxMavEUVg",
+    ytPlayer = new YT.Player('player', {
+        videoId: videoId,
         height: 562,
         width: 1000,
         playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
@@ -998,7 +1010,7 @@ function onYoutubePlayerReady() {
         data.media = generateData();
         data.media.streamType = "BUFFERED";
         if(videoSource == "youtube") {
-            switch(player.getPlayerState()){
+            switch(ytPlayer.getPlayerState()){
                 case 1:
                 data.playerState = "PLAYING";
                 break;
@@ -1031,10 +1043,10 @@ function onYoutubePlayerReady() {
     ytReady = true;
     if(videoId && videoSource == "youtube"){
         loading = true;
-        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-        player.playVideo();
+        ytPlayer.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+        ytPlayer.playVideo();
         if(seekTo){
-            player.seekTo(seekTo);
+            ytPlayer.seekTo(seekTo);
             seekTo = null;
         }
     } else {
@@ -1048,7 +1060,7 @@ function errorHandler(event){
     if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 || event.data == 101 || event.data == 150) {
         if(mobile_hack && _socketIo) {
-            curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
+            curr_playing = ytPlayer.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
             var skip = {
                 error: event.data,
                 id: videoId,
@@ -1070,13 +1082,13 @@ function errorHandler(event){
 function getCurrentData() {
     var data = new cast.receiver.media.MediaStatus();
     var extended = new cast.receiver.media.ExtendedMediaStatus();
-    extended.playerState = player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    extended.playerState = ytPlayer.getPlayerState() == 1 ? "PLAYING" : ytPlayer.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
     extended.opt_media = generateData();
     data.currentItemId = videoId;
     data.extendedStatus = extended;
-    data.currentTime = player.getCurrentTime();
+    data.currentTime = ytPlayer.getCurrentTime();
     data.playerState = extended.playerState;
-    data.volume.level = player.getVolume() / 100;
+    data.volume.level = ytPlayer.getVolume() / 100;
     data.volume.mute = false;
     data.media = extended.opt_media;
     data.supportedMediaCommands = 15;
@@ -1098,7 +1110,7 @@ function onPlayerStateChange(event) {
     } else if(event.data == 1){
         loading = false;
         if(seekTo){
-            player.seekTo(seekTo);
+            ytPlayer.seekTo(seekTo);
             seekTo = null;
         }
 
