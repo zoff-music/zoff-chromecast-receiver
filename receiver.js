@@ -669,12 +669,18 @@ function mobilespecs(json_parsed) {
                 }, 15000);
                 //}
                 setTimeout(function() {
-                    if(ytPlayers["ytPlayer" + currentYT].getPlayerState() == -1 && videoSource == "youtube" && ytPlayers["ytPlayer" + currentYT].getCurrentTime() < startSeconds) {
+                    try {
+                        if(ytPlayers["ytPlayer" + currentYT].getPlayerState() == -1 && videoSource == "youtube" && ytPlayers["ytPlayer" + currentYT].getCurrentTime() < startSeconds) {
+                            seekToFunction(startSeconds);
+                            ytPlayers["ytPlayer" + currentYT].playVideo();
+                        } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
+                            seekToFunction(startSeconds);
+                            soundcloud_player.play();
+                        }
+                    } catch(e){
                         seekToFunction(startSeconds);
-                        ytPlayers["ytPlayer" + currentYT].playVideo();
-                    } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
-                        seekToFunction(startSeconds);
-                        soundcloud_player.play();
+                        //if(videoSou)
+                        //soundcloud_player.play();
                     }
                 }, 1500);
                 /*if(seekTo){
@@ -830,7 +836,7 @@ window.castReceiverManager.onSenderDisconnected = function(event) {
 window.addEventListener('load', function() {
     if(document.querySelectorAll("script[src='https://www.youtube.com/iframe_api']").length == 1){
             try{
-                onYouTubeIframeAPIReady();
+                //onYouTubeIframeAPIReady();
                 //SC.Widget(Player.soundcloud_player).bind("ready", Player.soundcloudReady);
 
             } catch(error){
@@ -1030,19 +1036,23 @@ function onYoutubePlayerReady() {
         data.media = generateData();
         data.media.streamType = "BUFFERED";
         if(videoSource == "youtube") {
-            switch(ytPlayers["ytPlayer" + currentYT].getPlayerState()){
-                case 1:
+            try {
+                switch(ytPlayers["ytPlayer" + currentYT].getPlayerState()){
+                    case 1:
+                    data.playerState = "PLAYING";
+                    break;
+                    case 2:
+                    data.playerState = "PAUSED";
+                    break;
+                    case 0:
+                    data.playerState = "ENDED";
+                    break;
+                    default:
+                    data.playerState = "PLAYING";
+                    break;
+                }
+            } catch(e) {
                 data.playerState = "PLAYING";
-                break;
-                case 2:
-                data.playerState = "PAUSED";
-                break;
-                case 0:
-                data.playerState = "ENDED";
-                break;
-                default:
-                data.playerState = "PLAYING";
-                break;
             }
         } else {
             if(scUsingWidget) {
