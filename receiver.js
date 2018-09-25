@@ -133,7 +133,7 @@ mediaManager.onLoad = function (event) {
             prev_video = videoId;
             if(event.data.media.contentID) event.data.media.contentId = event.data.media.contentID;
             videoId = event.data.media.contentId;
-            if(event.data.media.contentType == "video/*") {
+            if(event.data.media.contentType == "video") {
                 videoSource = event.data.media.customData.source;
             } else {
                 videoSource = event.data.media.contentType;
@@ -313,7 +313,7 @@ function clearAllPlayers() {
 function loadVideoById(id, start, end) {
     if(id == null) return;
     console.log("first place: loadVideoById", videoSource, id, start, end);
-    if(videoSource == "") {
+    if(videoSource == "video") {
         console.log("clearing all players");
         clearAllPlayers();
     } else if(videoSource != "soundcloud") {
