@@ -953,7 +953,7 @@ function onYouTubeIframeAPIReady() {
         width: 1000,
         playerVars: {'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
         events: {
-            'onReady': onPlayerReady,
+            'onReady': onYoutubePlayerReady,
             'onStateChange': onPlayerStateChange,
             'onError': errorHandler
         }
@@ -987,7 +987,7 @@ function generateData() {
     return mediaInfo;
 }
 
-function onPlayerReady() {
+function onYoutubePlayerReady() {
     mediaManager.customizedStatusCallback = function(event) {
         console.log("customized", event);
         var data = new cast.receiver.media.MediaStatus();
@@ -1039,6 +1039,8 @@ function onPlayerReady() {
         loadVideoById(videoId, startSeconds, endSeconds);
     }
 }
+
+window.onYoutubePlayerReady = onYoutubePlayerReady;
 
 function errorHandler(event){
     if(videoSource == "soundcloud") return;
