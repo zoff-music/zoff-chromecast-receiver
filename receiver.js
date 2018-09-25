@@ -1,12 +1,22 @@
 var ytReady     = false;
 var videoId     = null;
 var seekTo      = null;
+//var ytPlayers["ytPlayer" + currentYT];
 var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
+var currentYT = 0;
+var ytPlayers = {};
+ytPlayers["ytPlayer" + currentYT] = [];
+var SC_widget;
+var scCurrentTime = 0;
+var currDurr = 0;
+var SC_player;
+var scUsingWidget = true;
 var title = "temptitle";
 var started = false;
+var previousVideoSource = "";
 var mobile_hack = false;
 var connect_error = false;
 var startSeconds = 0;
@@ -58,14 +68,14 @@ var fooPlayer = {
     },
     play: function() {
         if(videoSource == "youtube") {
-            player.playVideo();
+            ytPlayers["ytPlayer" + currentYT].playVideo();
         } else {
             soundcloud_player.play();
         }
     },
     pause: function() {
         if(videoSource == "youtube") {
-            player.pauseVideo();
+            ytPlayers["ytPlayer" + currentYT].pauseVideo();
         } else {
             soundcloud_player.pause();
         }
@@ -123,7 +133,7 @@ mediaManager.onLoad = function (event) {
             prev_video = videoId;
             if(event.data.media.contentID) event.data.media.contentId = event.data.media.contentID;
             videoId = event.data.media.contentId;
-            if(event.data.media.contentType == "video/*") {
+            if(event.data.media.contentType == "video") {
                 videoSource = event.data.media.customData.source;
             } else {
                 videoSource = event.data.media.contentType;
@@ -211,7 +221,7 @@ mediaManager.onLoad = function (event) {
 mediaManager.onPlay = function(event) {
     console.log("onPlay", event);
     if(videoSource == "youtube") {
-        player.playVideo();
+        ytPlayers["ytPlayer" + currentYT].playVideo();
     } else {
         soundcloud_player.play();
     }
@@ -220,7 +230,7 @@ mediaManager.onPlay = function(event) {
 mediaManager.onPause = function(event) {
     console.log("onPause", event);
     if(videoSource == "youtube") {
-        player.pauseVideo();
+        ytPlayers["ytPlayer" + currentYT].pauseVideo();
     } else {
         soundcloud_player.pause();
     }
@@ -229,7 +239,9 @@ mediaManager.onPause = function(event) {
 function seekToFunction(value) {
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
-        player.seekTo(value)
+        try {
+            ytPlayers["ytPlayer" + currentYT].seekTo(value)
+        } catch(e) {}
     } else {
         soundcloud_player.seek(value * 1000);
     }
@@ -237,7 +249,7 @@ function seekToFunction(value) {
 
 function pauseVideo() {
     if(videoSource != "soundcloud") {
-        player.pauseVideo()
+        ytPlayers["ytPlayer" + currentYT].pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -245,7 +257,7 @@ function pauseVideo() {
 
 function stopVideo() {
     if(videoSource != "soundcloud") {
-        player.pauseVideo()
+        ytPlayers["ytPlayer" + currentYT].pauseVideo()
     } else {
         soundcloud_player.pause();
     }
@@ -253,37 +265,90 @@ function stopVideo() {
 
 function getCurrentTime() {
     if(videoSource != "soundcloud") {
-        return player.getCurrentTime();
+        try {
+            return ytPlayers["ytPlayer" + currentYT].getCurrentTime();
+        } catch(e) {
+            return 0;
+        }
     } else {
-        return Math.floor(soundcloud_player.currentTime() / 1000);
+        if(scUsingWidget) {
+            return currDurr;
+        } else {
+            return Math.floor(soundcloud_player.currentTime() / 1000);
+        }
     }
 }
 
 function playVideo() {
     if(videoSource != "soundcloud") {
-        player.playVideo()
+        ytPlayers["ytPlayer" + currentYT].playVideo()
     } else {
         soundcloud_player.play();
     }
 }
 
+function clearAllPlayers() {
+    try {
+        soundcloud_player.unbind("finish", soundcloudFinish);
+        soundcloud_player.unbind("pause", soundcloudPause);
+        soundcloud_player.unbind("play", soundcloudPlay);
+        soundcloud_player = null;
+        document.querySelector("#sc_player").innerHTML = "";
+
+        //document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+        //videoId = id;
+        //onYouTubeIframeAPIReady();
+    }catch(e){}
+
+    try {
+        console.log("time to destroy");
+        ytPlayers["ytPlayer" + currentYT].destroy();
+    } catch(e){}
+    console.log("destroyed");
+    try {
+        document.querySelector("#player").remove();
+    } catch(e) {}
+}
+
 function loadVideoById(id, start, end) {
     if(id == null) return;
     console.log("first place: loadVideoById", videoSource, id, start, end);
-    if(videoSource != "soundcloud") {
-        soundcloud_player.pause();
+    if(videoSource == "video") {
+        console.log("clearing all players");
+        clearAllPlayers();
+    } else if(videoSource != "soundcloud") {
+        console.log("youtubeplayers");
+        if(previousVideoSource == "soundcloud" || previousVideoSource == "") {
+            try {
+                soundcloud_player.unbind("finish", soundcloudFinish);
+                soundcloud_player.unbind("pause", soundcloudPause);
+                soundcloud_player.unbind("play", soundcloudPlay);
+                soundcloud_player = null;
+                document.querySelector("#sc_player").innerHTML = "";
+
+                document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+                videoId = id;
+                onYouTubeIframeAPIReady();
+            }catch(e){}
+        }
+        try {
+            //soundcloud_player.pause();
+        } catch(e){}
+
         if(!$("#player_overlay").hasClass("hide")) {
             $("#player_overlay").addClass("hide");
         }
         try {
-            if(player.getVideoUrl().indexOf(id) > -1) {
-                player.seekTo(start);
+            if(ytPlayers["ytPlayer" + currentYT].getVideoUrl().indexOf(id) > -1) {
+                ytPlayers["ytPlayer" + currentYT].seekTo(start);
             } else {
                 throw "player object not existing yet";
             }
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
-            player.loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+            if(previousVideoSource == "youtube") {
+                ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+            }
         }
         setTimeout(function() {
             try {
@@ -295,42 +360,100 @@ function loadVideoById(id, start, end) {
             fooPlayer.events.loadedmetadata();
         }, 1000);
     } else {
+        console.log("soundcloudplayers");
+        if(previousVideoSource == "youtube" || previousVideoSource == "") {
+            try {
+                console.log("time to destroy");
+                ytPlayers["ytPlayer" + currentYT].destroy();
+            } catch(e){}
+            console.log("destroyed");
+            document.querySelector("#player").remove();
+        }
         try {
-            player.pauseVideo();
+            //ytPlayers["ytPlayer" + currentYT].pauseVideo();
         } catch(e) {}
         if(currentSoundcloudVideo != id) {
             currentSoundcloudVideo = id;
-            SC.stream("/tracks/" + id).then(function(_player){
-                soundcloud_player = _player;
-                soundcloud_player.bind("finish", soundcloudFinish);
-                soundcloud_player.bind("pause", soundcloudPause);
-                soundcloud_player.bind("play", soundcloudPlay);
-                $("#player_overlay").removeClass("hide");
-                $("#player_overlay").css("background",  "url('" + thumbnail + "')");
-                $("#player_overlay").css("background-size", "auto");
-                $("#player_overlay").css("background-position", "20%");
-                $("#player_overlay").css("background-color", "#2d2d2d");
-                _player.play().then(function(){
-                    seekToFunction(start);
-                }).catch(function(e){
-                    console.log(e);
-                });
+            if(scUsingWidget) {
+                initializeSCWidget(id);
+            } else {
+                /*
+                SC_player.stream("/tracks/" + id).then(function(_player){
+                    soundcloud_player = _player;
+                    soundcloud_player.bind("finish", soundcloudFinish);
+                    soundcloud_player.bind("pause", soundcloudPause);
+                    soundcloud_player.bind("play", soundcloudPlay);
+                    $("#player_overlay").removeClass("hide");
+                    $("#player_overlay").css("background",  "url('" + thumbnail + "')");
+                    $("#player_overlay").css("background-size", "auto");
+                    $("#player_overlay").css("background-position", "20%");
+                    $("#player_overlay").css("background-color", "#2d2d2d");
+                    _player.play().then(function(){
+                        seekToFunction(start);
+                    }).catch(function(e){
+                        console.log(e);
+                    });
 
-                mediaManager.setMediaInformation(generateData(), true);
-                mediaManager.sendLoadComplete();
-                mediaManager.setMediaInformation(generateData(), true);
-                fooPlayer.events.loadedmetadata();
-            });
+                    mediaManager.setMediaInformation(generateData(), true);
+                    mediaManager.sendLoadComplete();
+                    mediaManager.setMediaInformation(generateData(), true);
+                    fooPlayer.events.loadedmetadata();
+                });
+                */
+            }
         } else {
             soundcloud_player.seek(start * 1000);
         }
     }
+    previousVideoSource = videoSource;
+}
 
+function initializeSCWidget(id) {
+    try {
+        soundcloud_player.unbind("finish", soundcloudFinish);
+        soundcloud_player.unbind("pause", soundcloudPause);
+        soundcloud_player.unbind("play", soundcloudPlay);
+        //Player.soundcloud_player.unbind("seek", Player.soundcloudSeek);
+    }catch(e){}
+    var this_autoplay = "?auto_play=true";
+    scUsingWidget = true;
+    $("#player_overlay").removeClass("hide");
+    $("#player_overlay").css("background",  "url('" + thumbnail + "')");
+    $("#player_overlay").css("background-size", "auto");
+    $("#player_overlay").css("background-position", "20%");
+    $("#player_overlay").css("background-color", "#2d2d2d");
+    if(document.querySelectorAll("#scplayerElement").length == 0) {
+        var single = "single_active=false";
+        single = "&"+single;
+        document.querySelector("#sc_player").innerHTML = '<iframe id="scplayerElement" style="opacity:0;position: absolute;top: 0;left: 0;" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay;" \
+          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + id + this_autoplay + '"> \
+        </iframe>';
+        addSCWidgetElements();
+    } else {
+        soundcloud_player.bind("finish", soundcloudFinish);
+        soundcloud_player.bind("pause", soundcloudPause);
+        soundcloud_player.bind("play", soundcloudPlay);
+        soundcloud_player.load('https://api.soundcloud.com/tracks/' + id + this_autoplay, {single_active: false});
+    }
+}
+
+function addSCWidgetElements() {
+    try {
+        soundcloud_player = SC_widget.Widget(document.querySelector("#scplayerElement"));
+        soundcloud_player.seek = soundcloud_player.seekTo;
+        soundcloud_player.bind("finish", soundcloudFinish);
+        soundcloud_player.bind("pause", soundcloudPause);
+        soundcloud_player.bind("play", soundcloudPlay);
+    } catch(e) {
+        setTimeout(function() {
+            addSCWidgetElements();
+        }, 500);
+    }
 }
 
 function getPlayerState() {
     if(videoSource != "soundcloud") {
-        return player.getPlayerState()
+        return ytPlayers["ytPlayer" + currentYT].getPlayerState()
     } else {
         if(soundcloud_player.getState() == "playing") return YT.PlayerState.PLAYING;
         else if(soundcloud_player.getState() == "paused") return YT.PlayerState.PAUSED;
@@ -340,13 +463,13 @@ function getPlayerState() {
 
 function mute() {
     if(videoSource != "soundcloud") {
-        player.mute()
+        ytPlayers["ytPlayer" + currentYT].mute()
     }
 }
 
 function unMute() {
     if(videoSource != "soundcloud") {
-        player.unMute()
+        ytPlayers["ytPlayer" + currentYT].unMute()
     }
 }
 
@@ -578,12 +701,18 @@ function mobilespecs(json_parsed) {
                 }, 15000);
                 //}
                 setTimeout(function() {
-                    if(player.getPlayerState() == -1 && videoSource == "youtube" && player.getCurrentTime() < startSeconds) {
+                    try {
+                        if(ytPlayers["ytPlayer" + currentYT].getPlayerState() == -1 && videoSource == "youtube" && ytPlayers["ytPlayer" + currentYT].getCurrentTime() < startSeconds) {
+                            seekToFunction(startSeconds);
+                            ytPlayers["ytPlayer" + currentYT].playVideo();
+                        } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
+                            seekToFunction(startSeconds);
+                            soundcloud_player.play();
+                        }
+                    } catch(e){
                         seekToFunction(startSeconds);
-                        player.playVideo();
-                    } else if(videoSource && "soundcloud" && soundcloud_player.currentTime() / 1000 < startSeconds) {
-                        seekToFunction(startSeconds);
-                        soundcloud_player.play();
+                        //if(videoSou)
+                        //soundcloud_player.play();
                     }
                 }, 1500);
                 /*if(seekTo){
@@ -739,7 +868,7 @@ window.castReceiverManager.onSenderDisconnected = function(event) {
 window.addEventListener('load', function() {
     if(document.querySelectorAll("script[src='https://www.youtube.com/iframe_api']").length == 1){
             try{
-                Player.onYouTubeIframeAPIReady();
+                //onYouTubeIframeAPIReady();
                 //SC.Widget(Player.soundcloud_player).bind("ready", Player.soundcloudReady);
 
             } catch(error){
@@ -754,9 +883,11 @@ window.addEventListener('load', function() {
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         }
 
-    if(document.querySelectorAll("script[src='https://connect.soundcloud.com/sdk/sdk-3.3.0.js']").length == 1) {
+    /*if(document.querySelectorAll("script[src='https://connect.soundcloud.com/sdk/sdk-3.3.0.js']").length == 1) {
             try {
-                Player.soundcloudReady();
+                if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
+                    Player.soundcloudReady();
+                }
             } catch(error) {
                 console.error(error);
                 console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
@@ -768,7 +899,8 @@ window.addEventListener('load', function() {
                     if (tagSC.readyState == "loaded" ||
                             tagSC.readyState == "complete"){
                         tagSC.onreadystatechange = null;
-                        SC.initialize({
+                        SC_player = SC;
+                        SC_player.initialize({
                             client_id: soundcloud_api
                         }, function() {
                         });
@@ -776,7 +908,8 @@ window.addEventListener('load', function() {
                 };
             } else {  //Others
                 tagSC.onload = function(){
-                    SC.initialize({
+                    SC_player = SC;
+                    SC_player.initialize({
                         client_id: soundcloud_api
                     }, function() {
                     });
@@ -785,6 +918,42 @@ window.addEventListener('load', function() {
             tagSC.src        = "https://connect.soundcloud.com/sdk/sdk-3.3.0.js";
             firstScriptTagSC = document.getElementsByTagName('script')[0];
             firstScriptTagSC.parentNode.insertBefore(tagSC, firstScriptTagSC);
+        }*/
+
+        if(document.querySelectorAll("script[src='https://zoff.me/assets/sclib/scapi.js']").length == 1) {
+            try {
+                /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
+                    Player.soundcloudReady();
+                }*/
+            } catch(error) {
+                //sc_need_initialization = true;
+                //console.error(error);
+                //console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
+            }
+        } else {
+            tagSCWidget            = document.createElement('script');
+            if (tagSCWidget.readyState){  //IE
+                tagSCWidget.onreadystatechange = function(){
+                    if (tagSCWidget.readyState == "loaded" ||
+                            tagSCWidget.readyState == "complete"){
+                        tagSCWidget.onreadystatechange = null;
+                        SC_widget = SC;
+                        /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
+                            Player.soundcloudReady();
+                        }*/
+                    }
+                };
+            } else {  //Others
+                tagSCWidget.onload = function(){
+                    SC_widget = SC;
+                    /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
+                        Player.soundcloudReady();
+                    }*/
+                };
+            }
+            tagSCWidget.src        = "https://zoff.me/assets/sclib/scapi.js";
+            firstScriptTagSCWidget = document.getElementsByTagName('script')[0];
+            firstScriptTagSCWidget.parentNode.insertBefore(tagSCWidget, firstScriptTagSCWidget);
         }
 });
 
@@ -793,7 +962,13 @@ function durationSetter(){
         duration = endSeconds - startSeconds;//player.getDuration();
         dMinutes = Math.floor(duration / 60);
         dSeconds = duration - dMinutes * 60;
-        currDurr = getCurrentTime() !== undefined ? Math.floor(getCurrentTime()) : seekTo;
+        if(scUsingWidget && videoSource == "soundcloud") {
+            soundcloud_player.getPosition(function(pos) {
+                currDurr = Math.floor(pos) / 1000;
+            })
+        } else {
+            currDurr = getCurrentTime() !== undefined ? Math.floor(getCurrentTime()) : seekTo;
+        }
         if(currDurr - startSeconds > duration) {
             currDurr = duration - startSeconds;
         }
@@ -802,6 +977,7 @@ function durationSetter(){
         seconds = currDurr - (minutes * 60);
         fooPlayer.duration = duration;
         fooPlayer.currentTime = getCurrentTime();
+
         fooPlayer.title = title;
         if(endSeconds - getCurrentTime() <= 15 && hidden_info) {
             clearTimeout(hide_timer);
@@ -842,16 +1018,22 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-        height: 562,
-        width: 1000,
-        playerVars: {'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': errorHandler
-        }
-    });
+    //if(videoId != undefined) {
+        delete ytPlayers["ytPlayer" + currentYT];
+        currentYT += 1;
+        ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
+            videoId: videoId,
+            height: 562,
+            width: 1000,
+            playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
+            events: {
+                'onReady': onYoutubePlayerReady,
+                'onStateChange': onPlayerStateChange,
+                'onError': errorHandler
+            }
+        });
+        document.querySelector("#player").style.opacity = 0;
+    //}
 }
 
 function generateData() {
@@ -881,7 +1063,7 @@ function generateData() {
     return mediaInfo;
 }
 
-function onPlayerReady() {
+function onYoutubePlayerReady() {
     mediaManager.customizedStatusCallback = function(event) {
         console.log("customized", event);
         var data = new cast.receiver.media.MediaStatus();
@@ -890,25 +1072,33 @@ function onPlayerReady() {
         data.media = generateData();
         data.media.streamType = "BUFFERED";
         if(videoSource == "youtube") {
-            switch(player.getPlayerState()){
-                case 1:
+            try {
+                switch(ytPlayers["ytPlayer" + currentYT].getPlayerState()){
+                    case 1:
+                    data.playerState = "PLAYING";
+                    break;
+                    case 2:
+                    data.playerState = "PAUSED";
+                    break;
+                    case 0:
+                    data.playerState = "ENDED";
+                    break;
+                    default:
+                    data.playerState = "PLAYING";
+                    break;
+                }
+            } catch(e) {
                 data.playerState = "PLAYING";
-                break;
-                case 2:
-                data.playerState = "PAUSED";
-                break;
-                case 0:
-                data.playerState = "ENDED";
-                break;
-                default:
-                data.playerState = "PLAYING";
-                break;
             }
         } else {
-            if(soundcloud_player.isPlaying()) {
+            if(scUsingWidget) {
                 data.playerState = "PLAYING";
             } else {
-                data.playerState = "PAUSED";
+                if(soundcloud_player.isPlaying()) {
+                    data.playerState = "PLAYING";
+                } else {
+                    data.playerState = "PAUSED";
+                }
             }
         }
         return data;
@@ -919,10 +1109,10 @@ function onPlayerReady() {
     ytReady = true;
     if(videoId && videoSource == "youtube"){
         loading = true;
-        player.loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-        player.playVideo();
+        ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
+        ytPlayers["ytPlayer" + currentYT].playVideo();
         if(seekTo){
-            player.seekTo(seekTo);
+            ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
             seekTo = null;
         }
     } else {
@@ -930,11 +1120,13 @@ function onPlayerReady() {
     }
 }
 
+window.onYoutubePlayerReady = onYoutubePlayerReady;
+
 function errorHandler(event){
     if(videoSource == "soundcloud") return;
     if(event.data == 5 || event.data == 100 || event.data == 101 || event.data == 150) {
         if(mobile_hack && _socketIo) {
-            curr_playing = player.getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
+            curr_playing = ytPlayers["ytPlayer" + currentYT].getVideoUrl().replace("https://www.youtube.com/watch?v=", "");
             var skip = {
                 error: event.data,
                 id: videoId,
@@ -956,13 +1148,13 @@ function errorHandler(event){
 function getCurrentData() {
     var data = new cast.receiver.media.MediaStatus();
     var extended = new cast.receiver.media.ExtendedMediaStatus();
-    extended.playerState = player.getPlayerState() == 1 ? "PLAYING" : player.getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
+    extended.playerState = ytPlayers["ytPlayer" + currentYT].getPlayerState() == 1 ? "PLAYING" : ytPlayers["ytPlayer" + currentYT].getPlayerState() == 2 ? "PAUSED" : "BUFFERING";
     extended.opt_media = generateData();
     data.currentItemId = videoId;
     data.extendedStatus = extended;
-    data.currentTime = player.getCurrentTime();
+    data.currentTime = ytPlayers["ytPlayer" + currentYT].getCurrentTime();
     data.playerState = extended.playerState;
-    data.volume.level = player.getVolume() / 100;
+    data.volume.level = ytPlayers["ytPlayer" + currentYT].getVolume() / 100;
     data.volume.mute = false;
     data.media = extended.opt_media;
     data.supportedMediaCommands = 15;
@@ -982,9 +1174,10 @@ function onPlayerStateChange(event) {
         }
 
     } else if(event.data == 1){
+        document.querySelector("#player").style.opacity = 1;
         loading = false;
         if(seekTo){
-            player.seekTo(seekTo);
+            ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
             seekTo = null;
         }
 
