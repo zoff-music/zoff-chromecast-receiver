@@ -1018,7 +1018,7 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
-    if(videoId != undefined) {
+    //if(videoId != undefined) {
         currentYT += 1;
         ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
             videoId: videoId,
@@ -1031,7 +1031,8 @@ function onYouTubeIframeAPIReady() {
                 'onError': errorHandler
             }
         });
-    }
+        document.querySelector("#player").style.opacity = 0;
+    //}
 }
 
 function generateData() {
@@ -1172,6 +1173,7 @@ function onPlayerStateChange(event) {
         }
 
     } else if(event.data == 1){
+        document.querySelector("#player").style.opacity = 1;
         loading = false;
         if(seekTo){
             ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
