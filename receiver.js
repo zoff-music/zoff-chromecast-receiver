@@ -8,7 +8,7 @@ var initial     = true;
 var hidden_info = false;
 var currentYT = 0;
 var ytPlayers = {};
-ytPlayers["ytPlayer" + currentYT]s = [];
+ytPlayers["ytPlayer" + currentYT] = [];
 var SC_widget;
 var scCurrentTime = 0;
 var currDurr = 0;
