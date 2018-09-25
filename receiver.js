@@ -769,7 +769,7 @@ window.addEventListener('load', function() {
                             tagSC.readyState == "complete"){
                         tagSC.onreadystatechange = null;
                         SC.initialize({
-                            client_id: 'ed53fc01f248f15becddf8eb52cc91ef'
+                            client_id: soundcloud_api
                         }, function() {
                         });
                     }
@@ -777,7 +777,7 @@ window.addEventListener('load', function() {
             } else {  //Others
                 tagSC.onload = function(){
                     SC.initialize({
-                        client_id: 'ed53fc01f248f15becddf8eb52cc91ef'
+                        client_id: soundcloud_api
                     }, function() {
                     });
                 };
