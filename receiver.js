@@ -948,10 +948,12 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
+    console.log(videoSource);
     player = new YT.Player('player', {
+        videoId: "KgMxMavEUVg",
         height: 562,
         width: 1000,
-        playerVars: {'controls': 0, rel:"0", wmode:"transparent", iv_load_policy: "3", showinfo: "0"},
+        playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
         events: {
             'onReady': onYoutubePlayerReady,
             'onStateChange': onPlayerStateChange,
