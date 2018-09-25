@@ -1019,6 +1019,7 @@ function pad(n){
 
 function onYouTubeIframeAPIReady() {
     //if(videoId != undefined) {
+        delete ytPlayers["ytPlayer" + currentYT];
         currentYT += 1;
         ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
             videoId: videoId,
