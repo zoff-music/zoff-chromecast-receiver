@@ -359,7 +359,7 @@ function initializeSCWidget(id) {
     if(document.querySelectorAll("#scplayerElement").length == 0) {
         var single = "single_active=false";
         single = "&"+single;
-        document.querySelector("#sc_player").innerHTML = '<iframe id="scplayerElement" style="opacity:0;" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay;" \
+        document.querySelector("#sc_player").innerHTML = '<iframe id="scplayerElement" style="opacity:0;position: absolute;top: 0;left: 0;" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay;" \
           src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + id + this_autoplay + '"> \
         </iframe>';
         addSCWidgetElements();
