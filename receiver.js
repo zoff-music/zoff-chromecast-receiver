@@ -824,6 +824,7 @@ window.addEventListener('load', function() {
                     if (tagSC.readyState == "loaded" ||
                             tagSC.readyState == "complete"){
                         tagSC.onreadystatechange = null;
+                        SC_player = SC;
                         SC_player.initialize({
                             client_id: soundcloud_api
                         }, function() {
@@ -832,6 +833,7 @@ window.addEventListener('load', function() {
                 };
             } else {  //Others
                 tagSC.onload = function(){
+                    SC_player = SC;
                     SC_player.initialize({
                         client_id: soundcloud_api
                     }, function() {
