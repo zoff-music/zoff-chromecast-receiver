@@ -286,15 +286,17 @@ function loadVideoById(id, start, end) {
     console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource != "soundcloud") {
         if(previousVideoSource == "soundcloud" || previousVideoSource == "") {
-            soundcloud_player.unbind("finish", soundcloudFinish);
-            soundcloud_player.unbind("pause", soundcloudPause);
-            soundcloud_player.unbind("play", soundcloudPlay);
-            soundcloud_player = null;
-            document.querySelector("#sc_player").innerHTML = "";
+            try {
+                soundcloud_player.unbind("finish", soundcloudFinish);
+                soundcloud_player.unbind("pause", soundcloudPause);
+                soundcloud_player.unbind("play", soundcloudPlay);
+                soundcloud_player = null;
+                document.querySelector("#sc_player").innerHTML = "";
 
-            document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
-            videoId = id;
-            onYouTubeIframeAPIReady();
+                document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+                videoId = id;
+                onYouTubeIframeAPIReady();
+            }catch(e){}
         }
         try {
             //soundcloud_player.pause();
@@ -324,7 +326,9 @@ function loadVideoById(id, start, end) {
         }, 1000);
     } else {
         if(previousVideoSource == "youtube" || previousVideoSource == "") {
-            ytPlayers["ytPlayer" + currentYT].destroy();
+            try {
+                ytPlayers["ytPlayer" + currentYT].destroy();
+            } catch(e){}
             document.querySelector("#player").remove();
         }
         try {
