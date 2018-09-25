@@ -354,8 +354,7 @@ function initializeSCWidget(id) {
 
     if(document.querySelectorAll("#scplayerElement").length == 0) {
         var single = "single_active=false";
-        if(_autoplay) single = "&"+single;
-        else single = "?"+single;
+        single = "&"+single;
         document.querySelector("#sc_player").innerHTML = '<iframe id="scplayerElement" style="opacity:0;" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay;" \
           src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + id + this_autoplay + '"> \
         </iframe>';
