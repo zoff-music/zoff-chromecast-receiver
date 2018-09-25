@@ -263,7 +263,11 @@ function stopVideo() {
 
 function getCurrentTime() {
     if(videoSource != "soundcloud") {
-        return ytPlayers["ytPlayer" + currentYT].getCurrentTime();
+        try {
+            return ytPlayers["ytPlayer" + currentYT].getCurrentTime();
+        } catch(e) {
+            return 0;
+        }
     } else {
         if(scUsingWidget) {
             return currDurr;
@@ -313,7 +317,9 @@ function loadVideoById(id, start, end) {
             }
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
-            ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+            if(previousVideoSource == "youtube") {
+                ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
+            }
         }
         setTimeout(function() {
             try {
