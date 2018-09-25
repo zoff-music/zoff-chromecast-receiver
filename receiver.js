@@ -1,13 +1,14 @@
 var ytReady     = false;
 var videoId     = null;
 var seekTo      = null;
-var ytPlayers["ytPlayer" + currentYT];
+//var ytPlayers["ytPlayer" + currentYT];
 var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
-var ytPlayers["ytPlayer" + currentYT]s = [];
 var currentYT = 0;
+var ytPlayers = {};
+ytPlayers["ytPlayer" + currentYT]s = [];
 var SC_widget;
 var scCurrentTime = 0;
 var currDurr = 0;
