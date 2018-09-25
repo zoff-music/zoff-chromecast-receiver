@@ -239,7 +239,9 @@ mediaManager.onPause = function(event) {
 function seekToFunction(value) {
     if(isNaN(value)) return;
     if(videoSource != "soundcloud") {
-        ytPlayers["ytPlayer" + currentYT].seekTo(value)
+        try {
+            ytPlayers["ytPlayer" + currentYT].seekTo(value)
+        } catch(e) {}
     } else {
         soundcloud_player.seek(value * 1000);
     }
@@ -285,10 +287,37 @@ function playVideo() {
     }
 }
 
+function clearAllPlayers() {
+    try {
+        soundcloud_player.unbind("finish", soundcloudFinish);
+        soundcloud_player.unbind("pause", soundcloudPause);
+        soundcloud_player.unbind("play", soundcloudPlay);
+        soundcloud_player = null;
+        document.querySelector("#sc_player").innerHTML = "";
+
+        //document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+        //videoId = id;
+        //onYouTubeIframeAPIReady();
+    }catch(e){}
+
+    try {
+        console.log("time to destroy");
+        ytPlayers["ytPlayer" + currentYT].destroy();
+    } catch(e){}
+    console.log("destroyed");
+    try {
+        document.querySelector("#player").remove();
+    } catch(e) {}
+}
+
 function loadVideoById(id, start, end) {
     if(id == null) return;
     console.log("first place: loadVideoById", videoSource, id, start, end);
-    if(videoSource != "soundcloud") {
+    if(videoSource == "") {
+        console.log("clearing all players");
+        clearAllPlayers();
+    } else if(videoSource != "soundcloud") {
+        console.log("youtubeplayers");
         if(previousVideoSource == "soundcloud" || previousVideoSource == "") {
             try {
                 soundcloud_player.unbind("finish", soundcloudFinish);
@@ -331,10 +360,13 @@ function loadVideoById(id, start, end) {
             fooPlayer.events.loadedmetadata();
         }, 1000);
     } else {
+        console.log("soundcloudplayers");
         if(previousVideoSource == "youtube" || previousVideoSource == "") {
             try {
+                console.log("time to destroy");
                 ytPlayers["ytPlayer" + currentYT].destroy();
             } catch(e){}
+            console.log("destroyed");
             document.querySelector("#player").remove();
         }
         try {
