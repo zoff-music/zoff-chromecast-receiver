@@ -351,7 +351,11 @@ function initializeSCWidget(id) {
     }catch(e){}
     var this_autoplay = "?auto_play=true";
     scUsingWidget = true;
-
+    $("#player_overlay").removeClass("hide");
+    $("#player_overlay").css("background",  "url('" + thumbnail + "')");
+    $("#player_overlay").css("background-size", "auto");
+    $("#player_overlay").css("background-position", "20%");
+    $("#player_overlay").css("background-color", "#2d2d2d");
     if(document.querySelectorAll("#scplayerElement").length == 0) {
         var single = "single_active=false";
         single = "&"+single;
