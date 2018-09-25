@@ -1018,18 +1018,20 @@ function pad(n){
 }
 
 function onYouTubeIframeAPIReady() {
-    currentYT += 1;
-    ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
-        videoId: videoId,
-        height: 562,
-        width: 1000,
-        playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
-        events: {
-            'onReady': onYoutubePlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': errorHandler
-        }
-    });
+    if(videoId != undefined) {
+        currentYT += 1;
+        ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
+            videoId: videoId,
+            height: 562,
+            width: 1000,
+            playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
+            events: {
+                'onReady': onYoutubePlayerReady,
+                'onStateChange': onPlayerStateChange,
+                'onError': errorHandler
+            }
+        });
+    }
 }
 
 function generateData() {
