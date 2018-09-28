@@ -506,6 +506,7 @@ function soundcloudPause() {
 }
 
 function soundcloudPlay() {
+    console.log("this place");
     if(videoSource != "soundcloud") return;
     hideVideoLoad();
     customMessageBus.broadcast(JSON.stringify({type: YT.PlayerState.PLAYING, videoId: videoId }));
