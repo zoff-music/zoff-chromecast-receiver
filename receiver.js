@@ -140,7 +140,7 @@ function showVideoLoad() {
 
 function hideVideoLoad() {
     if(!$(".uil-ring-css").hasClass("hide")) {
-        $(".uil-ring-css").removeClass("hide");
+        $(".uil-ring-css").addClass("hide");
     }
 }
 
