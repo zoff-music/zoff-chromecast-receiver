@@ -123,6 +123,25 @@ var soundcloud_player = {
     }
 }
 
+function showVideoLoad() {
+    $(".uil-ring-css").removeClass("hide");
+    $(".uil-ring-css").css("transform", "scale(1)");
+    $(".uil-ring-css").css("top", "0");
+    $(".uil-ring-css").css("bottom", "0");
+    $(".uil-ring-css").css("height", "100%");
+    $(".uil-ring-css").css("width", "100%");
+    $(".uil-ring-css").css("display", "flex");
+    $(".uil-ring-css").css("align-items", "center");
+    $(".uil-ring-css").css("justify-content", "center");
+    $(".uil-ring-css").css("background", "rgba(0,0,0,.5)");
+    $(".uil-ring-css").css("z-index", "9");
+
+}
+
+function hideVideoLoad() {
+    $(".uil-ring-css").css("display", "none");
+}
+
 mediaElement = fooPlayer;
 mediaManager = new cast.receiver.MediaManager(mediaElement);
 mediaManager.onLoad = function (event) {
@@ -312,6 +331,7 @@ function clearAllPlayers() {
 
 function loadVideoById(id, start, end) {
     if(id == null) return;
+    showVideoLoad();
     console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource == "video") {
         console.log("clearing all players");
@@ -484,7 +504,9 @@ function soundcloudPause() {
 }
 
 function soundcloudPlay() {
+    console.log("this place");
     if(videoSource != "soundcloud") return;
+    hideVideoLoad();
     customMessageBus.broadcast(JSON.stringify({type: YT.PlayerState.PLAYING, videoId: videoId }));
 }
 
@@ -1174,6 +1196,7 @@ function onPlayerStateChange(event) {
         }
 
     } else if(event.data == 1){
+        hideVideoLoad();
         document.querySelector("#player").style.opacity = 1;
         loading = false;
         if(seekTo){
