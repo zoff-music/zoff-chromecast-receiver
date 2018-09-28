@@ -139,9 +139,7 @@ function showVideoLoad() {
 }
 
 function hideVideoLoad() {
-    if(!$(".uil-ring-css").hasClass("hide")) {
-        $(".uil-ring-css").addClass("hide");
-    }
+    $(".uil-ring-css").css("display", "none");
 }
 
 mediaElement = fooPlayer;
