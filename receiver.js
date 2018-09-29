@@ -305,7 +305,7 @@ function playVideo() {
         soundcloud_player.play();
     }
 }
-clearAllPlayers();
+
 function clearAllPlayers() {
     try {
         soundcloud_player.unbind("finish", soundcloudFinish);
@@ -370,9 +370,12 @@ function loadVideoById(id, start, end) {
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
             console.log(previousVideoSource);
-            if(previousVideoSource == "youtube") {
+            //if(previousVideoSource == "youtube") {
+            try {
                 ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-            }
+            } catch(e) {
+                console.log(e);
+            }//}
         }
         setTimeout(function() {
             try {
