@@ -1117,7 +1117,7 @@ function onYoutubePlayerReady() {
                     ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
                     seekTo = null;
                 }
-            }catch(e) {console.log(e);
+            }catch(e) {console.log(e);}
         }, 1500);
 
     } else {
