@@ -305,7 +305,7 @@ function playVideo() {
         soundcloud_player.play();
     }
 }
-
+clearAllPlayers();
 function clearAllPlayers() {
     try {
         soundcloud_player.unbind("finish", soundcloudFinish);
