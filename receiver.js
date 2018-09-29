@@ -67,18 +67,22 @@ var fooPlayer = {
         }
     },
     play: function() {
-        if(videoSource == "youtube") {
-            ytPlayers["ytPlayer" + currentYT].playVideo();
-        } else {
-            soundcloud_player.play();
-        }
+        try {
+            if(videoSource == "youtube") {
+                ytPlayers["ytPlayer" + currentYT].playVideo();
+            } else {
+                soundcloud_player.play();
+            }
+        } catch(e) {}
     },
     pause: function() {
-        if(videoSource == "youtube") {
-            ytPlayers["ytPlayer" + currentYT].pauseVideo();
-        } else {
-            soundcloud_player.pause();
-        }
+        try {
+            if(videoSource == "youtube") {
+                ytPlayers["ytPlayer" + currentYT].pauseVideo();
+            } else {
+                soundcloud_player.pause();
+            }
+        } catch(e){}
     },
     currentTime: 0,
     getTitle: function() {
