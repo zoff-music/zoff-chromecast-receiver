@@ -370,9 +370,12 @@ function loadVideoById(id, start, end) {
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
             console.log(previousVideoSource);
-            //if(previousVideoSource == "youtube") {
+            if(previousVideoSource == "youtube") {
                 ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-            //}
+            } else if(previousVideoSource != "soundcloud"){
+                videoId = id;
+                onYouTubeIframeAPIReady();
+            }
         }
         setTimeout(function() {
             try {
