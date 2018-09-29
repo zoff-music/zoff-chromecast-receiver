@@ -330,8 +330,10 @@ function clearAllPlayers() {
 }
 
 function loadVideoById(id, start, end) {
+    console.log("We are trying to load a video now", id, start, end);
     if(id == null) return;
     showVideoLoad();
+
     console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource == "video") {
         console.log("clearing all players");
