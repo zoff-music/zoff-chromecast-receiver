@@ -1048,6 +1048,7 @@ function pad(n){
 
 function onYouTubeIframeAPIReady() {
     //if(videoId != undefined) {
+    console.log("redoing youtube iframe");
         delete ytPlayers["ytPlayer" + currentYT];
         currentYT += 1;
         ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
@@ -1093,6 +1094,7 @@ function generateData() {
 }
 
 function onYoutubePlayerReady() {
+    console.log("we are ready now");
     mediaManager.customizedStatusCallback = function(event) {
         console.log("customized", event);
         var data = new cast.receiver.media.MediaStatus();
@@ -1136,7 +1138,7 @@ function onYoutubePlayerReady() {
     window.castReceiverManager.start(appConfig);
     mediaManager.setSupportedMediaCommands(1+8+4);
     ytReady = true;
-    console.log("i am now ready, and going to play");
+    console.log("i am now ready, and going to play", "ytPlayer" + currentYT, videoId, videoSource);
     if(videoId && videoSource == "youtube"){
         loading = true;
         ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
