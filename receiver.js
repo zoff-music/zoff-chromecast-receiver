@@ -372,9 +372,6 @@ function loadVideoById(id, start, end) {
             console.log(previousVideoSource);
             if(previousVideoSource == "youtube") {
                 ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-            } else if(previousVideoSource != "soundcloud"){
-                videoId = id;
-                onYouTubeIframeAPIReady();
             }
         }
         setTimeout(function() {
@@ -1136,6 +1133,7 @@ function onYoutubePlayerReady() {
     window.castReceiverManager.start(appConfig);
     mediaManager.setSupportedMediaCommands(1+8+4);
     ytReady = true;
+    console.log("i am now ready, and going to play");
     if(videoId && videoSource == "youtube"){
         loading = true;
         ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
