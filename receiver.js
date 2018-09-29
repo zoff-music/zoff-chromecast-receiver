@@ -340,6 +340,9 @@ function loadVideoById(id, start, end) {
         clearAllPlayers();
     } else if(videoSource != "soundcloud") {
         console.log("youtubeplayers");
+        if(document.querySelector("#player") == null) {
+            document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+        }
         if(previousVideoSource == "soundcloud" || previousVideoSource == "") {
             try {
                 soundcloud_player.unbind("finish", soundcloudFinish);
@@ -348,7 +351,7 @@ function loadVideoById(id, start, end) {
                 soundcloud_player = null;
                 document.querySelector("#sc_player").innerHTML = "";
 
-                document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+
 
             }catch(e){}
             videoId = id;
@@ -1049,6 +1052,10 @@ function pad(n){
 function onYouTubeIframeAPIReady() {
     //if(videoId != undefined) {
     console.log("redoing youtube iframe");
+    try {
+        ytPlayers["ytPlayer" + currentYT].destroy();
+    } catch(e) {}
+
         delete ytPlayers["ytPlayer" + currentYT];
         currentYT += 1;
         ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
