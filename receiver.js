@@ -1110,11 +1110,16 @@ function onYoutubePlayerReady() {
         loading = true;
         $("#player").removeClass("hide");
         ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-        ytPlayers["ytPlayer" + currentYT].playVideo();
-        if(seekTo){
-            ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
-            seekTo = null;
-        }
+        setTimeout(function() {
+            try {
+                ytPlayers["ytPlayer" + currentYT].playVideo();
+                if(seekTo){
+                    ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
+                    seekTo = null;
+                }
+            }catch(e) {console.log(e);
+        }, 1500);
+
     } else {
         loadVideoById(videoId, startSeconds, endSeconds);
     }
