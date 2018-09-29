@@ -349,9 +349,10 @@ function loadVideoById(id, start, end) {
                 document.querySelector("#sc_player").innerHTML = "";
 
                 document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
-                videoId = id;
-                onYouTubeIframeAPIReady();
+
             }catch(e){}
+            videoId = id;
+            onYouTubeIframeAPIReady();
         }
         try {
             //soundcloud_player.pause();
@@ -368,9 +369,10 @@ function loadVideoById(id, start, end) {
             }
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
-            if(previousVideoSource == "youtube") {
+            console.log(previousVideoSource);
+            //if(previousVideoSource == "youtube") {
                 ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-            }
+            //}
         }
         setTimeout(function() {
             try {
