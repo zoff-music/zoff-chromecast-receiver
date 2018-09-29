@@ -1168,7 +1168,14 @@ function getCurrentData() {
 
 function onPlayerStateChange(event) {
     if(videoSource == "soundcloud") return;
-    if (event.data==YT.PlayerState.ENDED) {
+    if(event.data == YT.PlayerState.UNSTARTED) {
+        console.log("unstarted here");
+        try {
+            ytPlayers["ytPlayer" + currentYT].playVideo();
+        } catch(e) {
+            console.log(e);
+        }
+    } else if (event.data==YT.PlayerState.ENDED) {
         if(mobile_hack && _socketIo) {
             var end = {id: videoId, channel: channel};
             if(userpass) end.pass = userpass;
