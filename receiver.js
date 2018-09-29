@@ -350,9 +350,6 @@ function loadVideoById(id, start, end) {
                 soundcloud_player.unbind("play", soundcloudPlay);
                 soundcloud_player = null;
                 document.querySelector("#sc_player").innerHTML = "";
-
-
-
             }catch(e){}
             videoId = id;
             onYouTubeIframeAPIReady();
@@ -915,43 +912,6 @@ window.addEventListener('load', function() {
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         }
 
-    /*if(document.querySelectorAll("script[src='https://connect.soundcloud.com/sdk/sdk-3.3.0.js']").length == 1) {
-            try {
-                if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
-                    Player.soundcloudReady();
-                }
-            } catch(error) {
-                console.error(error);
-                console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
-            }
-        } else {
-            tagSC            = document.createElement('script');
-            if (tagSC.readyState){  //IE
-                tagSC.onreadystatechange = function(){
-                    if (tagSC.readyState == "loaded" ||
-                            tagSC.readyState == "complete"){
-                        tagSC.onreadystatechange = null;
-                        SC_player = SC;
-                        SC_player.initialize({
-                            client_id: soundcloud_api
-                        }, function() {
-                        });
-                    }
-                };
-            } else {  //Others
-                tagSC.onload = function(){
-                    SC_player = SC;
-                    SC_player.initialize({
-                        client_id: soundcloud_api
-                    }, function() {
-                    });
-                };
-            }
-            tagSC.src        = "https://connect.soundcloud.com/sdk/sdk-3.3.0.js";
-            firstScriptTagSC = document.getElementsByTagName('script')[0];
-            firstScriptTagSC.parentNode.insertBefore(tagSC, firstScriptTagSC);
-        }*/
-
         if(document.querySelectorAll("script[src='https://zoff.me/assets/sclib/scapi.js']").length == 1) {
             try {
                 /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
@@ -1148,6 +1108,7 @@ function onYoutubePlayerReady() {
     console.log("i am now ready, and going to play", "ytPlayer" + currentYT, videoId, videoSource);
     if(videoId && videoSource == "youtube"){
         loading = true;
+        $("#player").removeClass("hide");
         ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
         ytPlayers["ytPlayer" + currentYT].playVideo();
         if(seekTo){
