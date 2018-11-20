@@ -67,18 +67,22 @@ var fooPlayer = {
         }
     },
     play: function() {
-        if(videoSource == "youtube") {
-            ytPlayers["ytPlayer" + currentYT].playVideo();
-        } else {
-            soundcloud_player.play();
-        }
+        try {
+            if(videoSource == "youtube") {
+                ytPlayers["ytPlayer" + currentYT].playVideo();
+            } else {
+                soundcloud_player.play();
+            }
+        } catch(e) {}
     },
     pause: function() {
-        if(videoSource == "youtube") {
-            ytPlayers["ytPlayer" + currentYT].pauseVideo();
-        } else {
-            soundcloud_player.pause();
-        }
+        try {
+            if(videoSource == "youtube") {
+                ytPlayers["ytPlayer" + currentYT].pauseVideo();
+            } else {
+                soundcloud_player.pause();
+            }
+        } catch(e){}
     },
     currentTime: 0,
     getTitle: function() {
@@ -330,14 +334,19 @@ function clearAllPlayers() {
 }
 
 function loadVideoById(id, start, end) {
+    console.log("We are trying to load a video now", id, start, end);
     if(id == null) return;
     showVideoLoad();
+
     console.log("first place: loadVideoById", videoSource, id, start, end);
     if(videoSource == "video") {
         console.log("clearing all players");
         clearAllPlayers();
     } else if(videoSource != "soundcloud") {
         console.log("youtubeplayers");
+        if(document.querySelector("#player") == null) {
+            document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
+        }
         if(previousVideoSource == "soundcloud" || previousVideoSource == "") {
             try {
                 soundcloud_player.unbind("finish", soundcloudFinish);
@@ -345,11 +354,9 @@ function loadVideoById(id, start, end) {
                 soundcloud_player.unbind("play", soundcloudPlay);
                 soundcloud_player = null;
                 document.querySelector("#sc_player").innerHTML = "";
-
-                document.querySelector("#wrapper").insertAdjacentHTML("beforeend", "<div id='player'></div>");
-                videoId = id;
-                onYouTubeIframeAPIReady();
             }catch(e){}
+            videoId = id;
+            onYouTubeIframeAPIReady();
         }
         try {
             //soundcloud_player.pause();
@@ -366,9 +373,13 @@ function loadVideoById(id, start, end) {
             }
         } catch(e) {
             console.log("first place: loadVideoById", videoSource, id, start, end);
-            if(previousVideoSource == "youtube") {
+            console.log(previousVideoSource);
+            //if(previousVideoSource == "youtube") {
+            try {
                 ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': id, 'startSeconds': start, 'endSeconds': end});
-            }
+            } catch(e) {
+                console.log(e);
+            }//}
         }
         setTimeout(function() {
             try {
@@ -905,43 +916,6 @@ window.addEventListener('load', function() {
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         }
 
-    /*if(document.querySelectorAll("script[src='https://connect.soundcloud.com/sdk/sdk-3.3.0.js']").length == 1) {
-            try {
-                if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
-                    Player.soundcloudReady();
-                }
-            } catch(error) {
-                console.error(error);
-                console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
-            }
-        } else {
-            tagSC            = document.createElement('script');
-            if (tagSC.readyState){  //IE
-                tagSC.onreadystatechange = function(){
-                    if (tagSC.readyState == "loaded" ||
-                            tagSC.readyState == "complete"){
-                        tagSC.onreadystatechange = null;
-                        SC_player = SC;
-                        SC_player.initialize({
-                            client_id: soundcloud_api
-                        }, function() {
-                        });
-                    }
-                };
-            } else {  //Others
-                tagSC.onload = function(){
-                    SC_player = SC;
-                    SC_player.initialize({
-                        client_id: soundcloud_api
-                    }, function() {
-                    });
-                };
-            }
-            tagSC.src        = "https://connect.soundcloud.com/sdk/sdk-3.3.0.js";
-            firstScriptTagSC = document.getElementsByTagName('script')[0];
-            firstScriptTagSC.parentNode.insertBefore(tagSC, firstScriptTagSC);
-        }*/
-
         if(document.querySelectorAll("script[src='https://zoff.me/assets/sclib/scapi.js']").length == 1) {
             try {
                 /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
@@ -1041,6 +1015,11 @@ function pad(n){
 
 function onYouTubeIframeAPIReady() {
     //if(videoId != undefined) {
+    console.log("redoing youtube iframe");
+    try {
+        ytPlayers["ytPlayer" + currentYT].destroy();
+    } catch(e) {}
+
         delete ytPlayers["ytPlayer" + currentYT];
         currentYT += 1;
         ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
@@ -1086,6 +1065,7 @@ function generateData() {
 }
 
 function onYoutubePlayerReady() {
+    console.log("we are ready now");
     mediaManager.customizedStatusCallback = function(event) {
         console.log("customized", event);
         var data = new cast.receiver.media.MediaStatus();
@@ -1129,14 +1109,21 @@ function onYoutubePlayerReady() {
     window.castReceiverManager.start(appConfig);
     mediaManager.setSupportedMediaCommands(1+8+4);
     ytReady = true;
+    console.log("i am now ready, and going to play", "ytPlayer" + currentYT, videoId, videoSource);
     if(videoId && videoSource == "youtube"){
         loading = true;
+        $("#player").removeClass("hide");
         ytPlayers["ytPlayer" + currentYT].loadVideoById({'videoId': videoId, 'startSeconds': startSeconds, 'endSeconds': endSeconds});
-        ytPlayers["ytPlayer" + currentYT].playVideo();
-        if(seekTo){
-            ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
-            seekTo = null;
-        }
+        setTimeout(function() {
+            try {
+                ytPlayers["ytPlayer" + currentYT].playVideo();
+                if(seekTo){
+                    ytPlayers["ytPlayer" + currentYT].seekTo(seekTo);
+                    seekTo = null;
+                }
+            }catch(e) {console.log(e);}
+        }, 1500);
+
     } else {
         loadVideoById(videoId, startSeconds, endSeconds);
     }
@@ -1185,7 +1172,14 @@ function getCurrentData() {
 
 function onPlayerStateChange(event) {
     if(videoSource == "soundcloud") return;
-    if (event.data==YT.PlayerState.ENDED) {
+    if(event.data == YT.PlayerState.UNSTARTED) {
+        console.log("unstarted here");
+        try {
+            ytPlayers["ytPlayer" + currentYT].playVideo();
+        } catch(e) {
+            console.log(e);
+        }
+    } else if (event.data==YT.PlayerState.ENDED) {
         if(mobile_hack && _socketIo) {
             var end = {id: videoId, channel: channel};
             if(userpass) end.pass = userpass;
