@@ -195,8 +195,8 @@ mediaManager.onLoad = function (event) {
                 hide_timer = setTimeout(function() {
                     hidden_info = true;
                     //$("#title").fadeOut();
-                    $("#title").removeClass("slid-in-title");
-                    $("#next_song").removeClass("slid-in");
+                    //$("#title").removeClass("slid-in-title");
+                    //$("#next_song").removeClass("slid-in");
 
                 }, 15000);
             }
@@ -575,8 +575,8 @@ customMessageBus.onMessage = function(event) {
                     hide_timer = setTimeout(function() {
                         hidden_info = true;
                         //$("#title").fadeOut();
-                        $("#title").removeClass("slid-in-title");
-                        $("#next_song").removeClass("slid-in");
+                        //$("#title").removeClass("slid-in-title");
+                        //$("#next_song").removeClass("slid-in");
 
                     }, 15000);
                 }
@@ -651,8 +651,8 @@ customMessageBus.onMessage = function(event) {
             hide_timer = setTimeout(function() {
                 hidden_info = true;
                 //$("#title").fadeOut();
-                $("#title").removeClass("slid-in-title");
-                $("#next_song").removeClass("slid-in");
+                //$("#title").removeClass("slid-in-title");
+                //$("#next_song").removeClass("slid-in");
             }, 15000);
         }
         break;
@@ -729,8 +729,8 @@ function mobilespecs(json_parsed) {
                 hide_timer = setTimeout(function() {
                     hidden_info = true;
                     //$("#title").fadeOut();
-                    $("#title").removeClass("slid-in-title");
-                    $("#next_song").removeClass("slid-in");
+                    //$("#title").removeClass("slid-in-title");
+                    //$("#next_song").removeClass("slid-in");
                 }, 15000);
                 //}
                 setTimeout(function() {
@@ -854,8 +854,8 @@ function mobilespecs(json_parsed) {
         hide_timer = setTimeout(function() {
             hidden_info = true;
             //$("#title").fadeOut();
-            $("#title").removeClass("slid-in-title");
-            $("#next_song").removeClass("slid-in");
+            //$("#title").removeClass("slid-in-title");
+            //$("#next_song").removeClass("slid-in");
         }, 15000);
     });
 
@@ -1204,8 +1204,8 @@ function onPlayerStateChange(event) {
             hide_timer = setTimeout(function() {
                 hidden_info = true;
                 //$("#title").fadeOut();
-                $("#title").removeClass("slid-in-title");
-                $("#next_song").removeClass("slid-in");
+                //$("#title").removeClass("slid-in-title");
+                //$("#next_song").removeClass("slid-in");
             }, 15000);
         }
         //mediaManager.setMediaInformation(generateData(), true);
