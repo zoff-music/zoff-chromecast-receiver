@@ -6,6 +6,7 @@ var nextVideo   = null;
 var loading     = false;
 var initial     = true;
 var hidden_info = false;
+var chromecastInfoShow = true;
 var currentYT = 0;
 var ytPlayers = {};
 ytPlayers["ytPlayer" + currentYT] = [];
@@ -183,7 +184,7 @@ mediaManager.onLoad = function (event) {
                 initial = false;
                 durationSetter();
             }
-            if(started) {
+            if(started && chromecastInfoShow) {
                 //$("#title").fadeIn();
                 if(!$("#title").hasClass("slid-in-title")) {
                     $("#title").addClass("slid-in-title");
@@ -527,6 +528,21 @@ customMessageBus.onMessage = function(event) {
     var json_parsed = JSON.parse(event.data);
     console.log(json_parsed.type, event);
     switch(json_parsed.type){
+        case "chromecastInfoShow":
+            chromecastInfoShow = json_parsed.value;
+            if(!chromecastInfoShow) {
+                $("#title").fadeOut();
+                $("#title").removeClass("slid-in-title");
+                $("#next_song").removeClass("slid-in");
+            } else {
+                if(!$("#title").hasClass("slid-in-title")) {
+                    $("#title").addClass("slid-in-title");
+                }
+                if(!$("#next_song").hasClass("slid-in")) {
+                    $("#next_song").addClass("slid-in");
+                }
+            }
+            break;
         case "loadVideo":
         if(!mobile_hack) {
             if(ytReady){
@@ -563,7 +579,7 @@ customMessageBus.onMessage = function(event) {
                     initial = false;
                     durationSetter();
                 }
-                if(started) {
+                if(started && chromecastInfoShow) {
                     //$("#title").fadeIn();
                     if(!$("#title").hasClass("slid-in-title")) {
                         $("#title").addClass("slid-in-title");
@@ -643,7 +659,7 @@ customMessageBus.onMessage = function(event) {
             }
             $("#next_title_content").html("Next Song:<br>" + nextTitle);
 
-            if(!$("#next_song").hasClass("slid-in")) {
+            if(!$("#next_song").hasClass("slid-in") && chromecastInfoShow) {
                 $("#next_song").addClass("slid-in");
             }
 
@@ -719,11 +735,13 @@ function mobilespecs(json_parsed) {
                 //if(prev_video != videoId){
                 loadVideoById(videoId, startSeconds + (time - conf.startTime), endSeconds);
                 //$("#title").fadeIn();
-                if(!$("#title").hasClass("slid-in-title")) {
-                    $("#title").addClass("slid-in-title");
-                }
-                if(!$("#next_song").hasClass("slid-in")) {
-                    $("#next_song").addClass("slid-in");
+                if(chromecastInfoShow) {
+                    if(!$("#title").hasClass("slid-in-title")) {
+                        $("#title").addClass("slid-in-title");
+                    }
+                    if(!$("#next_song").hasClass("slid-in")) {
+                        $("#next_song").addClass("slid-in");
+                    }
                 }
                 clearTimeout(hide_timer);
                 hide_timer = setTimeout(function() {
@@ -846,7 +864,7 @@ function mobilespecs(json_parsed) {
         } else {
             $("#next_pic").attr("src", msg.thumbnail);
         }
-        if(!$("#next_song").hasClass("slid-in")) {
+        if(!$("#next_song").hasClass("slid-in") && chromecastInfoShow) {
             $("#next_song").addClass("slid-in");
         }
 
@@ -979,11 +997,13 @@ function durationSetter(){
             clearTimeout(hide_timer);
             hidden_info = false;
             //$("#title").fadeIn();
-            if(!$("#title").hasClass("slid-in-title")) {
-                $("#title").addClass("slid-in-title");
-            }
-            if(!$("#next_song").hasClass("slid-in")) {
-                $("#next_song").addClass("slid-in");
+            if(chromecastInfoShow) {
+                if(!$("#title").hasClass("slid-in-title")) {
+                    $("#title").addClass("slid-in-title");
+                }
+                if(!$("#next_song").hasClass("slid-in")) {
+                    $("#next_song").addClass("slid-in");
+                }
             }
         }
         //if(videoSource != "soundcloud") {
