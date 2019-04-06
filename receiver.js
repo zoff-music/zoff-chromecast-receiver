@@ -411,33 +411,33 @@ function loadVideoById(id, start, end) {
             } else {
                 /*
                 SC_player.stream("/tracks/" + id).then(function(_player){
-                    soundcloud_player = _player;
-                    soundcloud_player.bind("finish", soundcloudFinish);
-                    soundcloud_player.bind("pause", soundcloudPause);
-                    soundcloud_player.bind("play", soundcloudPlay);
-                    $("#player_overlay").removeClass("hide");
-                    $("#player_overlay").css("background",  "url('" + thumbnail + "')");
-                    $("#player_overlay").css("background-size", "auto");
-                    $("#player_overlay").css("background-position", "20%");
-                    $("#player_overlay").css("background-color", "#2d2d2d");
-                    _player.play().then(function(){
-                        seekToFunction(start);
-                    }).catch(function(e){
-                        console.log(e);
-                    });
+                soundcloud_player = _player;
+                soundcloud_player.bind("finish", soundcloudFinish);
+                soundcloud_player.bind("pause", soundcloudPause);
+                soundcloud_player.bind("play", soundcloudPlay);
+                $("#player_overlay").removeClass("hide");
+                $("#player_overlay").css("background",  "url('" + thumbnail + "')");
+                $("#player_overlay").css("background-size", "auto");
+                $("#player_overlay").css("background-position", "20%");
+                $("#player_overlay").css("background-color", "#2d2d2d");
+                _player.play().then(function(){
+                seekToFunction(start);
+            }).catch(function(e){
+            console.log(e);
+        });
 
-                    mediaManager.setMediaInformation(generateData(), true);
-                    mediaManager.sendLoadComplete();
-                    mediaManager.setMediaInformation(generateData(), true);
-                    fooPlayer.events.loadedmetadata();
-                });
-                */
-            }
-        } else {
-            soundcloud_player.seek(start * 1000);
-        }
-    }
-    previousVideoSource = videoSource;
+        mediaManager.setMediaInformation(generateData(), true);
+        mediaManager.sendLoadComplete();
+        mediaManager.setMediaInformation(generateData(), true);
+        fooPlayer.events.loadedmetadata();
+    });
+    */
+}
+} else {
+    soundcloud_player.seek(start * 1000);
+}
+}
+previousVideoSource = videoSource;
 }
 
 function initializeSCWidget(id) {
@@ -458,7 +458,7 @@ function initializeSCWidget(id) {
         var single = "single_active=false";
         single = "&"+single;
         document.querySelector("#sc_player").innerHTML = '<iframe id="scplayerElement" style="opacity:0;position: absolute;top: 0;left: 0;" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay;" \
-          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + id + this_autoplay + '"> \
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + id + this_autoplay + '"> \
         </iframe>';
         addSCWidgetElements();
     } else {
@@ -529,20 +529,20 @@ customMessageBus.onMessage = function(event) {
     console.log(json_parsed.type, event);
     switch(json_parsed.type){
         case "chromecastInfoShow":
-            chromecastInfoShow = json_parsed.value;
-            if(!chromecastInfoShow) {
-                $("#title").fadeOut();
-                $("#title").removeClass("slid-in-title");
-                $("#next_song").removeClass("slid-in");
-            } else {
-                if(!$("#title").hasClass("slid-in-title")) {
-                    $("#title").addClass("slid-in-title");
-                }
-                if(!$("#next_song").hasClass("slid-in")) {
-                    $("#next_song").addClass("slid-in");
-                }
+        chromecastInfoShow = json_parsed.value;
+        if(!chromecastInfoShow) {
+            $("#title").fadeOut();
+            $("#title").removeClass("slid-in-title");
+            $("#next_song").removeClass("slid-in");
+        } else {
+            if(!$("#title").hasClass("slid-in-title")) {
+                $("#title").addClass("slid-in-title");
             }
-            break;
+            if(!$("#next_song").hasClass("slid-in")) {
+                $("#next_song").addClass("slid-in");
+            }
+        }
+        break;
         case "loadVideo":
         if(!mobile_hack) {
             if(ytReady){
@@ -674,9 +674,9 @@ customMessageBus.onMessage = function(event) {
         break;
         case "mobilespecs":
 
-            mobilespecs(json_parsed);
-            break;
-}
+        mobilespecs(json_parsed);
+        break;
+    }
 };
 
 function mobilespecs(json_parsed) {
@@ -693,196 +693,204 @@ function mobilespecs(json_parsed) {
     channel = json_parsed.channel;
     mobile_hack = true;
 
-    var oScript = document.createElement("script");
-    oScript.type = "text\/javascript";
-    oScript.onload = function() {
-        _socketIo = io.connect('https://zoff.me:8080', {
-            'secure': true,
-        });
+    if(document.querySelector("#socketScript") == null) {
+        var oScript = document.createElement("script");
+        oScript.type = "text\/javascript";
+        oScript.id = "socketScript";
+        oScript.onload = function() {
+            try {
+                _socketIo.disconnect();
+            } catch(e) {
 
-        console.log("Tried to connect to socket.io zoff");
-        console.log("This channel = ", channel);
-        var pos = {channel: channel};
-        if(userpass) pos.pass = userpass;
+            }
+            try {
+                _socketIo.removeEventListener("np");
+                _socketIo.removeEventListener("connect_failed");
+                _socketIo.removeEventListener("connect_error");
+                _socketIo.removeEventListener("reconnect");
+                _socketIo.removeEventListener("reconnected");
+                _socketIo.removeEventListener("connect");
+                _socketIo.removeEventListener("self_ping");
+                _socketIo.removeEventListener("channel");
+                _socketIo.removeEventListener("next_song");
+                _socketIo.removeEventListener("connect_failed");
+            } catch(e) {
+            }
+            _socketIo = io.connect('https://zoff.me:8080', {
+                'secure': true,
+            });
 
-        _socketIo.on("np", function(msg) {
-            console.log("Gotten np");
-            console.log(msg);
-            sentEnd = false;
-            if(msg.np) {
-                var conf       = msg.conf[0];
-                var time       = msg.time;
-                var seekTo     = time - conf.startTime;
-                prev_video = videoId;
-                videoId = msg.np[0].id;
-                thumbnail = "";
-                videoSource = "youtube";
-                startSeconds = msg.np[0].start;
-                endSeconds = msg.np[0].end;
-                title = msg.np[0].title;
-                castReceiverManager.setApplicationState('Now Playing: ' + msg.np[0].title);
-                if(startSeconds == undefined) {
-                    startSeconds = 0;
-                }
-                if(endSeconds == undefined) {
-                    endSeconds = msg.np[0].duration;
-                }
+            console.log("Tried to connect to socket.io zoff");
+            console.log("This channel = ", channel);
+            var pos = {channel: channel};
+            if(userpass) pos.pass = userpass;
 
-                if(msg.np[0].source && msg.np[0].source != "youtube") {
-                    videoSource = msg.np[0].source;
-                    thumbnail = msg.np[0].thumbnail;
-                }
-                //if(prev_video != videoId){
-                loadVideoById(videoId, startSeconds + (time - conf.startTime), endSeconds);
-                //$("#title").fadeIn();
-                if(chromecastInfoShow) {
-                    if(!$("#title").hasClass("slid-in-title")) {
-                        $("#title").addClass("slid-in-title");
+            _socketIo.on("np", function(msg) {
+                console.log("Gotten np");
+                console.log(msg);
+                sentEnd = false;
+                if(msg.np) {
+                    var conf       = msg.conf[0];
+                    var time       = msg.time;
+                    var seekTo     = time - conf.startTime;
+                    prev_video = videoId;
+                    videoId = msg.np[0].id;
+                    thumbnail = "";
+                    videoSource = "youtube";
+                    startSeconds = msg.np[0].start;
+                    endSeconds = msg.np[0].end;
+                    title = msg.np[0].title;
+                    castReceiverManager.setApplicationState('Now Playing: ' + msg.np[0].title);
+                    if(startSeconds == undefined) {
+                        startSeconds = 0;
                     }
-                    if(!$("#next_song").hasClass("slid-in")) {
-                        $("#next_song").addClass("slid-in");
+                    if(endSeconds == undefined) {
+                        endSeconds = msg.np[0].duration;
+                    }
+
+                    if(msg.np[0].source && msg.np[0].source != "youtube") {
+                        videoSource = msg.np[0].source;
+                        thumbnail = msg.np[0].thumbnail;
+                    }
+                    //if(prev_video != videoId){
+                    loadVideoById(videoId, startSeconds + (time - conf.startTime), endSeconds);
+                    //$("#title").fadeIn();
+                    if(chromecastInfoShow) {
+                        if(!$("#title").hasClass("slid-in-title")) {
+                            $("#title").addClass("slid-in-title");
+                        }
+                        if(!$("#next_song").hasClass("slid-in")) {
+                            $("#next_song").addClass("slid-in");
+                        }
+                    }
+                    clearTimeout(hide_timer);
+                    hide_timer = setTimeout(function() {
+                        hidden_info = true;
+                    }, 15000);
+                    setTimeout(function() {
+                        try {
+                            if(ytPlayers["ytPlayer" + currentYT].getPlayerState() == -1 && videoSource == "youtube" && ytPlayers["ytPlayer" + currentYT].getCurrentTime() < startSeconds) {
+                                seekToFunction(startSeconds);
+                                ytPlayers["ytPlayer" + currentYT].playVideo();
+                            } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
+                                seekToFunction(startSeconds);
+                                soundcloud_player.play();
+                            }
+                        } catch(e){
+                            seekToFunction(startSeconds);
+                        }
+                    }, 1500);
+                }
+            });
+
+            _socketIo.on('connect_failed', function(){
+                console.log("connect failed");
+                if(!connect_error){
+                    connect_error = true;
+                }
+            });
+
+            _socketIo.on("connect_error", function(){
+                console.log("connect error");
+                if(!connect_error){
+                    connect_error = true;
+                }
+            });
+
+            _socketIo.on("reconnect", function(e) {
+                console.log("Reconnect event", e);
+            });
+
+            _socketIo.on("reconnected", function(e) {
+                console.log("Reconnect event", e);
+            });
+
+            _socketIo.on("connect", function(){
+                console.log("connected to _socketIo.io");
+                _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
+                console.log("emitted chromecast elements");
+                var pos = {channel: channel};
+                if(userpass) pos.userpass = userpass;
+                setTimeout(function() {
+                    if(_socketIo.connected) {
+                        _socketIo.emit('pos', pos);//, pass: userpass});
+                        _socketIo.emit('next_song', pos);
+                    }
+                }, 1000);
+                if(connect_error){
+                    connect_error = false;
+                    var pos = {channel: channel};
+                    if(userpass) pos.userpass = userpass;
+                    if(_socketIo.connected) {
+                        _socketIo.emit('pos', pos);//, pass: userpass});
                     }
                 }
+            });
+
+            _socketIo.on("self_ping", function() {
+                if(channel != undefined && channel.toLowerCase() != "" && _socketIo.connected) {
+                    _socketIo.emit("self_ping", {channel: channel.toLowerCase()});
+                }
+            });
+
+            _socketIo.on("channel", function(msg) {
+                if(msg.type == "added") {
+                    var added = msg.value;
+                    var id = added.id;
+                    var _title = added.title;
+                    var new_thumbnail;
+                    var this_id = toast_id;
+                    if(added.source == "soundcloud") {
+                        new_thumbnail = added.thumbnail;
+                    } else {
+                        new_thumbnail = "https://img.youtube.com/vi/" + id + "/mqdefault.jpg";
+                    }
+
+                    document.getElementById("toast-container").insertAdjacentHTML("beforeend", '<div class="toast" id="toast-' + toast_id +'"> \
+                    <div style="display:flex;"> \
+                    <img id="new_added_song_image" style="height:100px;align-self:center;" src="' + new_thumbnail + '"> \
+                    <div style="padding-left:32px;padding-right:32px;"> \
+                    <p>New song added</p> \
+                    <p id="new_song_added_title">' + _title + '</p> \
+                    </div> \
+                    </div> \
+                    </div>');
+                    toast_id += 1;
+                    setTimeout(function() {
+                        document.getElementById("toast-container").children[0].remove();
+                    }, 10000);
+
+                }
+            });
+
+            _socketIo.on("next_song", function(msg) {
+                console.log(msg);
+                nextVideo = msg.videoId;
+                nextTitle = msg.title;
+                $("#next_title_content").html("Next:<br>" + nextTitle);
+                if(msg.source != "soundcloud") {
+                    $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
+                } else {
+                    $("#next_pic").attr("src", msg.thumbnail);
+                }
+                if(!$("#next_song").hasClass("slid-in") && chromecastInfoShow) {
+                    $("#next_song").addClass("slid-in");
+                }
+
                 clearTimeout(hide_timer);
                 hide_timer = setTimeout(function() {
                     hidden_info = true;
-                    //$("#title").fadeOut();
-                    //$("#title").removeClass("slid-in-title");
-                    //$("#next_song").removeClass("slid-in");
+
                 }, 15000);
-                //}
-                setTimeout(function() {
-                    try {
-                        if(ytPlayers["ytPlayer" + currentYT].getPlayerState() == -1 && videoSource == "youtube" && ytPlayers["ytPlayer" + currentYT].getCurrentTime() < startSeconds) {
-                            seekToFunction(startSeconds);
-                            ytPlayers["ytPlayer" + currentYT].playVideo();
-                        } else if(videoSource && "soundcloud" && !scUsingWidget && soundcloud_player.currentTime() / 1000 < startSeconds) {
-                            seekToFunction(startSeconds);
-                            soundcloud_player.play();
-                        }
-                    } catch(e){
-                        seekToFunction(startSeconds);
-                        //if(videoSou)
-                        //soundcloud_player.play();
-                    }
-                }, 1500);
-                /*if(seekTo){
-                seekToFunction(seekTo);
-            }*/
-        }
-    });
-
-    _socketIo.on('connect_failed', function(){
-        console.log("connect failed");
-        if(!connect_error){
-            connect_error = true;
-        }
-    });
-
-    _socketIo.on("connect_error", function(){
-        console.log("connect error");
-        if(!connect_error){
-            connect_error = true;
-        }
-    });
-
-    _socketIo.on("reconnect", function(e) {
-        console.log("Reconnect event", e);
-    });
-
-    _socketIo.on("reconnected", function(e) {
-        console.log("Reconnect event", e);
-    });
-
-    _socketIo.on("connect", function(){
-        console.log("connected to _socketIo.io");
-        //if(_socketIo.connected) {
-            _socketIo.emit('chromecast', {guid: guid, socket_id: socket_id, channel: channel});
-            console.log("emitted chromecast elements");
-            var pos = {channel: channel};
-            if(userpass) pos.userpass = userpass;
-            setTimeout(function() {
-                if(_socketIo.connected) {
-                    _socketIo.emit('pos', pos);//, pass: userpass});
-                    _socketIo.emit('next_song', pos);
-                }
-            }, 1000);
-        //}
-        if(connect_error){
-            connect_error = false;
-            var pos = {channel: channel};
-            if(userpass) pos.userpass = userpass;
-            if(_socketIo.connected) {
-                _socketIo.emit('pos', pos);//, pass: userpass});
-            }
-        }
-    });
-
-    _socketIo.on("self_ping", function() {
-        if(channel != undefined && channel.toLowerCase() != "" && _socketIo.connected) {
-            _socketIo.emit("self_ping", {channel: channel.toLowerCase()});
-        }
-    });
-
-    _socketIo.on("channel", function(msg) {
-        if(msg.type == "added") {
-            var added = msg.value;
-            var id = added.id;
-            var _title = added.title;
-            var new_thumbnail;
-            var this_id = toast_id;
-            if(added.source == "soundcloud") {
-                new_thumbnail = added.thumbnail;
-            } else {
-                new_thumbnail = "https://img.youtube.com/vi/" + id + "/mqdefault.jpg";
-            }
-
-            document.getElementById("toast-container").insertAdjacentHTML("beforeend", '<div class="toast" id="toast-' + toast_id +'"> \
-				<div style="display:flex;"> \
-					<img id="new_added_song_image" style="height:100px;align-self:center;" src="' + new_thumbnail + '"> \
-					<div style="padding-left:32px;padding-right:32px;"> \
-						<p>New song added</p> \
-						<p id="new_song_added_title">' + _title + '</p> \
-					</div> \
-				</div> \
-			</div>');
-            toast_id += 1;
-            setTimeout(function() {
-                document.getElementById("toast-container").children[0].remove();
-            }, 10000);
+            });
 
         }
-    });
 
-    _socketIo.on("next_song", function(msg) {
-        console.log(msg);
-        nextVideo = msg.videoId;
-        nextTitle = msg.title;
-        $("#next_title_content").html("Next:<br>" + nextTitle);
-        if(msg.source != "soundcloud") {
-            $("#next_pic").attr("src", "//img.youtube.com/vi/"+nextVideo+"/mqdefault.jpg");
-        } else {
-            $("#next_pic").attr("src", msg.thumbnail);
-        }
-        if(!$("#next_song").hasClass("slid-in") && chromecastInfoShow) {
-            $("#next_song").addClass("slid-in");
-        }
-
-        clearTimeout(hide_timer);
-        hide_timer = setTimeout(function() {
-            hidden_info = true;
-            //$("#title").fadeOut();
-            //$("#title").removeClass("slid-in-title");
-            //$("#next_song").removeClass("slid-in");
-        }, 15000);
-    });
-
-}
-
-oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.slim.js";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
-console.log("Inserted script");
+        oScript.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.slim.js";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(oScript, firstScriptTag);
+        console.log("Inserted script");
+    }
 }
 /**
 * Application config
@@ -918,57 +926,57 @@ window.castReceiverManager.onSenderDisconnected = function(event) {
 
 window.addEventListener('load', function() {
     if(document.querySelectorAll("script[src='https://www.youtube.com/iframe_api']").length == 1){
-            try{
-                //onYouTubeIframeAPIReady();
-                //SC.Widget(Player.soundcloud_player).bind("ready", Player.soundcloudReady);
+        try{
+            //onYouTubeIframeAPIReady();
+            //SC.Widget(Player.soundcloud_player).bind("ready", Player.soundcloudReady);
 
-            } catch(error){
-                console.error(error);
-                console.error("Seems YouTube iFrame script isn't correctly loaded. Please reload the page.");
-            }
-
-        } else {
-            tag            = document.createElement('script');
-            tag.src        = "https://www.youtube.com/iframe_api";
-            firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } catch(error){
+            console.error(error);
+            console.error("Seems YouTube iFrame script isn't correctly loaded. Please reload the page.");
         }
 
-        if(document.querySelectorAll("script[src='https://zoff.me/assets/sclib/scapi.js']").length == 1) {
-            try {
+    } else {
+        tag            = document.createElement('script');
+        tag.src        = "https://www.youtube.com/iframe_api";
+        firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    if(document.querySelectorAll("script[src='https://zoff.me/assets/sclib/scapi.js']").length == 1) {
+        try {
+            /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
+            Player.soundcloudReady();
+        }*/
+    } catch(error) {
+        //sc_need_initialization = true;
+        //console.error(error);
+        //console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
+    }
+} else {
+    tagSCWidget            = document.createElement('script');
+    if (tagSCWidget.readyState){  //IE
+        tagSCWidget.onreadystatechange = function(){
+            if (tagSCWidget.readyState == "loaded" ||
+            tagSCWidget.readyState == "complete"){
+                tagSCWidget.onreadystatechange = null;
+                SC_widget = SC;
                 /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
-                    Player.soundcloudReady();
-                }*/
-            } catch(error) {
-                //sc_need_initialization = true;
-                //console.error(error);
-                //console.error("Seems SoundCloud script isn't correctly loaded. Please reload the page.");
-            }
-        } else {
-            tagSCWidget            = document.createElement('script');
-            if (tagSCWidget.readyState){  //IE
-                tagSCWidget.onreadystatechange = function(){
-                    if (tagSCWidget.readyState == "loaded" ||
-                            tagSCWidget.readyState == "complete"){
-                        tagSCWidget.onreadystatechange = null;
-                        SC_widget = SC;
-                        /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
-                            Player.soundcloudReady();
-                        }*/
-                    }
-                };
-            } else {  //Others
-                tagSCWidget.onload = function(){
-                    SC_widget = SC;
-                    /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
-                        Player.soundcloudReady();
-                    }*/
-                };
-            }
-            tagSCWidget.src        = "https://zoff.me/assets/sclib/scapi.js";
-            firstScriptTagSCWidget = document.getElementsByTagName('script')[0];
-            firstScriptTagSCWidget.parentNode.insertBefore(tagSCWidget, firstScriptTagSCWidget);
+                Player.soundcloudReady();
+            }*/
         }
+    };
+} else {  //Others
+    tagSCWidget.onload = function(){
+        SC_widget = SC;
+        /*if(SC_player != null && SC_player != undefined && SC_widget != null && SC_widget != undefined) {
+        Player.soundcloudReady();
+    }*/
+};
+}
+tagSCWidget.src        = "https://zoff.me/assets/sclib/scapi.js";
+firstScriptTagSCWidget = document.getElementsByTagName('script')[0];
+firstScriptTagSCWidget.parentNode.insertBefore(tagSCWidget, firstScriptTagSCWidget);
+}
 });
 
 function durationSetter(){
@@ -1040,20 +1048,20 @@ function onYouTubeIframeAPIReady() {
         ytPlayers["ytPlayer" + currentYT].destroy();
     } catch(e) {}
 
-        delete ytPlayers["ytPlayer" + currentYT];
-        currentYT += 1;
-        ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
-            videoId: videoId,
-            height: 562,
-            width: 1000,
-            playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
-            events: {
-                'onReady': onYoutubePlayerReady,
-                'onStateChange': onPlayerStateChange,
-                'onError': errorHandler
-            }
-        });
-        document.querySelector("#player").style.opacity = 0;
+    delete ytPlayers["ytPlayer" + currentYT];
+    currentYT += 1;
+    ytPlayers["ytPlayer" + currentYT] = new YT.Player('player', {
+        videoId: videoId,
+        height: 562,
+        width: 1000,
+        playerVars: {rel:"0", autoplay: 1, wmode:"transparent", controls: "0" , fs: "0", iv_load_policy: "3", theme:"light", color:"white", showinfo: 0},
+        events: {
+            'onReady': onYoutubePlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': errorHandler
+        }
+    });
+    document.querySelector("#player").style.opacity = 0;
     //}
 }
 
