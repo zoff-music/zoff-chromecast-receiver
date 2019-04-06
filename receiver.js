@@ -445,6 +445,7 @@ function initializeSCWidget(id) {
         soundcloud_player.unbind("finish", soundcloudFinish);
         soundcloud_player.unbind("pause", soundcloudPause);
         soundcloud_player.unbind("play", soundcloudPlay);
+        soundcloud_player.unbind("error", soundcloudError);
         //Player.soundcloud_player.unbind("seek", Player.soundcloudSeek);
     }catch(e){}
     var this_autoplay = "?auto_play=true";
@@ -465,6 +466,7 @@ function initializeSCWidget(id) {
         soundcloud_player.bind("finish", soundcloudFinish);
         soundcloud_player.bind("pause", soundcloudPause);
         soundcloud_player.bind("play", soundcloudPlay);
+        soundcloud_player.bind("error", soundcloudError);
         soundcloud_player.load('https://api.soundcloud.com/tracks/' + id + this_autoplay, {single_active: false});
     }
 }
@@ -476,6 +478,7 @@ function addSCWidgetElements() {
         soundcloud_player.bind("finish", soundcloudFinish);
         soundcloud_player.bind("pause", soundcloudPause);
         soundcloud_player.bind("play", soundcloudPlay);
+        soundcloud_player.bind("error", soundcloudError);
     } catch(e) {
         setTimeout(function() {
             addSCWidgetElements();
@@ -1158,6 +1161,28 @@ function onYoutubePlayerReady() {
 }
 
 window.onYoutubePlayerReady = onYoutubePlayerReady;
+
+function soundcloudError() {
+    var event = {data:5};
+    if(event.data == 5 || event.data == 100 || event.data == 101 || event.data == 150) {
+        if(mobile_hack && _socketIo) {
+            var skip = {
+                error: event.data,
+                id: videoId,
+                //pass: adminpass,
+                channel: channel.toLowerCase(),
+                //userpass: userpass
+            }
+            if(userpass) skip.userpass = userpass;
+            if(adminpass) skip.pass = adminpass;
+            if(_socketIo.connected) {
+                _socketIo.emit("skip", skip);
+            }
+        } else {
+            customMessageBus.broadcast(JSON.stringify({type: 0, videoId: videoId, data_code: event.data }));
+        }
+    }
+}
 
 function errorHandler(event){
     if(videoSource == "soundcloud") return;
